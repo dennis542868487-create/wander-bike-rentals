@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -94,6 +95,11 @@ const faqs = [
     question: "Do you offer bike trailers?",
     answer:
       "Yes. Bike trailers are available. If you need one for a family ride, it is best to call ahead and confirm availability.",
+  },
+  {
+    question: "Do I need a photo ID to verify my identity?",
+    answer:
+      "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements.",
   },
   {
     question: "Where are you located?",
@@ -214,7 +220,7 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.25)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--brand)] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-dark)]"
               >
                 Call Now
               </a>
@@ -222,7 +228,7 @@ export default function Home() {
                 href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white/90 px-7 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-white"
+                className="inline-flex items-center justify-center rounded-full border border-[var(--card-border)] bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
               >
                 Get Directions
               </a>
@@ -245,46 +251,57 @@ export default function Home() {
           </div>
 
           <div className="grid gap-5 lg:pl-8">
-            <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_25px_70px_rgba(15,23,42,0.10)] backdrop-blur">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">
-                    Rental Snapshot
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-950">Quick local info</p>
-                </div>
-                <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
-                  Open today
-                </span>
+            <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/95 shadow-[0_25px_70px_rgba(15,23,42,0.10)] backdrop-blur">
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
+                <Image
+                  src="/assets/bikes-row.jpg"
+                  alt="Rows of rental bikes inside Wander Bike Rentals"
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
+              <div className="p-7">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">
+                      Rental Snapshot
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-slate-950">Quick local info</p>
+                  </div>
+                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+                    Open today
+                  </span>
+                </div>
 
-              <div className="mt-7 space-y-5 text-sm text-slate-600">
-                <div className="rounded-2xl bg-slate-50 p-4">
-                  <p className="font-semibold text-slate-950">Address</p>
-                  <p className="mt-1">12071 First Ave #101, Richmond, BC V7E 3M1</p>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="mt-7 space-y-5 text-sm text-slate-600">
                   <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="font-semibold text-slate-950">Phone</p>
-                    <p className="mt-1">(778) 952-1389</p>
+                    <p className="font-semibold text-slate-950">Address</p>
+                    <p className="mt-1">12071 First Ave #101, Richmond, BC V7E 3M1</p>
                   </div>
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="font-semibold text-slate-950">Hours shown</p>
-                    <p className="mt-1">Closes 18:00</p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="font-semibold text-slate-950">Phone</p>
+                      <p className="mt-1">(778) 952-1389</p>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <p className="font-semibold text-slate-950">Hours shown</p>
+                      <p className="mt-1">Closes 18:00</p>
+                    </div>
                   </div>
-                </div>
-                <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
-                  <p className="font-semibold">Why people choose this setup</p>
-                  <p className="mt-2 leading-7 text-teal-900/80">
-                    Clear pricing, family-friendly options, and a simple path from Google search to real contact.
-                  </p>
+                  <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
+                    <p className="font-semibold">Why people choose this setup</p>
+                    <p className="mt-2 leading-7 text-teal-900/80">
+                      Clear pricing, family-friendly options, and a simple path from Google search to real contact.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               {pricing.map((item) => (
-                <div key={item.name} className="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm">
+                <div key={item.name} className="rounded-3xl border border-[var(--card-border)] bg-white/95 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
                   <p className="text-sm font-semibold text-slate-950">{item.name}</p>
                   <p className="mt-3 text-2xl font-bold text-teal-700">
                     {item.price}
@@ -314,11 +331,11 @@ export default function Home() {
           {pricing.map((item) => (
             <div
               key={item.name}
-              className="group rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]"
+              className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]"
             >
               <div className="flex items-start justify-between gap-4">
                 <h3 className="text-xl font-semibold text-slate-950">{item.name}</h3>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 group-hover:bg-teal-50 group-hover:text-teal-700">
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 group-hover:bg-[var(--brand-soft)] group-hover:text-[var(--brand)]">
                   Hourly
                 </span>
               </div>
@@ -377,7 +394,7 @@ export default function Home() {
             <Link
               key={item.href}
               href={item.href}
-              className="group rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]"
+              className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]"
             >
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-lg font-semibold text-slate-950">{item.title}</h3>
@@ -405,18 +422,39 @@ export default function Home() {
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {[
-            "Storefront and entrance",
-            "Adult and kids bikes",
-            "Family or visitor riding scene",
-          ].map((item, index) => (
-            <div
-              key={item}
-              className={`flex min-h-72 items-end rounded-[2rem] border border-dashed border-slate-300 p-7 text-base font-semibold text-slate-500 ${index === 1 ? "bg-[linear-gradient(180deg,#dffaf7_0%,#f8fafc_100%)]" : "bg-slate-100"}`}
-            >
-              {item}
+          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-[4/5] w-full">
+              <Image
+                src="/assets/bikes-row.jpg"
+                alt="Rows of rental bikes ready for riders"
+                fill
+                className="object-cover"
+              />
             </div>
-          ))}
+            <div className="p-5 text-sm font-semibold text-slate-700">Adult and rental bike lineup</div>
+          </div>
+          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-[4/5] w-full">
+              <Image
+                src="/assets/trailer-bike.jpg"
+                alt="Bike with family trailer inside Wander Bike Rentals"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-5 text-sm font-semibold text-slate-700">Trailer and family rental setup</div>
+          </div>
+          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div className="relative aspect-[4/5] w-full">
+              <Image
+                src="/assets/helmets.jpg"
+                alt="Helmet selection at Wander Bike Rentals"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-5 text-sm font-semibold text-slate-700">Helmets included with rentals</div>
+          </div>
         </div>
       </section>
 
@@ -484,7 +522,7 @@ export default function Home() {
           {faqs.map((faq) => (
             <div
               key={faq.question}
-              className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm"
+              className="rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)]"
             >
               <h3 className="text-lg font-semibold text-slate-950">{faq.question}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-600">{faq.answer}</p>
@@ -508,13 +546,13 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-slate-200"
               >
                 Call (778) 952-1389
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 View location details
               </Link>

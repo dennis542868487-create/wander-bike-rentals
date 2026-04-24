@@ -20,6 +20,7 @@ const faqs = [
   ["Do rentals include helmets?", "Yes. Helmet and lock are included."],
   ["Do you have kids bikes?", "Yes. Kids bike rentals are available."],
   ["Do you offer bike trailers?", "Yes. Contact the shop for current trailer availability."],
+  ["Do I need a photo ID to verify my identity?", "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements."],
   ["Where are you located?", "12071 First Ave #101, Richmond, BC V7E 3M1."],
   ["How can I contact you?", "Call (778) 952-1389 for direct contact."],
 ];

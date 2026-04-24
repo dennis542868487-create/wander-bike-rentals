@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
+  --brand: #0f766e;
+  --brand-dark: #115e59;
+  --brand-soft: #ecfdf5;
+  --card-border: #dbe4ea;
 }
 
 @theme inline {

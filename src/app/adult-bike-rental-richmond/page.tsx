@@ -24,18 +24,18 @@ export default function AdultBikeRentalRichmondPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Adult bike page
+              Adult bikes
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Adult Bike Rental Richmond
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A simple landing page for adult bike rentals in Richmond near Steveston.
+                Adult bike rentals for visitors, couples, and casual rides around Richmond and Steveston.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page gives adult bike rentals a clearer entry point in the navigation, which makes the service mix easier to understand at a glance.
+              If you are looking for an easy adult bike rental in Richmond, Wander Bike Rentals offers a simple local option with clear pricing, convenient contact, and a helpful starting point near Steveston.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -55,13 +55,13 @@ export default function AdultBikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Adult bikes overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why this page was added</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A simple rental option for everyday rides</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                The navigation previously showed Kids Bikes and Trailers, but not a matching adult-bike entry.
+                Adult bike rentals are a good fit for relaxed rides, casual exploring, and simple day trips around the area.
               </p>
               <p>
-                Adding this page makes the service categories feel more balanced and clearer for users.
+                Whether you are riding solo or with company, this option gives you an easy place to get started.
               </p>
             </div>
           </div>

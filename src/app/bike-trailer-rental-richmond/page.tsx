@@ -24,16 +24,16 @@ const quickFacts = [
 
 const reasons = [
   {
-    title: "Specific search intent",
-    text: "This page is built for people who already know they need a trailer and want a local option.",
+    title: "Helpful for family rides",
+    text: "A practical option when younger children are part of the outing.",
   },
   {
-    title: "Family logistics",
-    text: "Trailer rentals make it easier to plan outings when younger children are part of the ride.",
+    title: "Simple planning",
+    text: "It helps families confirm trailer availability before coming by.",
   },
   {
-    title: "Stronger long-tail SEO",
-    text: "It gives the website a dedicated landing page for a more specific and valuable search term.",
+    title: "Easier local outings",
+    text: "A trailer can make relaxed rides around Richmond and Steveston easier to plan.",
   },
 ];
 
@@ -45,20 +45,18 @@ export default function BikeTrailerRentalRichmondPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Trailer service page
+              Trailer rentals
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Bike Trailer Rental Richmond
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A dedicated local landing page for families looking for bike trailer rental in Richmond.
+                Bike trailer rentals for families planning easier rides around Richmond and Steveston.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals offers trailer rentals for families and local riders planning easier
-              outings near Steveston. This page is meant for a specific search intent, people who already
-              know they need a trailer and want a local place that clearly offers one.
+              Wander Bike Rentals offers trailer rentals for families and local riders who want a simpler outing with younger children near Steveston.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -86,13 +84,13 @@ export default function BikeTrailerRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Trailer overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why this page matters</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A practical option for younger riders</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Trailer rentals can easily get buried inside a general rental page, but they deserve a dedicated landing page because the search intent is more specific.
+                Trailer rentals can make family rides easier when younger children are joining the outing.
               </p>
               <p>
-                This page helps reduce uncertainty for families and gives them a clearer next step, call the shop and confirm availability.
+                If your ride depends on a trailer, calling first is the best way to confirm availability.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
@@ -105,11 +103,11 @@ export default function BikeTrailerRentalRichmondPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why people land here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Built for trailer-specific searches</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why families choose trailers</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">An easier option for group outings</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            This page supports more specific local searches and gives family-focused users a cleaner decision path.
+            This page helps families quickly understand whether a trailer rental fits their plan.
           </p>
         </div>
 
@@ -130,7 +128,7 @@ export default function BikeTrailerRentalRichmondPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight">Call about trailer availability, view the trailer guide, or check the location</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                This page now matches the homepage more closely and gives trailer-related searches a clearer and more polished landing page.
+                If you are planning a family ride, call first to confirm trailer availability, then check the guide or location.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

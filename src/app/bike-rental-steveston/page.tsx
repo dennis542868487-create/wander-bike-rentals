@@ -24,16 +24,16 @@ const quickFacts = [
 
 const reasons = [
   {
-    title: "Local intent match",
-    text: "This page is designed for people specifically searching for bike rental in Steveston.",
+    title: "Easy local starting point",
+    text: "A convenient option for visitors and casual riders who want to get rolling around Steveston.",
   },
   {
     title: "Visitor-friendly",
-    text: "A good fit for casual riders and visitors who want a simple place to get started.",
+    text: "A good fit for relaxed rides, waterfront exploring, and simple local outings.",
   },
   {
     title: "Family options",
-    text: "Adult bikes, kids bikes, and trailer rentals make it easier to serve different ride plans.",
+    text: "Adult bikes, kids bikes, and trailer rentals make it easier to plan different kinds of rides.",
   },
 ];
 
@@ -45,20 +45,18 @@ export default function BikeRentalStevestonPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Steveston service page
+              Steveston rentals
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Bike Rental Steveston
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A clean local landing page for visitors and riders looking for bike rental in Steveston.
+                Bike rentals for visitors and casual riders looking to explore Steveston and nearby Richmond.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals is positioned as a simple local option for people who want to ride around
-              Steveston without overcomplicating the process. Whether you are visiting the area or planning
-              a casual outing, this page is here to make the rental option feel clear and easy to trust.
+              Wander Bike Rentals is a simple local option for people who want an easy rental experience in the Steveston area, with clear details, quick contact, and family-friendly choices.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -86,19 +84,17 @@ export default function BikeRentalStevestonPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Steveston overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why this page matters</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A relaxed way to explore the area</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                People often search by location first. A dedicated Steveston page gives the site a clearer
-                signal for local relevance and gives visitors a more direct landing page.
+                Steveston is a good place for a casual ride, whether you are visiting the area or planning a simple outing.
               </p>
               <p>
-                It also supports the simple goal of this website, make the shop feel local, useful,
-                and easy to contact when someone is ready to ride.
+                Adult bikes, kids bikes, and trailer rentals make it easier to choose something that fits your plan.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Adult bikes, kids bikes, and trailer rentals are all part of the offer, with helmet and lock included.
+              Adult bikes, kids bikes, and trailer rentals are all available, with helmet and lock included.
             </div>
           </div>
         </div>
@@ -107,11 +103,11 @@ export default function BikeRentalStevestonPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why people land here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Built for location-first searches</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why choose us</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A simple option for Steveston rides</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Steveston riders and visitors often start with the area name, then look for something simple, local, and clear.
+            If you want something local, clear, and easy to contact, this page gives you the basics before you visit.
           </p>
         </div>
 
@@ -132,7 +128,7 @@ export default function BikeRentalStevestonPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight">Call, view the Steveston guide, or check the shop location</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                This page now matches the homepage more closely and supports the bike rental Steveston keyword with clearer visual hierarchy.
+                If you are planning a ride in Steveston, call the shop, view the guide, or check the location before you head over.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

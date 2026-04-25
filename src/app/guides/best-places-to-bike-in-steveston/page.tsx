@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 
 const guidePoints = [
   {
-    title: "Future route ideas",
-    text: "This page is meant to become a useful local guide with real ride suggestions around Steveston.",
+    title: "Easy local ride ideas",
+    text: "A simple guide can help visitors choose a route that matches the kind of ride they want.",
   },
   {
-    title: "SEO support",
-    text: "Guide pages like this help the site cover broader local-intent and activity-based searches.",
+    title: "Good for relaxed outings",
+    text: "Steveston is well suited for casual rides, short exploring, and easy time outside.",
   },
   {
-    title: "Internal linking value",
-    text: "It also gives the site a natural way to connect visitors back to the main rental pages.",
+    title: "Helpful before your visit",
+    text: "A few local suggestions can make it easier to plan your ride before choosing a rental.",
   },
 ];
 
@@ -30,20 +30,18 @@ export default function BestPlacesToBikeInStevestonPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Guide page
+              Steveston ride guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Best Places to Bike in Steveston
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A future local guide page designed to support Steveston ride planning and broader SEO visibility.
+                A simple guide for visitors looking for easy and enjoyable places to bike around Steveston.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page is still a placeholder, but the design is now aligned with the rest of the site.
-              Later it can hold real route ideas, local recommendations, family-friendly suggestions,
-              and stronger internal links back to rental pages.
+              This page is here to help riders find local route ideas, family-friendly spots, and simple planning tips before heading out.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
@@ -63,17 +61,17 @@ export default function BestPlacesToBikeInStevestonPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why this page exists</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Find an easy ride that fits your day</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Useful guide pages help local service websites feel more complete and more relevant to real search behavior.
+                Some riders want a short outing, while others want more time to explore the area at an easy pace.
               </p>
               <p>
-                They also give visitors a softer entry point when they are still researching, not just ready to rent immediately.
+                This guide is meant to help you choose a ride that feels simple, local, and enjoyable.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Once real content is added here, this page can become one of the stronger local long-tail SEO assets on the site.
+              Local ride ideas and simple planning notes can help you feel ready before renting a bike.
             </div>
           </div>
         </div>
@@ -82,11 +80,11 @@ export default function BestPlacesToBikeInStevestonPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What will go here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A cleaner content structure for future guide writing</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can find here</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple ideas for local rides</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            The visual structure is ready now, so later content can drop into a page that already matches the rest of the site.
+            This guide is meant to help visitors feel more confident about where to ride before choosing a rental.
           </p>
         </div>
 
@@ -105,9 +103,9 @@ export default function BestPlacesToBikeInStevestonPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use this guide page, then jump back into the rental flow</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Check local ride ideas, then choose your rental</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Guide pages should help users research first, then move naturally toward service pages and contact details.
+                If you are ready to ride, head back to the rental page or check the shop location before you visit.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

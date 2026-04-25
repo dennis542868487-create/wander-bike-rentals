@@ -290,9 +290,9 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
-                    <p className="font-semibold">Why people choose this setup</p>
+                    <p className="font-semibold">What’s included</p>
                     <p className="mt-2 leading-7 text-teal-900/80">
-                      Clear pricing, family-friendly options, and a simple path from Google search to real contact.
+                      Clear pricing, family-friendly rental options, and helmet and lock included.
                     </p>
                   </div>
                 </div>
@@ -354,12 +354,11 @@ export default function Home() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Why Choose Us</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight">
-              A cleaner local rental experience, online and in person.
+              A simple local rental experience for visitors and families.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300">
-              This site is intentionally straightforward. People usually want a few key things,
-              where the shop is, what it costs, what options exist, and how quickly they can get started.
-              The design now reflects that more clearly.
+              Whether you are planning a relaxed ride around Steveston or a family outing in Richmond,
+              Wander Bike Rentals makes it easy to choose the right rental and get on the road.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -379,13 +378,13 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-6 py-18 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Service Pages</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Our Rentals</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              Explore the main rental pages
+              Find the right rental for your ride
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            These pages support the site’s most important local search terms and help visitors land on the right service faster.
+            Explore adult bikes, kids bikes, trailers, and location details before your visit.
           </p>
         </div>
 
@@ -413,11 +412,11 @@ export default function Home() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Gallery</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              Real photos will make this feel finished
+              See our bikes and gear
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Replacing placeholders with storefront, bike, and family-ride photos will be one of the highest-impact upgrades.
+            Take a quick look at the rental bikes, trailer setup, and helmets available at the shop.
           </p>
         </div>
 
@@ -540,7 +539,7 @@ export default function Home() {
                 Call now or get directions to Wander Bike Rentals
               </h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                This first polished version is already positioned as a clean local business site. Next upgrades would be real photos, refined service-page visuals, and finished guide content.
+                Ready to ride? Call the shop or get directions and we will help you choose the right bike, kids bike, or trailer rental.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

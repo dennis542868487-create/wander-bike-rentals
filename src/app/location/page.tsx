@@ -60,20 +60,18 @@ export default function LocationPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Location and contact page
+              Visit the shop
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Location and Contact
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A clear local contact page for visitors who want the address, phone number, hours, and directions fast.
+                Find the address, phone number, hours, and directions for Wander Bike Rentals.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page matters for both customers and local SEO. It makes the shop’s address, phone,
-              and hours easy to find, while also helping the website present cleaner local-business signals
-              for Steveston and Richmond searches.
+              If you are planning to visit, this page gives you the main shop details in one place so you can call, get directions, or head over directly.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -105,7 +103,7 @@ export default function LocationPage() {
               ))}
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              This page is one of the most important trust pages on the whole site because it connects search visibility with real-world action.
+              Use this page when you want the fastest way to call the shop, confirm the address, or open directions.
             </div>
           </div>
         </div>
@@ -114,11 +112,10 @@ export default function LocationPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why it matters</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Local business details should be obvious</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Before you visit</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">The key details should be easy to find</h2>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Strong local pages do more than look clean. They make the address, phone, hours,
-              and location intent obvious enough that both customers and search engines can understand them quickly.
+              Address, phone number, and hours are usually the main things people want before heading to the shop. This page keeps them easy to check at a glance.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {contactCards.map((item) => (
@@ -134,7 +131,7 @@ export default function LocationPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Related pages</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">Helpful next links</h2>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Once visitors confirm the location, they usually want to go back to the main rental pages or read a few quick answers.
+              Once you confirm the location, you may want to go back to the rental pages or read a few quick answers before visiting.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">

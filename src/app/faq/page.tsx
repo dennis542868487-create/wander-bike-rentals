@@ -58,20 +58,18 @@ export default function FaqPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              FAQ page
+              Common questions
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Frequently Asked Questions
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Clear answers to the most common questions people ask before calling or visiting the shop.
+                Clear answers to common questions before calling or visiting the shop.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              A good FAQ page helps in two ways. It reduces friction for real customers and also gives
-              search engines stronger context around helmets, kids bikes, trailer rentals, contact details,
-              and location intent.
+              This page is here to make the basics easy to check, including helmets, kids bikes, trailer rentals, contact details, and location.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
@@ -91,18 +89,17 @@ export default function FaqPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">FAQ overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">What this page helps clarify</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Quick answers before you visit</h2>
             <div className="mt-6 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Visitors often want quick confirmation before they act. Helmets, kids bikes, trailers,
-                address, and phone number are all common points of uncertainty.
+                Visitors often want quick confirmation before they decide what to do next.
               </p>
               <p>
-                This page reduces that uncertainty and gives the site a cleaner support page for both users and SEO.
+                This page helps answer common questions so you can move on to calling, getting directions, or choosing a rental.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Because the page also includes FAQ schema, it is one of the site’s stronger support pages for search understanding.
+              If you still need help after reading the FAQ, call the shop directly for the fastest answer.
             </div>
           </div>
         </div>
@@ -115,7 +112,7 @@ export default function FaqPage() {
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Common questions before renting</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            These answers are simple by design, because most visitors want quick confirmation more than long explanations.
+            These answers are kept simple so you can check the basics quickly.
           </p>
         </div>
 
@@ -134,9 +131,9 @@ export default function FaqPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the FAQ, then jump to the page you need</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the FAQ, then go to the page you need</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Once visitors have their quick answers, they usually want to go back to the main rental pages or check the location.
+                Once you have your quick answers, you can go back to the rental pages or check the location before visiting.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

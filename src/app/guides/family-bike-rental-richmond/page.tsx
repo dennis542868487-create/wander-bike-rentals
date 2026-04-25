@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 
 const guidePoints = [
   {
-    title: "Family planning content",
-    text: "This page is meant to become a practical guide for families planning an easier bike outing.",
+    title: "Family ride planning",
+    text: "A simple guide can help families plan an easier outing before they arrive.",
   },
   {
-    title: "Support page value",
-    text: "It gives the site a broader content layer beyond direct service pages alone.",
+    title: "Helpful rental choices",
+    text: "Kids bikes and trailer options can make family rides around Richmond easier to organize.",
   },
   {
-    title: "Natural internal links",
-    text: "It also helps connect users back to kids bike and trailer rental pages more naturally.",
+    title: "Useful before your visit",
+    text: "A few clear tips can help parents feel more confident before choosing a rental.",
   },
 ];
 
@@ -30,20 +30,18 @@ export default function FamilyBikeRentalRichmondPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Guide page
+              Family guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Family Bike Rental in Richmond
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A future guide page designed to support family-focused searches and outing planning in Richmond.
+                A simple guide for families planning an easier bike outing in Richmond.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page is still a placeholder, but its role is already clear. It should eventually help families
-              understand how kids bikes, trailer rentals, and easy local routes fit together, while giving the site
-              a stronger content layer around family-oriented search intent.
+              This page is here to help families think through kids bikes, trailer options, and simple ride planning before visiting Wander Bike Rentals.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
@@ -63,17 +61,17 @@ export default function FamilyBikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why this page exists</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Make family outings easier to plan</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Family-related search intent is often different from direct rental intent. People may still be planning, comparing, or asking what setup makes sense.
+                Family rides often go more smoothly when parents can quickly understand which rental options make sense.
               </p>
               <p>
-                This guide page helps give the website a softer content entry point for that kind of search behavior.
+                This guide is meant to help you compare simple choices before you head to the shop.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Once real content is added, this page can help bridge family research intent and direct rental conversion.
+              Kids bikes, trailer rentals, and easy local ride ideas can all help make a family outing simpler.
             </div>
           </div>
         </div>
@@ -82,11 +80,11 @@ export default function FamilyBikeRentalRichmondPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What will go here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A future family guide structure</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can find here</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Helpful ideas for family rides</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            The page is visually ready now, so later content can be added into a guide that already fits the rest of the website.
+            This guide is meant to make the planning side feel easier before you choose a rental.
           </p>
         </div>
 
@@ -105,9 +103,9 @@ export default function FamilyBikeRentalRichmondPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the family guide, then move back into the service pages</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Check the guide, then choose the right family rental</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Family guide pages work best when they support research first and then point naturally back to rentals and contact details.
+                If you are planning a family ride, you can compare kids bikes and trailer rentals before visiting the shop.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

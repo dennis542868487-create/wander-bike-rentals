@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import SiteHeader from "@/components/site-header";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,17 +45,6 @@ export const metadata: Metadata = {
   },
 };
 
-const navItems = [
-  { href: "/", label: "Home" },
-  { href: "/bike-rental-richmond", label: "Richmond" },
-  { href: "/bike-rental-steveston", label: "Steveston" },
-  { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
-  { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },
-  { href: "/bike-trailer-rental-richmond", label: "Trailers" },
-  { href: "/location", label: "Location" },
-  { href: "/faq", label: "FAQ" },
-];
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -67,40 +57,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-[radial-gradient(circle_at_top,#ecfdf5_0%,#f8fafc_24%,#ffffff_60%)] text-slate-900">
         <div className="min-h-screen">
-          <header className="sticky top-0 z-50 border-b border-white/70 bg-white/90 backdrop-blur-xl">
-            <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-5">
-              <div className="flex items-center gap-3 lg:gap-4">
-                <Link href="/" className="overflow-hidden rounded-[1.2rem] border border-[var(--card-border)] bg-white p-1 shadow-[0_14px_35px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5">
-                  <Image
-                    src="/assets/wander-logo.jpg"
-                    alt="Wander Bike Rentals logo"
-                    width={72}
-                    height={72}
-                    className="h-11 w-11 rounded-[0.95rem] object-cover sm:h-14 sm:w-14 lg:h-16 lg:w-16"
-                    priority
-                  />
-                </Link>
-                <div className="min-w-0">
-                  <Link href="/" className="block truncate text-base font-bold tracking-tight text-slate-950 sm:text-lg lg:text-xl">
-                    Wander Bike Rentals
-                  </Link>
-                  <p className="text-xs text-slate-500 lg:text-sm">Steveston, Richmond</p>
-                </div>
-              </div>
-
-              <nav className="grid grid-cols-4 gap-1 text-center text-xs font-medium text-slate-600 sm:flex sm:flex-wrap sm:gap-2 sm:text-sm lg:gap-3 lg:text-sm">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-xl px-2 py-2 transition hover:bg-[var(--brand-soft)] hover:text-[var(--brand)] sm:rounded-full sm:px-4 lg:px-5 lg:py-2.5"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </header>
+          <SiteHeader />
 
           {children}
 

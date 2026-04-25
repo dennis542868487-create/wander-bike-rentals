@@ -45,22 +45,18 @@ export default function BikeRentalRichmondPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Richmond service page
+              Richmond rentals
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Bike Rental Richmond
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A simple local option for bike rental in Richmond, with adult bikes,
-                kids bikes, and trailer rentals near Steveston.
+                Adult bikes, kids bikes, and trailer rentals for relaxed rides around Richmond and Steveston.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals is built for visitors, casual riders, couples, and
-              families who want a straightforward place to rent a bike. Instead of a
-              complicated booking flow, this page focuses on what matters first,
-              clear service, local relevance, fast contact, and a simple path to getting started.
+              Wander Bike Rentals is a simple local option for visitors, casual riders, couples, and families who want an easy place to rent a bike and get on the road.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -88,19 +84,17 @@ export default function BikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Richmond overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Built for direct local intent</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A convenient local starting point</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                This page is designed for people already searching for bike rental in Richmond.
-                That makes it a high-intent landing page with strong local SEO value.
+                If you are looking for a bike rental in Richmond, this is a simple place to start with clear options and easy contact.
               </p>
               <p>
-                It also helps the site signal that the business serves Richmond riders looking for
-                convenience, family options, and a clear next step.
+                Adult bikes, kids bikes, and trailers make it easier to plan a casual ride, a couple outing, or a family trip.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Helmet and lock are included, which keeps the experience easier for first-time visitors and casual riders.
+              Helmet and lock are included, which helps keep the rental experience simple for local visitors and first-time riders.
             </div>
           </div>
         </div>
@@ -110,10 +104,10 @@ export default function BikeRentalRichmondPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Rental options</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">What this page helps people find</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Choose the rental that fits your ride</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Richmond riders often want to confirm the core rental types quickly before calling or heading over.
+            Whether you are riding solo, with kids, or planning an easier family outing, you can check the main options here first.
           </p>
         </div>
 
@@ -134,7 +128,7 @@ export default function BikeRentalRichmondPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight">Call, view the shop location, or read common questions</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                This page now matches the homepage better visually and continues to support the local bike rental Richmond keyword clearly.
+                If you are ready to ride, call the shop, check the location, or read the FAQ before you visit.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

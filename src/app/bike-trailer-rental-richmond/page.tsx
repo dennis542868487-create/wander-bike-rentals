@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Bike Trailer Rental Richmond | Wander Bike Rentals",
     description:
       "Convenient bike trailer rental in Richmond near Steveston for family rides and easier local outings.",
-    url: "https://wander-bike-rentals.vercel.app/bike-trailer-rental-richmond",
+    url: "https://wanderbike.ca/bike-trailer-rental-richmond",
   },
 };
 
@@ -25,15 +25,15 @@ const quickFacts = [
 const reasons = [
   {
     title: "Helpful for family rides",
-    text: "A practical option when younger children are part of the outing.",
+    text: "Trailers help make the ride more manageable when younger children are coming along and you want a simpler setup.",
   },
   {
     title: "Simple planning",
-    text: "It helps families confirm trailer availability before coming by.",
+    text: "Families can call ahead, confirm the details, and avoid guessing before they make the trip to the shop.",
   },
   {
     title: "Easier local outings",
-    text: "A trailer can make relaxed rides around Richmond and Steveston easier to plan.",
+    text: "A trailer can make waterfront or neighborhood rides feel easier to organize when the plan is built around younger kids.",
   },
 ];
 
@@ -49,25 +49,25 @@ export default function BikeTrailerRentalRichmondPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Bike Trailer Rental Richmond
+                Bike trailer rentals for easier family rides around Richmond and Steveston.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Bike trailer rentals for families planning easier rides around Richmond and Steveston.
+                A practical option when you want to bring younger children along and make the ride easier to manage.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals offers trailer rentals for families and local riders who want a simpler outing with younger children near Steveston.
+              If a family ride depends on having the right setup for younger children, this page gives you the basics first. You can see that trailer rentals are available, call ahead, and check the location before you head over.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call About Trailers
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
               </Link>
@@ -84,17 +84,17 @@ export default function BikeTrailerRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Trailer overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A practical option for younger riders</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit when the ride needs to stay simple</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Trailer rentals can make family rides easier when younger children are joining the outing.
+                Trailer rentals can make it much easier to plan a ride when younger children are part of the day and you want something more manageable.
               </p>
               <p>
-                If your ride depends on a trailer, calling first is the best way to confirm availability.
+                If the outing depends on having a trailer, calling ahead is the best way to confirm the details before you come by.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              If the ride depends on family logistics, calling first is usually the smartest next step.
+              For family outings, confirming trailer availability first can save time and make the whole ride easier to organize.
             </div>
           </div>
         </div>
@@ -103,11 +103,11 @@ export default function BikeTrailerRentalRichmondPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why families choose trailers</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">An easier option for group outings</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why families choose trailer rentals</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A simpler option when younger kids are part of the ride</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            This page helps families quickly understand whether a trailer rental fits their plan.
+            If you are trying to make the outing easier for the whole group, this page helps you decide whether a trailer is the right fit.
           </p>
         </div>
 

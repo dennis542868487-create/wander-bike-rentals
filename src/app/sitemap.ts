@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://wander-bike-rentals.vercel.app";
+  const baseUrl = "https://wanderbike.ca";
   const routes = [
     "",
     "/bike-rental-richmond",
     "/bike-rental-steveston",
+    "/adult-bike-rental-richmond",
     "/kids-bike-rental-richmond",
     "/bike-trailer-rental-richmond",
     "/location",

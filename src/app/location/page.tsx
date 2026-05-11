@@ -4,9 +4,9 @@ import Link from "next/link";
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
-  "@id": "https://wander-bike-rentals.vercel.app/#business",
+  "@id": "https://wanderbike.ca/#business",
   name: "Wander Bike Rentals",
-  url: "https://wander-bike-rentals.vercel.app/location",
+  url: "https://wanderbike.ca/location",
   telephone: "+1-778-952-1389",
   address: {
     "@type": "PostalAddress",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: "Location and Contact | Wander Bike Rentals",
     description:
       "Address, phone number, hours, and directions for Wander Bike Rentals in Steveston, Richmond.",
-    url: "https://wander-bike-rentals.vercel.app/location",
+    url: "https://wanderbike.ca/location",
   },
 };
 
@@ -64,19 +64,19 @@ export default function LocationPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Location and Contact
+                Find Wander Bike before you head out for your ride.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Find the address, phone number, hours, and directions for Wander Bike Rentals.
+                Check the address, call the shop, and open directions in a few seconds before you leave.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If you are planning to visit, this page gives you the main shop details in one place so you can call, get directions, or head over directly.
+              If you are ready to ride, this page keeps the main visit details in one place so you can call ahead, confirm the location, and head over without digging through the site.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white no-underline shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm no-underline shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call Now
               </a>
@@ -84,7 +84,7 @@ export default function LocationPage() {
                 href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 no-underline transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm no-underline"
               >
                 Open in Google Maps
               </a>
@@ -93,7 +93,7 @@ export default function LocationPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Visit summary</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Quick shop details</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">The details most people want first</h2>
             <div className="mt-6 space-y-4">
               {contactCards.map((item) => (
                 <div key={item.label} className="rounded-2xl bg-slate-50 p-4">
@@ -103,7 +103,7 @@ export default function LocationPage() {
               ))}
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Use this page when you want the fastest way to call the shop, confirm the address, or open directions.
+              This is the fastest page to use when you want to call the shop, check the address, or open the map and go.
             </div>
           </div>
         </div>
@@ -113,9 +113,9 @@ export default function LocationPage() {
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Before you visit</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">The key details should be easy to find</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">The basics should be easy to confirm</h2>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Address, phone number, and hours are usually the main things people want before heading to the shop. This page keeps them easy to check at a glance.
+              Most people just want the essentials before they leave: where the shop is, how to call, and when it is open. This section keeps those details easy to check at a glance.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {contactCards.map((item) => (
@@ -129,21 +129,21 @@ export default function LocationPage() {
 
           <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#f8fffd_0%,#eff6ff_100%)] p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Related pages</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Helpful next links</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Helpful next steps before you go</h2>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Once you confirm the location, you may want to go back to the rental pages or read a few quick answers before visiting.
+              Once you have the location, you may want to look at the rental pages again or check a few quick answers before visiting.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+              <Link href="/" className="btn-secondary px-4 py-2 text-sm">
                 Back to Home
               </Link>
-              <Link href="/bike-rental-richmond" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+              <Link href="/bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">
                 Bike Rental Richmond
               </Link>
-              <Link href="/bike-rental-steveston" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+              <Link href="/bike-rental-steveston" className="btn-secondary px-4 py-2 text-sm">
                 Bike Rental Steveston
               </Link>
-              <Link href="/faq" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+              <Link href="/faq" className="btn-secondary px-4 py-2 text-sm">
                 View FAQ
               </Link>
             </div>

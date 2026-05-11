@@ -2,23 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Best Places to Bike in Steveston",
+  title: "Best Bike Routes",
   description:
-    "Guide page for biking around Steveston, Richmond, connected to Wander Bike Rentals.",
+    "Easy bike routes around Steveston and Richmond, with ideas for relaxed rides, waterfront stops, and casual afternoons out.",
 };
 
 const guidePoints = [
   {
-    title: "Easy local ride ideas",
-    text: "A simple guide can help visitors choose a route that matches the kind of ride they want.",
+    title: "Choose the pace that fits your day",
+    text: "Some routes are better for a short easy ride, while others work better if you want more time outside with a few stops along the way.",
   },
   {
-    title: "Good for relaxed outings",
-    text: "Steveston is well suited for casual rides, short exploring, and easy time outside.",
+    title: "Waterfront rides are the easiest starting point",
+    text: "If you are visiting for the first time, the best route is usually the one that feels simple, scenic, and easy to follow without overthinking it.",
   },
   {
-    title: "Helpful before your visit",
-    text: "A few local suggestions can make it easier to plan your ride before choosing a rental.",
+    title: "Leave room for stops",
+    text: "The best bike route is often the one that gives you time to stop for photos, snacks, coffee, or a quick walk instead of trying to rush through everything.",
   },
 ];
 
@@ -30,29 +30,29 @@ export default function BestPlacesToBikeInStevestonPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Steveston ride guide
+              Route guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Best Places to Bike in Steveston
+                Best bike routes for a relaxed ride around Steveston and Richmond.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A simple guide for visitors looking for easy and enjoyable places to bike around Steveston.
+                Route ideas for anyone who wants something scenic, easy to follow, and worth the time before or after a bike rental.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page is here to help riders find local route ideas, family-friendly spots, and simple planning tips before heading out.
+              If you are not sure where to ride first, start here. This guide helps you choose a route that fits your pace, your group, and the kind of afternoon you want to have.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                Bike Rental Steveston
+                View Steveston Rentals
               </Link>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
               </Link>
@@ -61,17 +61,17 @@ export default function BestPlacesToBikeInStevestonPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Find an easy ride that fits your day</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Start with the route, then make the day around it</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Some riders want a short outing, while others want more time to explore the area at an easy pace.
+                Some people want a quick waterfront ride, while others want to turn the rental into a longer afternoon with food, stops, and more time outside.
               </p>
               <p>
-                This guide is meant to help you choose a ride that feels simple, local, and enjoyable.
+                Start with a route that feels right instead of guessing after you pick up the bike.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Local ride ideas and simple planning notes can help you feel ready before renting a bike.
+              The best route is usually the one that feels easy to enjoy, not the one that tries to cover the most ground.
             </div>
           </div>
         </div>
@@ -81,10 +81,10 @@ export default function BestPlacesToBikeInStevestonPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can find here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple ideas for local rides</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple route ideas that feel worth your time</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            This guide is meant to help visitors feel more confident about where to ride before choosing a rental.
+            Use this guide if you want a route that feels pleasant, manageable, and easy to pair with the rest of your afternoon.
           </p>
         </div>
 
@@ -103,21 +103,21 @@ export default function BestPlacesToBikeInStevestonPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Check local ride ideas, then choose your rental</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Pick the route first, then choose the rental that fits</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are ready to ride, head back to the rental page or check the shop location before you visit.
+                Once you know the kind of ride you want, head back to the rental page or check the shop location before you go.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/bike-rental-steveston"
-                className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                Bike Rental Steveston
+                Steveston Rentals
               </Link>
               <Link
                 href="/location"
-                className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Location
               </Link>

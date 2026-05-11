@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Adult Bikes Richmond | Wander Bike Rentals",
     description:
       "Adult bike rental in Richmond near Steveston for visitors, couples, and casual riders.",
-    url: "https://wander-bike-rentals.vercel.app/adult-bike-rental-richmond",
+    url: "https://wanderbike.ca/adult-bike-rental-richmond",
   },
 };
 
@@ -28,25 +28,25 @@ export default function AdultBikeRentalRichmondPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Adult Bike Rental Richmond
+                Adult bike rentals for easy rides around Richmond and Steveston.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Adult bike rentals for visitors, couples, and casual rides around Richmond and Steveston.
+                A simple option for visitors, couples, and anyone who wants to get out for a relaxed ride without overthinking the details.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If you are looking for an easy adult bike rental in Richmond, Wander Bike Rentals offers a simple local option with clear pricing, convenient contact, and a helpful starting point near Steveston.
+              If you want to pick up a bike and start riding with less hassle, this is a good place to begin. You can check the location, call ahead, and choose an adult bike for a casual ride near the waterfront or around Richmond.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call About Adult Bikes
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
               </Link>
@@ -55,13 +55,13 @@ export default function AdultBikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Adult bikes overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A simple rental option for everyday rides</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A comfortable choice for a simple day out</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Adult bike rentals are a good fit for relaxed rides, casual exploring, and simple day trips around the area.
+                Adult bikes work well for easy rides along the waterfront, casual exploring around Steveston, or a slower ride when you just want to enjoy the area.
               </p>
               <p>
-                Whether you are riding solo or with company, this option gives you an easy place to get started.
+                Whether you are heading out on your own, riding with a partner, or meeting friends, this page helps you start with the basics before you visit.
               </p>
             </div>
           </div>

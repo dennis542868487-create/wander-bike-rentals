@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Kids Bike Rental Richmond | Wander Bike Rentals",
     description:
       "Family-friendly kids bike rental in Richmond near Steveston with helmet and lock included.",
-    url: "https://wander-bike-rentals.vercel.app/kids-bike-rental-richmond",
+    url: "https://wanderbike.ca/kids-bike-rental-richmond",
   },
 };
 
@@ -25,15 +25,15 @@ const quickFacts = [
 const reasons = [
   {
     title: "Family-friendly options",
-    text: "A helpful choice for parents planning an easy ride with children.",
+    text: "Parents can start here if they want a ride that feels easier to organize and more comfortable for children.",
   },
   {
     title: "Simple planning",
-    text: "You can check the basics quickly before calling or heading to the shop.",
+    text: "It is easier to plan the day when you can check the basics first, then call or head over with fewer questions.",
   },
   {
     title: "Works well with family rides",
-    text: "Kids bikes make it easier to plan a relaxed outing around Steveston and Richmond.",
+    text: "Kids bikes help families plan a slower outing that feels more manageable around Steveston and nearby Richmond routes.",
   },
 ];
 
@@ -49,25 +49,25 @@ export default function KidsBikeRentalRichmondPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Kids Bike Rental Richmond
+                Kids bike rentals for easier family rides around Richmond and Steveston.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Family-friendly kids bike rentals for easy rides around Richmond and Steveston.
+                A helpful option for parents who want to keep a family outing simple, comfortable, and easier to plan before arriving.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals helps families keep things simple with child-friendly rental options, clear contact details, and a convenient local starting point near Steveston.
+              If you are planning a ride with children, this page helps you start with the basics. You can see that kids bikes are available, check the location, and call the shop before you head over.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call About Kids Bikes
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
               </Link>
@@ -84,17 +84,17 @@ export default function KidsBikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Family overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A simple option for family outings</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit for family plans and shorter rides</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Family rides are easier to plan when the rental options are clear and easy to check.
+                When you are riding with children, it helps to know the family-friendly options before you arrive instead of figuring everything out at the counter.
               </p>
               <p>
-                This page helps parents quickly see that kids bike rentals are available near Steveston.
+                This page gives parents a simple starting point if they want to plan a slower ride around Steveston or a relaxed outing in Richmond.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Kids bikes pair well with trailer rentals and other family-friendly options if you are planning a group ride.
+              If you are organizing a group ride, kids bikes can also be paired with other family options such as trailer rentals.
             </div>
           </div>
         </div>
@@ -103,11 +103,11 @@ export default function KidsBikeRentalRichmondPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why families choose this page</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A clearer option for kids bike rentals</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why families choose Wander Bike</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A simpler way to plan a ride with kids</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Parents can quickly check whether this shop fits a child-friendly ride before making contact.
+            If you are trying to keep the day easy, this page gives you the key details before you call or visit.
           </p>
         </div>
 

@@ -2,23 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Steveston Bike Ride Guide",
+  title: "Things to Do in Steveston Village",
   description:
-    "Guide page for visitors planning a bike ride in Steveston, Richmond.",
+    "A simple visitor guide to riding, walking, and spending time around Steveston Village before or after your bike rental.",
 };
 
 const guidePoints = [
   {
-    title: "Easy ride planning",
-    text: "A simple guide can help visitors feel more prepared before heading out for a ride.",
+    title: "Ride the village at an easy pace",
+    text: "Steveston works well for a slower ride where you can stop often, look around, and enjoy the waterfront without rushing.",
   },
   {
-    title: "Good for relaxed outings",
-    text: "Steveston is a nice area for casual rides, short exploring, and easy local trips.",
+    title: "Mix biking with food and small stops",
+    text: "A village ride is more enjoyable when you leave time for coffee, snacks, ice cream, or a short walk by the boardwalk.",
   },
   {
-    title: "Helpful before you visit",
-    text: "Route ideas, simple tips, and local suggestions can make a rental feel easier to plan.",
+    title: "Keep the plan simple",
+    text: "If you are visiting for the first time, the easiest plan is to rent, ride the village and waterfront, then stop somewhere casual before heading back.",
   },
 ];
 
@@ -30,48 +30,48 @@ export default function StevestonBikeRideGuidePage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Steveston guide
+              Steveston Village guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Steveston Bike Ride Guide
+                Things to do in Steveston Village before or after your ride.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A simple guide for visitors planning a relaxed bike ride around Steveston.
+                A local guide for turning your bike rental into a more enjoyable afternoon around the village and waterfront.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page is here to make ride planning easier with local ideas, simple tips, and useful details to check before renting and heading out.
+              If you are planning time in Steveston Village, this guide gives you a simple starting point. You can ride through the area, stop along the waterfront, and make the outing feel more relaxed instead of treating it like a straight in-and-out rental.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                Bike Rental Steveston
+                View Steveston Rentals
               </Link>
               <Link
                 href="/faq"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
-                View FAQ
+                Visit FAQ
               </Link>
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Plan a simple local ride</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A relaxed way to enjoy more than just the ride</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Visitors do not always know where to start, so a simple local guide can make the ride feel easier to plan.
+                Steveston Village is one of those places where the best plan is often a simple one: rent the bike, ride a little, stop when something looks interesting, and keep the afternoon easy.
               </p>
               <p>
-                Whether you want a short outing or a relaxed ride around the area, this page is meant to point you in the right direction.
+                You do not need a packed plan here. A few good stops and a little extra time usually make the afternoon better.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Local ride tips, route ideas, and easy planning notes can help you feel ready before you go.
+              The easiest outing is usually a short village ride, a few waterfront stops, and enough time left over to enjoy the area without rushing.
             </div>
           </div>
         </div>
@@ -80,11 +80,11 @@ export default function StevestonBikeRideGuidePage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can find here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Useful tips before your ride</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can do here</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple ways to enjoy more of Steveston Village</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            This guide is meant to help visitors feel more confident before choosing a rental and starting their ride.
+            Use this guide if you want your rental to feel like part of a good afternoon out, not just transportation from one point to another.
           </p>
         </div>
 
@@ -103,21 +103,21 @@ export default function StevestonBikeRideGuidePage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Check the guide, then choose your rental</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Plan the village first, then choose the rental that fits</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are ready to ride, you can head back to the rental page or check the FAQ before visiting the shop.
+                Once you have a rough idea of how you want to spend the afternoon, head back to the rental page or check the FAQ before you go.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/bike-rental-steveston"
-                className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                Bike Rental Steveston
+                Steveston Rentals
               </Link>
               <Link
                 href="/faq"
-                className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 FAQ
               </Link>

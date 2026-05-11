@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     description:
       "Adult bikes, kids bikes, and trailer rentals in Steveston, Richmond with helmet and lock included.",
-    url: "https://wander-bike-rentals.vercel.app/",
+    url: "https://wanderbike.ca/",
   },
 };
 
@@ -41,19 +41,19 @@ const pricing = [
 const highlights = [
   {
     title: "Steveston location",
-    text: "A convenient local starting point for simple rides around Steveston and nearby Richmond routes.",
+    text: "The shop is in a convenient spot for getting onto a relaxed ride without wasting time on a long setup.",
   },
   {
     title: "Family-friendly options",
-    text: "Adult bikes, kids bikes, and trailer rentals make the shop a practical choice for different group sizes.",
+    text: "It is easier to plan a ride when one shop can cover adults, kids, and trailer rentals in one stop.",
   },
   {
     title: "Straightforward pricing",
-    text: "Clear hourly rates make it easy to understand the rental options before you arrive.",
+    text: "You can check the hourly rates before you visit, which helps you choose the right option faster.",
   },
   {
     title: "Helmet and lock included",
-    text: "The essentials are already covered, so it is easier to get on the road without extra hassle.",
+    text: "Helmet and lock are already included, so you can focus on the ride instead of extra add-ons.",
   },
 ];
 
@@ -61,22 +61,22 @@ const serviceLinks = [
   {
     title: "Bike Rental Richmond",
     href: "/bike-rental-richmond",
-    text: "Targeted for Richmond bike rental searches and local visitors looking for a simple place to ride.",
+    text: "See the main Richmond rental details first if you want a simple starting point before calling or visiting.",
   },
   {
     title: "Bike Rental Steveston",
     href: "/bike-rental-steveston",
-    text: "A location-specific page for Steveston visitors and riders planning a local trip.",
+    text: "A good place to start if you want a ride closer to Steveston Village and nearby waterfront areas.",
   },
   {
     title: "Kids Bike Rental Richmond",
     href: "/kids-bike-rental-richmond",
-    text: "Built for family-related searches and parents looking for child-friendly rentals.",
+    text: "Check the kids bike options if you are planning a family ride and want something easier to organize.",
   },
   {
     title: "Bike Trailer Rental Richmond",
     href: "/bike-trailer-rental-richmond",
-    text: "A direct landing page for trailer rental searches and family outing planning.",
+    text: "Useful if you are riding with younger children and want to see trailer details before you head over.",
   },
 ];
 
@@ -111,11 +111,11 @@ const faqs = [
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
-  "@id": "https://wander-bike-rentals.vercel.app/#business",
+  "@id": "https://wanderbike.ca/#business",
   name: "Wander Bike Rentals",
   description:
     "Bike rentals in Steveston, Richmond offering adult bikes, kids bikes, and trailer rentals.",
-  url: "https://wander-bike-rentals.vercel.app/",
+  url: "https://wanderbike.ca/",
   telephone: "+1-778-952-1389",
   priceRange: "$$",
   address: {
@@ -209,18 +209,17 @@ export default function Home() {
             </div>
             <div className="space-y-5">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl lg:leading-[1.05]">
-                Bike rentals that feel simple, local, and easy to trust.
+                Easy bike rentals for relaxed rides around Steveston and Richmond.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-                Adult bikes, kids bikes, and trailers for relaxed rides around Steveston.
-                Helmet and lock included, clear pricing, and fast contact when you need it.
+                Rent an adult bike, kids bike, or trailer and start your ride with less hassle. Wander Bike makes it easy to check pricing, call the shop, and get directions before you head over.
               </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-[var(--brand)] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-[var(--brand-dark)]"
+                className="btn-primary px-7 py-3.5 text-sm shadow-[0_16px_34px_rgba(15,23,42,0.16)]"
               >
                 Call Now
               </a>
@@ -228,7 +227,7 @@ export default function Home() {
                 href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--card-border)] bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-7 py-3.5 text-sm shadow-sm"
               >
                 Get Directions
               </a>
@@ -292,7 +291,7 @@ export default function Home() {
                   <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
                     <p className="font-semibold">What’s included</p>
                     <p className="mt-2 leading-7 text-teal-900/80">
-                      Clear pricing, family-friendly rental options, and helmet and lock included.
+                      Helmet and lock are included, and the shop has options for solo rides, couples, and family outings.
                     </p>
                   </div>
                 </div>
@@ -318,12 +317,12 @@ export default function Home() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Pricing</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              Clear rental pricing
+            <h2 id="pricing" className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Straightforward rates before you visit
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Simple hourly pricing for local rides, relaxed exploring, and family outings around Steveston.
+            Check the hourly rates first, then choose the bike or trailer that fits your plans for the day.
           </p>
         </div>
 
@@ -352,13 +351,12 @@ export default function Home() {
       <section className="bg-slate-950 py-18 text-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1.05fr_1fr] lg:px-8">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Why Choose Us</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Why riders choose Wander Bike</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight">
-              A simple local rental experience for visitors and families.
+              A practical option when you want to spend more time riding and less time figuring things out.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300">
-              Whether you are planning a relaxed ride around Steveston or a family outing in Richmond,
-              Wander Bike Rentals makes it easy to choose the right rental and get on the road.
+              If you want a simple pickup, clear prices, and rental options that work for adults, kids, and family outings, this shop keeps the process easy.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -375,7 +373,63 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-18 lg:px-8">
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Start here</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Quick paths for planning your visit
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-slate-600">
+            Jump to rentals, ride ideas, or the main visit details depending on what you want to figure out first.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          <div className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Rent a bike</p>
+            <h3 className="mt-3 text-2xl font-semibold text-slate-950">See the rental options first</h3>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Compare adult bikes, kids bikes, trailers, and hourly pricing before you call or visit.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Link href="/adult-bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Adult Bikes</Link>
+              <Link href="/kids-bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Kids Bikes</Link>
+              <Link href="/bike-trailer-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Trailers</Link>
+              <Link href="/#pricing" className="btn-secondary px-4 py-2 text-sm">Pricing</Link>
+            </div>
+          </div>
+
+          <div className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Plan your ride</p>
+            <h3 className="mt-3 text-2xl font-semibold text-slate-950">Browse local guides and route ideas</h3>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Start with Steveston and Richmond ride ideas if you want a better sense of where to go after pickup.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Link href="/bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Richmond Ride Ideas</Link>
+              <Link href="/bike-rental-steveston" className="btn-secondary px-4 py-2 text-sm">Steveston Ride Ideas</Link>
+              <Link href="/guides/best-places-to-bike-in-steveston" className="btn-secondary px-4 py-2 text-sm">Best Bike Routes</Link>
+            </div>
+          </div>
+
+          <div className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Visit us</p>
+            <h3 className="mt-3 text-2xl font-semibold text-slate-950">Check the shop details before you go</h3>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Find the address, map, phone number, and quick answers if you want the smoothest start to your ride.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Link href="/location" className="btn-secondary px-4 py-2 text-sm">Location</Link>
+              <Link href="/faq" className="btn-secondary px-4 py-2 text-sm">FAQ</Link>
+              <a href="tel:+17789521389" className="btn-primary px-4 py-2 text-sm">Call Now</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Our Rentals</p>
@@ -465,7 +519,7 @@ export default function Home() {
               Easy to find in Steveston, Richmond
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-              Clear location details matter for both customers and Google. This section helps visitors confirm the shop location, call the business, and head over without digging.
+              If you are ready to visit, this is the quickest place to check the address, phone number, and basic shop details before you head over.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl bg-slate-50 p-4">
@@ -486,12 +540,12 @@ export default function Home() {
           <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#f8fffd_0%,#eff6ff_100%)] p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Visit or contact</p>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Strong local business pages do more than look good. They make the address, phone number, and location intent obvious for both search engines and real people.
+              You can open the full location page for the shop details or jump straight to the map when you are ready to go.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+                className="btn-primary px-5 py-3 text-sm"
               >
                 View full location page
               </Link>
@@ -499,7 +553,7 @@ export default function Home() {
                 href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-5 py-3 text-sm"
               >
                 Open map
               </a>
@@ -514,7 +568,7 @@ export default function Home() {
           Common questions before renting
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-          These are the kinds of questions local riders and visitors often want answered quickly before calling or visiting the shop. You can also view the full <Link href="/faq" className="font-semibold text-teal-700 hover:underline">FAQ page</Link> or go straight to the <Link href="/location" className="font-semibold text-teal-700 hover:underline">location page</Link>.
+          If you want a quick answer before you call or visit, start here. You can also open the full <Link href="/faq" className="font-semibold text-teal-700 hover:underline">FAQ page</Link> or go straight to the <Link href="/location" className="font-semibold text-teal-700 hover:underline">location page</Link>.
         </p>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2">
@@ -532,26 +586,26 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="rounded-[2.25rem] bg-slate-950 px-8 py-14 text-white shadow-[0_30px_80px_rgba(15,23,42,0.30)]">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Ready to rent?</p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight">
-                Call now or get directions to Wander Bike Rentals
+                Call the shop or head straight to Wander Bike when you are ready to ride.
               </h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Ready to ride? Call the shop or get directions and we will help you choose the right bike, kids bike, or trailer rental.
+                If you already know what you want, the quickest next step is to call, confirm the details, and head over with directions ready.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-slate-200"
+                className="btn-secondary px-6 py-3 text-sm shadow-sm"
               >
                 Call (778) 952-1389
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 View location details
               </Link>

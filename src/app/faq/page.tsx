@@ -12,17 +12,17 @@ export const metadata: Metadata = {
     title: "FAQ | Wander Bike Rentals",
     description:
       "Answers to common questions about bike rentals, kids bikes, trailer rentals, helmets, and location.",
-    url: "https://wander-bike-rentals.vercel.app/faq",
+    url: "https://wanderbike.ca/faq",
   },
 };
 
 const faqs = [
-  ["Do rentals include helmets?", "Yes. Helmet and lock are included."],
-  ["Do you have kids bikes?", "Yes. Kids bike rentals are available."],
-  ["Do you offer bike trailers?", "Yes. Contact the shop for current trailer availability."],
-  ["Do I need a photo ID to verify my identity?", "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements."],
-  ["Where are you located?", "12071 First Ave #101, Richmond, BC V7E 3M1."],
-  ["How can I contact you?", "Call (778) 952-1389 for direct contact."],
+  ["Are helmets included with rentals?", "Yes. Helmet and lock are included."],
+  ["Do you have bikes for kids?", "Yes. Kids bike rentals are available."],
+  ["Can I rent a bike trailer?", "Yes. Contact the shop for current trailer availability."],
+  ["Do I need photo ID before renting?", "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements."],
+  ["Where is Wander Bike located?", "12071 First Ave #101, Richmond, BC V7E 3M1."],
+  ["What is the best way to contact the shop?", "Call (778) 952-1389 for direct contact."],
 ];
 
 const faqSchema = {
@@ -62,25 +62,25 @@ export default function FaqPage() {
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Frequently Asked Questions
+                Quick answers before you call or visit Wander Bike.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Clear answers to common questions before calling or visiting the shop.
+                Start here if you want to check the basics first, from helmets and kids bikes to trailers, location, and contact details.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              This page is here to make the basics easy to check, including helmets, kids bikes, trailer rentals, contact details, and location.
+              If you want a quick answer before deciding what to do next, this page gives you the most common details in one place so you can move on faster.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 View Location
               </Link>
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 Call Now
               </a>
@@ -89,17 +89,17 @@ export default function FaqPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">FAQ overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Quick answers before you visit</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">The questions most riders ask first</h2>
             <div className="mt-6 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Visitors often want quick confirmation before they decide what to do next.
+                Most people do not want to read a lot before they decide whether to call, visit, or keep planning.
               </p>
               <p>
-                This page helps answer common questions so you can move on to calling, getting directions, or choosing a rental.
+                This page keeps the common questions simple so you can get the answer you need and move on quickly.
               </p>
             </div>
             <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              If you still need help after reading the FAQ, call the shop directly for the fastest answer.
+              If your question is not listed here, calling the shop is still the fastest way to get a direct answer.
             </div>
           </div>
         </div>
@@ -109,10 +109,10 @@ export default function FaqPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">FAQ list</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Common questions before renting</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Common questions before you head over</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            These answers are kept simple so you can check the basics quickly.
+            Check the basics here first so you can get what you need quickly without digging through the site.
           </p>
         </div>
 
@@ -141,7 +141,7 @@ export default function FaqPage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
                   {item.label}
                 </Link>

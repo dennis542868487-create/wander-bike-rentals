@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Bike Rental Steveston | Wander Bike Rentals",
     description:
       "Rent adult bikes, kids bikes, and trailer rentals in Steveston, Richmond from Wander Bike Rentals.",
-    url: "https://wander-bike-rentals.vercel.app/bike-rental-steveston",
+    url: "https://wanderbike.ca/bike-rental-steveston",
   },
 };
 
@@ -61,13 +61,13 @@ export default function BikeRentalStevestonPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(15,118,110,0.22)] transition hover:-translate-y-0.5 hover:bg-teal-800"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call Now
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50"
+                className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
               </Link>
@@ -134,19 +134,19 @@ export default function BikeRentalStevestonPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="btn-secondary px-6 py-3 text-sm"
               >
                 Call Now
               </a>
               <Link
                 href="/guides/steveston-bike-ride-guide"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 View Steveston Guide
               </Link>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 View Location
               </Link>

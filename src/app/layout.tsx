@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://wander-bike-rentals.vercel.app"),
+  metadataBase: new URL("https://wanderbike.ca"),
   title: {
     default: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     template: "%s | Wander Bike Rentals",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     description:
       "Adult bikes, kids bikes, and trailer rentals in Steveston, Richmond. Helmet and lock included.",
-    url: "https://wander-bike-rentals.vercel.app",
+    url: "https://wanderbike.ca",
     siteName: "Wander Bike Rentals",
     locale: "en_CA",
     type: "website",
@@ -62,7 +62,7 @@ export default function RootLayout({
           {children}
 
           <footer className="border-t border-slate-200/80 bg-slate-950 text-slate-300">
-            <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 text-sm lg:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
+            <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 text-sm sm:gap-12 lg:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
               <div>
                 <div className="flex items-center gap-3">
                   <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-white p-1 shadow-[0_14px_35px_rgba(15,23,42,0.18)]">
@@ -83,23 +83,41 @@ export default function RootLayout({
                   Adult bikes, kids bikes, and trailers with helmet and lock included.
                   Built to help local riders and visitors get the details they need fast.
                 </p>
+                <a
+                  href="tel:+17789521389"
+                  className="btn-primary mt-6 px-5 py-3 text-sm"
+                >
+                  Call Now
+                </a>
               </div>
               <div>
                 <p className="font-semibold text-white">Contact</p>
-                <ul className="mt-4 space-y-3 text-slate-400">
+                <ul className="mt-4 space-y-3.5 text-slate-400">
                   <li>12071 First Ave #101, Richmond, BC V7E 3M1</li>
                   <li>(778) 952-1389</li>
                   <li>Open, closes 18:00</li>
                 </ul>
               </div>
-              <div>
-                <p className="font-semibold text-white">Quick Links</p>
-                <ul className="mt-4 space-y-3 text-slate-400">
-                  <li><Link className="transition hover:text-white" href="/bike-rental-richmond">Bike Rental Richmond</Link></li>
-                  <li><Link className="transition hover:text-white" href="/bike-rental-steveston">Bike Rental Steveston</Link></li>
-                  <li><Link className="transition hover:text-white" href="/location">Location</Link></li>
-                  <li><Link className="transition hover:text-white" href="/faq">FAQ</Link></li>
-                </ul>
+              <div className="grid gap-8 sm:grid-cols-2 lg:gap-10">
+                <div>
+                  <p className="font-semibold text-white">Rentals</p>
+                  <ul className="mt-4 space-y-3.5 text-slate-400">
+                    <li><Link className="transition hover:text-white" href="/adult-bike-rental-richmond">Adult Bikes</Link></li>
+                    <li><Link className="transition hover:text-white" href="/kids-bike-rental-richmond">Kids Bikes</Link></li>
+                    <li><Link className="transition hover:text-white" href="/bike-trailer-rental-richmond">Bike Trailers</Link></li>
+                    <li><Link className="transition hover:text-white" href="/#pricing">Pricing</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Guides & Visit</p>
+                  <ul className="mt-4 space-y-3.5 text-slate-400">
+                    <li><Link className="transition hover:text-white" href="/guides/best-places-to-bike-in-steveston">Best Bike Routes</Link></li>
+                    <li><Link className="transition hover:text-white" href="/guides/family-bike-rental-richmond">Things to Do in Richmond</Link></li>
+                    <li><Link className="transition hover:text-white" href="/guides/steveston-bike-ride-guide">Things to Do in Steveston Village</Link></li>
+                    <li><Link className="transition hover:text-white" href="/location">Location</Link></li>
+                    <li><Link className="transition hover:text-white" href="/faq">FAQ</Link></li>
+                  </ul>
+                </div>
               </div>
             </div>
           </footer>

@@ -2,23 +2,31 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Things to Do in Steveston Village",
+  title: "Steveston Bike Ride Guide",
   description:
-    "A simple visitor guide to riding, walking, and spending time around Steveston Village before or after your bike rental.",
+    "Plan an easy Steveston bike ride from Steveston Village to Garry Point Park, Fisherman’s Wharf, Britannia Shipyards, and the South Dyke Trail.",
 };
 
 const guidePoints = [
   {
-    title: "Ride the village at an easy pace",
-    text: "Steveston works well for a slower ride where you can stop often, look around, and enjoy the waterfront without rushing.",
+    title: "Start in Steveston Village",
+    text: "Begin where the waterfront, shops, restaurants, and harbour atmosphere are close together so the route can stay flexible from the start.",
   },
   {
-    title: "Mix biking with food and small stops",
-    text: "A village ride is more enjoyable when you leave time for coffee, snacks, ice cream, or a short walk by the boardwalk.",
+    title: "Ride to Garry Point Park",
+    text: "Make Garry Point Park the first stop for open views, fresh air, and an easy waterfront section that does not need a complicated route.",
   },
   {
-    title: "Keep the plan simple",
-    text: "If you are visiting for the first time, the easiest plan is to rent, ride the village and waterfront, then stop somewhere casual before heading back.",
+    title: "Stop at Fisherman’s Wharf",
+    text: "Return toward the village, lock up the bike, and enjoy the boats, seafood spots, and one of the most recognizable parts of Steveston.",
+  },
+  {
+    title: "Continue to Imperial Landing and Britannia Shipyards",
+    text: "Add more variety with village streets, river views, boardwalk sections, and a more historic waterfront feeling.",
+  },
+  {
+    title: "Optional longer ride: South Dyke Trail",
+    text: "If you want to keep going, follow the Fraser River for a quieter and more open ride away from the busiest village streets.",
   },
 ];
 
@@ -30,48 +38,48 @@ export default function StevestonBikeRideGuidePage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Steveston Village guide
+              Route guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Things to do in Steveston Village before or after your ride.
+                Steveston Bike Ride Guide
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                A local guide for turning your bike rental into a more enjoyable afternoon around the village and waterfront.
+                A simple local route for riding from Steveston Village to Garry Point Park, Fisherman’s Wharf, Imperial Landing, Britannia Shipyards, and the South Dyke Trail.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If you are planning time in Steveston Village, this guide gives you a simple starting point. You can ride through the area, stop along the waterfront, and make the outing feel more relaxed instead of treating it like a straight in-and-out rental.
+              Planning a bike ride in Steveston? This route can stay short and relaxed, or you can extend it into a longer waterfront ride toward London Farm and Finn Slough if you want more time outside.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                View Steveston Rentals
+                Steveston Rentals
               </Link>
               <Link
-                href="/faq"
+                href="/#pricing"
                 className="btn-secondary px-6 py-3.5 text-sm"
               >
-                Visit FAQ
+                See Pricing
               </Link>
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A relaxed way to enjoy more than just the ride</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A simple Steveston route you can actually follow</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Steveston Village is one of those places where the best plan is often a simple one: rent the bike, ride a little, stop when something looks interesting, and keep the afternoon easy.
+                This route works well because you can keep it short around the village and Garry Point Park, or stretch it farther toward Britannia Shipyards and the South Dyke Trail.
               </p>
               <p>
-                You do not need a packed plan here. A few good stops and a little extra time usually make the afternoon better.
+                It is a good fit for visitors, couples, families, and anyone who wants a relaxed Steveston ride instead of a fast workout.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              The easiest outing is usually a short village ride, a few waterfront stops, and enough time left over to enjoy the area without rushing.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              For a short ride, keep it around Steveston Village, Garry Point Park, and Fisherman’s Wharf. For more time out, add Britannia Shipyards and part of the South Dyke Trail.
             </div>
           </div>
         </div>
@@ -80,15 +88,15 @@ export default function StevestonBikeRideGuidePage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can do here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple ways to enjoy more of Steveston Village</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">A simple Steveston route</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Follow this route for an easier Steveston ride</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Use this guide if you want your rental to feel like part of a good afternoon out, not just transportation from one point to another.
+            Use this page when you want one route that can stay casual, scenic, and easy to adjust based on time, energy, and who is riding with you.
           </p>
         </div>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {guidePoints.map((item) => (
             <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
               <h3 className="text-lg font-semibold text-slate-950">{item.title}</h3>
@@ -103,9 +111,9 @@ export default function StevestonBikeRideGuidePage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Plan the village first, then choose the rental that fits</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the route, then choose the rental and shop details you need</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Once you have a rough idea of how you want to spend the afternoon, head back to the rental page or check the FAQ before you go.
+                Once you know how far you want to ride, head back to the Steveston rental page or check the location before you go.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -116,10 +124,10 @@ export default function StevestonBikeRideGuidePage() {
                 Steveston Rentals
               </Link>
               <Link
-                href="/faq"
+                href="/location"
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                FAQ
+                Location
               </Link>
             </div>
           </div>

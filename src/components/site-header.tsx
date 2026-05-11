@@ -102,7 +102,7 @@ export default function SiteHeader() {
                 alt="Wander Bike logo"
                 width={64}
                 height={64}
-                className="h-9 w-9 rounded-[0.95rem] object-cover sm:h-11 sm:w-11"
+                className="h-10 w-10 rounded-[0.95rem] object-contain bg-white sm:h-12 sm:w-12"
                 priority
               />
             </div>

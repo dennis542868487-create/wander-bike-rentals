@@ -21,7 +21,7 @@ const localBusinessSchema = {
     {
       "@type": "OpeningHoursSpecification",
       opens: "09:00",
-      closes: "18:00",
+      closes: "21:00",
     },
   ],
 };
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 const contactCards = [
   { label: "Address", value: "12071 First Ave #101, Richmond, BC V7E 3M1" },
   { label: "Phone", value: "(778) 952-1389" },
-  { label: "Hours", value: "Open, closes 18:00" },
+  { label: "Hours", value: "10:00 AM to 9:00 PM" },
 ];
 
 export default function LocationPage() {

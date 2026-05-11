@@ -17,23 +17,23 @@ export const metadata: Metadata = {
 };
 
 const quickFacts = [
-  { label: "Area", value: "Steveston, Richmond" },
-  { label: "Style", value: "Simple local rentals" },
+  { label: "Area", value: "Steveston Village, Richmond" },
+  { label: "Ride style", value: "Village and waterfront rides" },
   { label: "Included", value: "Helmet and lock" },
 ];
 
 const reasons = [
   {
-    title: "Easy local starting point",
-    text: "A convenient option for visitors and casual riders who want to get rolling around Steveston.",
+    title: "Ride to Garry Point Park",
+    text: "Take a relaxed ride to one of Steveston’s best waterfront stops for open views, fresh air, and photo breaks.",
   },
   {
-    title: "Visitor-friendly",
-    text: "A good fit for relaxed rides, waterfront exploring, and simple local outings.",
+    title: "Visit Fisherman’s Wharf",
+    text: "Ride through the village, lock up the bike, and walk toward the boats, seafood spots, and waterfront restaurants.",
   },
   {
-    title: "Family options",
-    text: "Adult bikes, kids bikes, and trailer rentals make it easier to plan different kinds of rides.",
+    title: "Follow the South Dyke Trail",
+    text: "For a longer ride, continue east toward Britannia Shipyards, Imperial Landing, and Fraser River views.",
   },
 ];
 
@@ -52,11 +52,11 @@ export default function BikeRentalStevestonPage() {
                 Bike Rental Steveston
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Bike rentals for visitors and casual riders looking to explore Steveston and nearby Richmond.
+                Explore Steveston Village by bike. Ride from the historic fishing village to Garry Point Park, Fisherman’s Wharf, Imperial Landing, and the South Dyke Trail with an easy local bike rental.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals is a simple local option for people who want an easy rental experience in the Steveston area, with clear details, quick contact, and family-friendly choices.
+              Adult bikes, kids bikes, and trailers are available, with helmet and lock included for a smoother Steveston ride.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -84,17 +84,17 @@ export default function BikeRentalStevestonPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Steveston overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A relaxed way to explore the area</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Explore more of Steveston by bike</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Steveston is a good place for a casual ride, whether you are visiting the area or planning a simple outing.
+                Steveston is one of Richmond’s easiest places to slow down, ride by the water, and turn a rental into a more complete day outside.
               </p>
               <p>
-                Adult bikes, kids bikes, and trailer rentals make it easier to choose something that fits your plan.
+                Start in the village, stop at Garry Point Park, pass Fisherman’s Wharf, then continue toward Imperial Landing or Britannia Shipyards if you want a longer route.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Adult bikes, kids bikes, and trailer rentals are all available, with helmet and lock included.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              Recommended Steveston ride: start in the village, ride to Garry Point Park, then continue east along the waterfront toward Britannia Shipyards and the South Dyke Trail.
             </div>
           </div>
         </div>
@@ -103,11 +103,11 @@ export default function BikeRentalStevestonPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Why choose us</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">A simple option for Steveston rides</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Steveston ride highlights</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Turn a Steveston rental into a better village and waterfront ride</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            If you want something local, clear, and easy to contact, this page gives you the basics before you visit.
+            Picture the stops first, then choose the rental that fits the ride.
           </p>
         </div>
 
@@ -126,9 +126,9 @@ export default function BikeRentalStevestonPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call, view the Steveston guide, or check the shop location</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call now, check the location, or plan the rest of the Steveston ride</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are planning a ride in Steveston, call the shop, view the guide, or check the location before you head over.
+                If you already know the kind of Steveston ride you want, call the shop, confirm the details, and head over.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -142,7 +142,7 @@ export default function BikeRentalStevestonPage() {
                 href="/guides/steveston-bike-ride-guide"
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                View Steveston Guide
+                Steveston Ride Guide
               </Link>
               <Link
                 href="/location"

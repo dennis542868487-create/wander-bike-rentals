@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 };
 
 const quickFacts = [
-  { label: "Best for", value: "Families and younger kids" },
-  { label: "Area", value: "Richmond near Steveston" },
-  { label: "Next step", value: "Call to confirm" },
+  { label: "Best for", value: "Families and younger children" },
+  { label: "Area", value: "Steveston and Richmond" },
+  { label: "Hours", value: "10:00 AM to 9:00 PM" },
 ];
 
 const reasons = [
@@ -56,20 +56,26 @@ export default function BikeTrailerRentalRichmondPage() {
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If a family ride depends on having the right setup for younger children, this page gives you the basics first. You can see that trailer rentals are available, call ahead, and check the location before you head over.
+              Trailer rentals help families keep the ride simpler when younger children are coming along and the route needs to stay relaxed and manageable.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                Call About Trailers
+                Call Now
               </a>
               <Link
                 href="/location"
                 className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
+              </Link>
+              <Link
+                href="/guides/bike-trailer-rental-richmond-guide"
+                className="btn-secondary px-6 py-3.5 text-sm"
+              >
+                Trailer Guide
               </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -84,17 +90,17 @@ export default function BikeTrailerRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Trailer overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit when the ride needs to stay simple</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit when the family ride needs to stay easy</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Trailer rentals can make it much easier to plan a ride when younger children are part of the day and you want something more manageable.
+                Trailer rentals work well when younger children are part of the plan and you want the outing to feel calm, flexible, and easier to manage.
               </p>
               <p>
-                If the outing depends on having a trailer, calling ahead is the best way to confirm the details before you come by.
+                A short Steveston route, a waterfront stop, and a trailer that suits the ride can make the whole day feel much smoother.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              For family outings, confirming trailer availability first can save time and make the whole ride easier to organize.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              If the ride depends on trailer availability, calling first is still the best way to confirm the setup before you come by.
             </div>
           </div>
         </div>
@@ -126,27 +132,27 @@ export default function BikeTrailerRentalRichmondPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call about trailer availability, view the trailer guide, or check the location</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call now, view the trailer guide, or confirm the shop details</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are planning a family ride, call first to confirm trailer availability, then check the guide or location.
+                If a trailer is part of the plan, confirm the details first, then choose the route or location information you need next.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="btn-secondary px-6 py-3 text-sm"
               >
-                Call About Trailers
+                Call Now
               </a>
               <Link
                 href="/guides/bike-trailer-rental-richmond-guide"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                View Trailer Guide
+                Trailer Guide
               </Link>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 View Location
               </Link>

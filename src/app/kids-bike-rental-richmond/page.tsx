@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 };
 
 const quickFacts = [
-  { label: "Best for", value: "Families and kids" },
-  { label: "Area", value: "Richmond near Steveston" },
-  { label: "Included", value: "Helmet and lock" },
+  { label: "Best for", value: "Family rides and younger riders" },
+  { label: "Area", value: "Steveston and Richmond" },
+  { label: "Hours", value: "10:00 AM to 9:00 PM" },
 ];
 
 const reasons = [
@@ -56,20 +56,26 @@ export default function KidsBikeRentalRichmondPage() {
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If you are planning a ride with children, this page helps you start with the basics. You can see that kids bikes are available, check the location, and call the shop before you head over.
+              Plan a more comfortable family ride with kids bikes for shorter loops around Steveston Village, Garry Point Park, and nearby waterfront paths.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                Call About Kids Bikes
+                Call Now
               </a>
               <Link
                 href="/location"
                 className="btn-secondary px-6 py-3.5 text-sm"
               >
                 View Location
+              </Link>
+              <Link
+                href="/guides/family-bike-rental-richmond"
+                className="btn-secondary px-6 py-3.5 text-sm"
+              >
+                Family Ride Guide
               </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -84,17 +90,17 @@ export default function KidsBikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Family overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit for family plans and shorter rides</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better fit for easy family outings near Steveston</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                When you are riding with children, it helps to know the family-friendly options before you arrive instead of figuring everything out at the counter.
+                Kids bikes work best when the goal is a relaxed ride, simple stops, and enough flexibility for photos, snacks, or a quick break by the water.
               </p>
               <p>
-                This page gives parents a simple starting point if they want to plan a slower ride around Steveston or a relaxed outing in Richmond.
+                For many families, the easiest plan is to start around Steveston, keep the route flat, and choose a ride that feels fun instead of rushed.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              If you are organizing a group ride, kids bikes can also be paired with other family options such as trailer rentals.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              Pair kids bikes with a short Steveston Village ride, Garry Point Park, or nearby waterfront paths for an easier family day out.
             </div>
           </div>
         </div>
@@ -126,27 +132,27 @@ export default function KidsBikeRentalRichmondPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call about kids bikes, view the family guide, or read the FAQ</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call now, plan the family ride, or check the shop details</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are planning a family ride, call the shop, check the guide, or read the FAQ before you visit.
+                Choose the next step that helps your family most, whether that means calling first, checking the route ideas, or confirming the location.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+                className="btn-secondary px-6 py-3 text-sm"
               >
-                Call About Kids Bikes
+                Call Now
               </a>
               <Link
                 href="/guides/family-bike-rental-richmond"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                View Family Guide
+                Family Ride Guide
               </Link>
               <Link
                 href="/faq"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Read FAQ
               </Link>

@@ -131,7 +131,7 @@ const localBusinessSchema = {
     {
       "@type": "OpeningHoursSpecification",
       opens: "09:00",
-      closes: "18:00",
+      closes: "21:00",
     },
   ],
   amenityFeature: [
@@ -285,7 +285,7 @@ export default function Home() {
                     </div>
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <p className="font-semibold text-slate-950">Hours shown</p>
-                      <p className="mt-1">Closes 18:00</p>
+                      <p className="mt-1">10:00 AM to 9:00 PM</p>
                     </div>
                   </div>
                   <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
@@ -532,7 +532,7 @@ export default function Home() {
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Hours</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">Open, closes 18:00</p>
+                <p className="mt-2 text-sm font-medium text-slate-900">10:00 AM to 9:00 PM</p>
               </div>
             </div>
           </div>

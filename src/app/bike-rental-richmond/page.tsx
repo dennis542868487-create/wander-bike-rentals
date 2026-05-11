@@ -17,23 +17,23 @@ export const metadata: Metadata = {
 };
 
 const quickFacts = [
-  { label: "Good for", value: "Visitors, couples, families" },
+  { label: "Best for", value: "Visitors, couples, and families" },
+  { label: "Ride style", value: "Flat waterfront routes" },
   { label: "Included", value: "Helmet and lock" },
-  { label: "Location", value: "Near Steveston" },
 ];
 
 const rentalTypes = [
   {
-    title: "Adult Bikes",
-    text: "A good fit for relaxed rides, local exploring, and simple day outings around Richmond.",
+    title: "Ride the West Dyke Trail",
+    text: "A flat scenic route with open marshland, waterfront views, and plenty of space for a relaxed Richmond ride.",
   },
   {
-    title: "Kids Bikes",
-    text: "Family-friendly options for parents planning a Steveston or Richmond ride.",
+    title: "Visit Steveston Village",
+    text: "Start near Steveston and turn the ride into a fuller Richmond outing with village stops, food, and harbour views.",
   },
   {
-    title: "Trailers",
-    text: "Helpful for younger children and families who want a smoother local outing.",
+    title: "Family-Friendly Rentals",
+    text: "Choose adult bikes, kids bikes, or trailers for an easier local ride with family-friendly flexibility.",
   },
 ];
 
@@ -52,11 +52,11 @@ export default function BikeRentalRichmondPage() {
                 Bike Rental Richmond
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Adult bikes, kids bikes, and trailer rentals for relaxed rides around Richmond and Steveston.
+                Explore Richmond by bike from Steveston. Ride flat waterfront trails, visit Garry Point Park, enjoy Steveston Village, and take in Richmond’s open dyke views with an easy local bike rental.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              Wander Bike Rentals is a simple local option for visitors, casual riders, couples, and families who want an easy place to rent a bike and get on the road.
+              Adult bikes, kids bikes, and trailers are available, with helmet and lock included for a simpler ride around Richmond.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -84,17 +84,17 @@ export default function BikeRentalRichmondPage() {
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Richmond overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A convenient local starting point</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better way to see Richmond from the water and dyke trails</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                If you are looking for a bike rental in Richmond, this is a simple place to start with clear options and easy contact.
+                Richmond is one of the easier places in Metro Vancouver to explore by bike because so many routes are flat, open, and easy to follow.
               </p>
               <p>
-                Adult bikes, kids bikes, and trailers make it easier to plan a casual ride, a couple outing, or a family trip.
+                Start near Steveston, ride toward Garry Point Park, continue onto the West Dyke Trail, or stretch the day toward Terra Nova and more waterfront views.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              Helmet and lock are included, which helps keep the rental experience simple for local visitors and first-time riders.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              Recommended Richmond ride: start from Steveston, ride to Garry Point Park, then continue along the West Dyke Trail for open views and a relaxed pace.
             </div>
           </div>
         </div>
@@ -103,11 +103,11 @@ export default function BikeRentalRichmondPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Rental options</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Choose the rental that fits your ride</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Richmond ride ideas</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Plan a Richmond ride with clear destination ideas</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Whether you are riding solo, with kids, or planning an easier family outing, you can check the main options here first.
+            Use these ideas to picture where to ride and how to turn the rental into a better Richmond outing.
           </p>
         </div>
 
@@ -126,9 +126,9 @@ export default function BikeRentalRichmondPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Next step</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call, view the shop location, or read common questions</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Call now, check the shop location, or plan the rest of the Richmond ride</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                If you are ready to ride, call the shop, check the location, or read the FAQ before you visit.
+                If you already know the kind of Richmond ride you want, the next step is simple: call the shop, confirm the basics, and head over.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -145,10 +145,10 @@ export default function BikeRentalRichmondPage() {
                 View Location
               </Link>
               <Link
-                href="/faq"
+                href="/guides/family-bike-rental-richmond"
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                Read FAQ
+                View Richmond Guide
               </Link>
             </div>
           </div>

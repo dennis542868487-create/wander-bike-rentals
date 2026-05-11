@@ -2,23 +2,35 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Best Bike Routes",
+  title: "Best Places to Bike in Steveston",
   description:
-    "Easy bike routes around Steveston and Richmond, with ideas for relaxed rides, waterfront stops, and casual afternoons out.",
+    "A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.",
 };
 
 const guidePoints = [
   {
-    title: "Choose the pace that fits your day",
-    text: "Some routes are better for a short easy ride, while others work better if you want more time outside with a few stops along the way.",
+    title: "Garry Point Park",
+    text: "An easy first stop for open waterfront views, photos, grass areas, and a slower feel before continuing onto the dyke trails.",
   },
   {
-    title: "Waterfront rides are the easiest starting point",
-    text: "If you are visiting for the first time, the best route is usually the one that feels simple, scenic, and easy to follow without overthinking it.",
+    title: "Fisherman’s Wharf",
+    text: "A simple bike stop where you can lock up, walk toward the boats, and enjoy seafood spots, shops, and the Steveston waterfront atmosphere.",
   },
   {
-    title: "Leave room for stops",
-    text: "The best bike route is often the one that gives you time to stop for photos, snacks, coffee, or a quick walk instead of trying to rush through everything.",
+    title: "Britannia Shipyards",
+    text: "A stronger stop if you want more history, a boardwalk setting, and a ride that feels more memorable than a quick loop.",
+  },
+  {
+    title: "South Dyke Trail",
+    text: "A better choice for riders who want a longer route, more Fraser River views, and a quieter ride away from the busiest village streets.",
+  },
+  {
+    title: "London Farm and Finn Slough",
+    text: "Good for riders who want to go farther and add a quieter, more local side to the Steveston ride.",
+  },
+  {
+    title: "West Dyke Trail toward Terra Nova",
+    text: "One of the most scenic nearby options for open sky, marshland, flat riding, and big Richmond views.",
   },
 ];
 
@@ -30,48 +42,48 @@ export default function BestPlacesToBikeInStevestonPage() {
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
           <div className="space-y-6">
             <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
-              Route guide
+              Steveston places guide
             </div>
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                Best bike routes for a relaxed ride around Steveston and Richmond.
+                Best Places to Bike in Steveston
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Route ideas for anyone who wants something scenic, easy to follow, and worth the time before or after a bike rental.
+                A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.
               </p>
             </div>
             <p className="max-w-2xl text-base leading-8 text-slate-600">
-              If you are not sure where to ride first, start here. This guide helps you choose a route that fits your pace, your group, and the kind of afternoon you want to have.
+              Steveston is one of the easier places in Richmond to explore by bike. From Garry Point Park and Fisherman’s Wharf to Britannia Shipyards, the South Dyke Trail, and the West Dyke Trail, many of the best local stops are close enough to enjoy in one relaxed ride.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
-                View Steveston Rentals
+                Steveston Rentals
               </Link>
               <Link
                 href="/location"
                 className="btn-secondary px-6 py-3.5 text-sm"
               >
-                View Location
+                Location
               </Link>
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Start with the route, then make the day around it</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Use this page to pick the stops that fit your ride</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
               <p>
-                Some people want a quick waterfront ride, while others want to turn the rental into a longer afternoon with food, stops, and more time outside.
+                Some riders want a short village loop, while others want a longer afternoon with more open space, food stops, and more time on the dyke trails.
               </p>
               <p>
-                Start with a route that feels right instead of guessing after you pick up the bike.
+                Pick the places first so the ride feels more intentional and less like guesswork after pickup.
               </p>
             </div>
-            <div className="mt-6 rounded-2xl bg-teal-50 p-4 text-sm leading-7 text-teal-900">
-              The best route is usually the one that feels easy to enjoy, not the one that tries to cover the most ground.
+            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
+              A good Steveston ride usually includes one easy park stop, one village stop, and enough time left over to keep the day relaxed.
             </div>
           </div>
         </div>
@@ -80,15 +92,15 @@ export default function BestPlacesToBikeInStevestonPage() {
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">What you can find here</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple route ideas that feel worth your time</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Best local stops</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Six places that make a Steveston ride feel worth doing</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Use this guide if you want a route that feels pleasant, manageable, and easy to pair with the rest of your afternoon.
+            Use these stops to build a short casual ride or a longer half-day route around the village, waterfront, and dyke trails.
           </p>
         </div>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {guidePoints.map((item) => (
             <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
               <h3 className="text-lg font-semibold text-slate-950">{item.title}</h3>
@@ -103,9 +115,9 @@ export default function BestPlacesToBikeInStevestonPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Pick the route first, then choose the rental that fits</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Pick the stops first, then choose the rental that fits</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
-                Once you know the kind of ride you want, head back to the rental page or check the shop location before you go.
+                Once you know which places you want to include, head back to the Steveston rental page or check the shop location before you go.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">

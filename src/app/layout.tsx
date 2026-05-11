@@ -34,6 +34,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [
+      { url: "/icon.jpg", type: "image/jpeg" },
+      { url: "/assets/wander-logo.jpg", type: "image/jpeg" },
+    ],
+    apple: "/assets/wander-logo.jpg",
+    shortcut: "/icon.jpg",
+  },
   openGraph: {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     description:
@@ -71,7 +79,7 @@ export default function RootLayout({
                       alt="Wander Bike Rentals logo"
                       width={72}
                       height={72}
-                      className="h-14 w-14 rounded-[0.95rem] object-cover"
+                      className="h-14 w-14 rounded-[0.95rem] object-contain bg-white"
                     />
                   </div>
                   <div>
@@ -95,7 +103,7 @@ export default function RootLayout({
                 <ul className="mt-4 space-y-3.5 text-slate-400">
                   <li>12071 First Ave #101, Richmond, BC V7E 3M1</li>
                   <li>(778) 952-1389</li>
-                  <li>Open, closes 18:00</li>
+                  <li>10:00 AM to 9:00 PM</li>
                 </ul>
               </div>
               <div className="grid gap-8 sm:grid-cols-2 lg:gap-10">

@@ -36,11 +36,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.png", type: "image/png" },
       { url: "/icon.jpg", type: "image/jpeg" },
-      { url: "/assets/wander-logo.jpg", type: "image/jpeg" },
     ],
-    apple: "/assets/wander-logo.jpg",
-    shortcut: "/icon.jpg",
+    apple: "/apple-icon.png",
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",

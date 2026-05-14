@@ -386,7 +386,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+        <div className="mt-8 grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
           <div className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Rent a bike</p>
             <h3 className="mt-3 text-2xl font-semibold text-slate-950">See the rental options first</h3>
@@ -397,7 +397,7 @@ export default function Home() {
               <Link href="/adult-bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Adult Bikes</Link>
               <Link href="/kids-bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Kids Bikes</Link>
               <Link href="/bike-trailer-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Trailers</Link>
-              <Link href="/#pricing" className="btn-secondary px-4 py-2 text-sm">Pricing</Link>
+              <Link href="/pricing" className="btn-secondary px-4 py-2 text-sm">Pricing</Link>
             </div>
           </div>
 
@@ -411,6 +411,18 @@ export default function Home() {
               <Link href="/bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">Richmond Ride Ideas</Link>
               <Link href="/bike-rental-steveston" className="btn-secondary px-4 py-2 text-sm">Steveston Ride Ideas</Link>
               <Link href="/guides/best-places-to-bike-in-steveston" className="btn-secondary px-4 py-2 text-sm">Best Bike Routes</Link>
+            </div>
+          </div>
+
+          <div className="group rounded-[2rem] border border-[var(--card-border)] bg-white p-7 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Quick repair</p>
+            <h3 className="mt-3 text-2xl font-semibold text-slate-950">Walk in for common bike issues</h3>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Check quick repair and basic maintenance details if you need help with a flat tire, brake adjustment, gear tuning, or a safety check.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Link href="/quick-bike-repair-richmond" className="btn-secondary px-4 py-2 text-sm">Quick Repair</Link>
+              <a href="tel:+17789521389" className="btn-primary px-4 py-2 text-sm">Call Now</a>
             </div>
           </div>
 

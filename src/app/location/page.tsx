@@ -150,6 +150,41 @@ export default function LocationPage() {
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Quick Repair</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Walk in if you need help with a common bike issue
+            </h2>
+            <p className="mt-4 text-base leading-8 text-slate-600">
+              If you need help with a flat tire, brake adjustment, gear tuning, wheel rubbing, chain cleaning, or a basic safety check, you can stop by and ask the shop to take a look.
+            </p>
+            <p className="mt-4 text-base leading-8 text-slate-600">
+              Smaller issues can often be checked quickly, and the final service depends on the bike condition after inspection.
+            </p>
+          </div>
+
+          <div className="rounded-[2rem] border border-slate-200 bg-slate-950 p-8 shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Walk-in repair info</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-white">
+              Check repair details before you head over
+            </h2>
+            <p className="mt-4 text-base leading-8 text-slate-300">
+              Use the repair page if you want a clearer overview of common services, walk-in expectations, and what the shop may be able to check on the spot.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/quick-bike-repair-richmond" className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100">
+                Quick Repair
+              </Link>
+              <a href="tel:+17789521389" className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">
+                Call Now
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

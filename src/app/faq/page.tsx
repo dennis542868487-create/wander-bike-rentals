@@ -20,6 +20,8 @@ const faqs = [
   ["Are helmets included with rentals?", "Yes. Helmet and lock are included."],
   ["Do you have bikes for kids?", "Yes. Kids bike rentals are available."],
   ["Can I rent a bike trailer?", "Yes. Contact the shop for current trailer availability."],
+  ["Do I need an appointment for quick bike repair?", "No appointment is needed for quick bike repair. You can walk in and ask the shop to take a look."],
+  ["What kinds of bike repairs do you handle?", "The shop can help with common issues such as flat tires, brake adjustment, gear tuning, wheel rubbing, chain cleaning, and basic safety checks. Final service depends on the bike condition after inspection."],
   ["Do I need photo ID before renting?", "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements."],
   ["Where is Wander Bike located?", "12071 First Ave #101, Richmond, BC V7E 3M1."],
   ["What is the best way to contact the shop?", "Call (778) 952-1389 for direct contact."],
@@ -41,6 +43,7 @@ const faqSchema = {
 const quickLinks = [
   { label: "Back to Home", href: "/" },
   { label: "Visit Location Page", href: "/location" },
+  { label: "Quick Repair", href: "/quick-bike-repair-richmond" },
   { label: "Bike Rental Richmond", href: "/bike-rental-richmond" },
   { label: "Bike Rental Steveston", href: "/bike-rental-steveston" },
 ];
@@ -72,18 +75,18 @@ export default function FaqPage() {
               If you want a quick answer before deciding what to do next, this page gives you the most common details in one place so you can move on faster.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/location"
-                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
-              >
-                View Location
-              </Link>
               <a
                 href="tel:+17789521389"
-                className="btn-secondary px-6 py-3.5 text-sm"
+                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
               >
                 Call Now
               </a>
+              <Link
+                href="/location"
+                className="btn-secondary px-6 py-3.5 text-sm"
+              >
+                View Location
+              </Link>
             </div>
           </div>
 

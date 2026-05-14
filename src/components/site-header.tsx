@@ -23,7 +23,7 @@ type NavItem =
     };
 
 const rentalsLinks: NavLink[] = [
-  { href: "/#pricing", label: "Pricing" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
   { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },
   { href: "/bike-trailer-rental-richmond", label: "Bike Trailers" },
@@ -40,6 +40,7 @@ const guidesLinks: NavLink[] = [
 const navItems: NavItem[] = [
   { type: "link", href: "/", label: "Home" },
   { type: "group", label: "Rentals", links: rentalsLinks },
+  { type: "link", href: "/quick-bike-repair-richmond", label: "Quick Repair" },
   { type: "group", label: "Guides", links: guidesLinks },
   { type: "link", href: "/location", label: "Location" },
   { type: "link", href: "/faq", label: "FAQ" },

@@ -157,19 +157,19 @@ export default function PricingPage() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="tel:+17789521389"
-                className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+                className="inline-flex min-w-[132px] items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-slate-100"
               >
                 Call Now
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+                className="inline-flex min-w-[120px] items-center justify-center rounded-full border border-white/35 bg-transparent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Location
               </Link>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+                className="inline-flex min-w-[100px] items-center justify-center rounded-full border border-white/35 bg-transparent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Home
               </Link>

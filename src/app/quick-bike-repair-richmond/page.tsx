@@ -164,19 +164,19 @@ export default function QuickBikeRepairRichmondPage() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="tel:+17789521389"
-                className="inline-flex min-w-[132px] items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-slate-100"
+                className="inline-flex min-w-[140px] items-center justify-center rounded-full border border-slate-700 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5 hover:bg-slate-800"
               >
                 Call Now
               </a>
               <Link
                 href="/location"
-                className="inline-flex min-w-[120px] items-center justify-center rounded-full border border-white/35 bg-transparent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex min-w-[124px] items-center justify-center rounded-full border border-slate-600 bg-slate-800 px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:bg-slate-700"
               >
                 Location
               </Link>
               <Link
                 href="/faq"
-                className="inline-flex min-w-[100px] items-center justify-center rounded-full border border-white/35 bg-transparent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex min-w-[104px] items-center justify-center rounded-full border border-slate-600 bg-slate-800 px-5 py-2.5 text-sm font-semibold text-slate-100 transition hover:-translate-y-0.5 hover:bg-slate-700"
               >
                 FAQ
               </Link>

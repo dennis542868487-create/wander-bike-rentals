@@ -60,7 +60,7 @@ function desktopLinkClass(active: boolean) {
   return [
     "inline-flex items-center rounded-full px-3.5 py-2 text-sm font-medium transition",
     active
-      ? "bg-[var(--brand-soft)] text-[var(--brand)] shadow-[inset_0_0_0_1px_rgba(13,148,136,0.16)]"
+      ? "bg-[var(--brand-soft)] text-[var(--brand-strong)] shadow-[inset_0_0_0_1px_rgba(13,148,136,0.16)]"
       : "text-slate-700 hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]",
   ].join(" ");
 }
@@ -69,7 +69,7 @@ function mobileLinkClass(active: boolean) {
   return [
     "flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium transition",
     active
-      ? "bg-[var(--brand-soft)] text-[var(--brand)]"
+      ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
       : "text-slate-800 hover:bg-slate-50",
   ].join(" ");
 }
@@ -155,7 +155,7 @@ export default function SiteHeader() {
                               className={[
                                 "flex items-center justify-between rounded-2xl px-3 py-3 text-sm transition",
                                 childActive
-                                  ? "bg-[var(--brand-soft)] font-medium text-[var(--brand)]"
+                                  ? "bg-[var(--brand-soft)] font-medium text-[var(--brand-strong)]"
                                   : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
                               ].join(" ")}
                             >
@@ -252,7 +252,7 @@ export default function SiteHeader() {
                               className={[
                                 "flex min-h-11 items-center justify-between rounded-xl px-3.5 py-3 text-sm transition",
                                 childActive
-                                  ? "bg-[var(--brand-soft)] font-medium text-[var(--brand)]"
+                                  ? "bg-[var(--brand-soft)] font-medium text-[var(--brand-strong)]"
                                   : "text-slate-700 hover:bg-white hover:text-slate-950",
                               ].join(" ")}
                             >

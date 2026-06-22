@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CMS n8n workflow code (contains secrets — never commit)
+n8n-*.js
+n8n-workflow-*.json

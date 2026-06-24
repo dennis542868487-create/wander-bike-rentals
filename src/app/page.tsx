@@ -263,7 +263,7 @@ export default function Home() {
           </div>
 
           <div className="hero-anim hero-d4 grid gap-5 lg:pl-8">
-            <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/95 shadow-[0_25px_70px_rgba(15,23,42,0.30)] backdrop-blur">
+            <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/80 shadow-[0_20px_50px_rgba(15,23,42,0.22)] backdrop-blur-xl">
               <div className="p-7">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -304,7 +304,7 @@ export default function Home() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               {pricing.map((item) => (
-                <div key={item.name} className="rounded-3xl border border-[var(--card-border)] bg-white/95 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(15,23,42,0.08)]">
+                <div key={item.name} className="rounded-3xl border border-white/40 bg-white/80 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.18)] backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/90 hover:shadow-[0_20px_44px_rgba(15,23,42,0.22)]">
                   <p className="text-sm font-semibold text-slate-950">{item.name}</p>
                   <p className="mt-3 text-2xl font-bold text-teal-700">
                     {item.price}

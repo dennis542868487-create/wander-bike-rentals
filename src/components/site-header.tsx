@@ -93,7 +93,7 @@ export default function SiteHeader() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/80">
+    <header className="site-header-anim sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/80">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3" onClick={closeMenu}>

@@ -82,3 +82,61 @@ a {
   background: rgba(20, 184, 166, 0.2);
   color: #0f172a;
 }
+
+/* ---------- Motion system ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* Scroll reveals: only hide once JS has marked the document ready,
+     so content stays visible if JavaScript fails. */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero entrance — runs on load, pure CSS (no JS required) */
+  .hero-anim {
+    opacity: 0;
+    animation: heroUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-d1 { animation-delay: 0.12s; }
+  .hero-d2 { animation-delay: 0.26s; }
+  .hero-d3 { animation-delay: 0.40s; }
+  .hero-d4 { animation-delay: 0.54s; }
+  .hero-d5 { animation-delay: 0.68s; }
+
+  @keyframes heroUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .hero-img-anim {
+    animation: heroImg 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes heroImg {
+    from { opacity: 0; transform: scale(1.04); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .hero-grad-anim {
+    opacity: 0;
+    animation: gradIn 1.1s ease 0.2s both;
+  }
+  @keyframes gradIn {
+    to { opacity: 1; }
+  }
+
+  /* Header fades down into place on first load */
+  .site-header-anim {
+    animation: headerDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes headerDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: none; }
+  }
+}

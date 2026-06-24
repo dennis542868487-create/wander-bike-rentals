@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
+import IntercomMessenger from "@/components/intercom-messenger";
+import Reveal from "@/components/reveal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -65,6 +67,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-[radial-gradient(circle_at_top,#ecfdf5_0%,#f8fafc_24%,#ffffff_60%)] text-slate-900">
         <div className="min-h-screen">
+          <Reveal />
           <SiteHeader />
 
           {children}
@@ -103,7 +106,7 @@ export default function RootLayout({
                 <ul className="mt-4 space-y-3.5 text-slate-400">
                   <li>12071 First Ave #101, Richmond, BC V7E 3M1</li>
                   <li>(778) 952-1389</li>
-                  <li>10:00 AM to 9:00 PM</li>
+                  <li>9:00 AM to 10:00 PM</li>
                 </ul>
               </div>
               <div className="grid gap-8 sm:grid-cols-2 lg:gap-10">
@@ -130,6 +133,7 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
+        <IntercomMessenger />
       </body>
     </html>
   );

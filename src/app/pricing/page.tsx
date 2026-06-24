@@ -75,7 +75,7 @@ export default function PricingPage() {
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$40</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$64.76</p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function PricingPage() {
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$30</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$50</p>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function PricingPage() {
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$30</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$50</p>
             </div>
           </div>

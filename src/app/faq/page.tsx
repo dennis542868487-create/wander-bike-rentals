@@ -20,7 +20,7 @@ const faqs = [
   ["Are helmets included with rentals?", "Yes. Helmet and lock are included."],
   ["Do you have bikes for kids?", "Yes. Kids bike rentals are available."],
   ["Can I rent a bike trailer?", "Yes. Contact the shop for current trailer availability."],
-  ["What are the full-day and half-day rental prices?", "Adult bike: full day (8 hr) is $64.76, half day (4 hr) is $40. Kids bike: full day (8 hr) is $50, half day (4 hr) is $30. Trailer: full day (8 hr) is $50, half day (4 hr) is $30."],
+  ["What are the full-day and half-day rental prices?", "Adult bike: full day (24 hr) is $64.76, half day (4 hr) is $40. Kids bike: full day (24 hr) is $50, half day (4 hr) is $30. Trailer: full day (24 hr) is $50, half day (4 hr) is $30."],
   ["What is the hourly rental price?", "Adult bike: $12.38/hr. Kids bike: $9.52/hr. Trailer: $9.52/hr."],
   ["Do I need an appointment for quick bike repair?", "No appointment is needed for quick bike repair. You can walk in and ask the shop to take a look."],
   ["What kinds of bike repairs do you handle?", "The shop can help with common issues such as flat tires, brake adjustment, gear tuning, wheel rubbing, chain cleaning, and basic safety checks. Final service depends on the bike condition after inspection."],

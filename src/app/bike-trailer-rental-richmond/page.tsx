@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const quickFacts = [
   { label: "Best for", value: "Families and younger children" },
   { label: "Area", value: "Steveston and Richmond" },
-  { label: "Hours", value: "10:00 AM to 9:00 PM" },
+  { label: "Hours", value: "9:00 AM to 10:00 PM" },
 ];
 
 const reasons = [

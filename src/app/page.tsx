@@ -131,7 +131,7 @@ const localBusinessSchema = {
     {
       "@type": "OpeningHoursSpecification",
       opens: "09:00",
-      closes: "21:00",
+      closes: "22:00",
     },
   ],
   amenityFeature: [
@@ -200,23 +200,36 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
 
-      <section className="relative overflow-hidden border-b border-white/60">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.18),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.10),transparent_34%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.15fr_0.95fr] lg:items-center lg:px-8 lg:py-24">
+      <section className="hero relative isolate overflow-hidden border-b border-white/10">
+        {/* Full-bleed hero background */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/assets/bikes-row.jpg"
+            alt="Rows of rental bikes inside Wander Bike Rentals"
+            fill
+            priority
+            sizes="100vw"
+            className="hero-img-anim object-cover object-center"
+          />
+          <div className="hero-grad-anim absolute inset-0 bg-gradient-to-br from-slate-950/88 via-slate-950/72 to-slate-900/55" />
+          <div className="hero-grad-anim absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.28),transparent_46%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.16),transparent_40%)]" />
+        </div>
+
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.15fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
           <div className="max-w-3xl space-y-7">
-            <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+            <div className="hero-anim hero-d1 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-teal-100 shadow-sm backdrop-blur">
               Wander Bike Rentals • Steveston, Richmond
             </div>
             <div className="space-y-5">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl lg:leading-[1.05]">
+              <h1 className="hero-anim hero-d2 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.05]">
                 Easy bike rentals for relaxed rides around Steveston and Richmond.
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+              <p className="hero-anim hero-d3 max-w-2xl text-lg leading-8 text-slate-100/90 sm:text-xl">
                 Rent an adult bike, kids bike, or trailer and start your ride with less hassle. Wander Bike makes it easy to check pricing, call the shop, and get directions before you head over.
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
                 className="btn-primary px-7 py-3.5 text-sm shadow-[0_16px_34px_rgba(15,23,42,0.16)]"
@@ -233,33 +246,24 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="grid gap-4 pt-2 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Location</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">Steveston, Richmond</p>
+            <div className="hero-anim hero-d5 grid gap-4 pt-2 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-sm backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">Location</p>
+                <p className="mt-2 text-sm font-medium text-white">Steveston, Richmond</p>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Included</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">Helmet and lock</p>
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-sm backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">Included</p>
+                <p className="mt-2 text-sm font-medium text-white">Helmet and lock</p>
               </div>
-              <div className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Good for</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">Visitors and families</p>
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-sm backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">Good for</p>
+                <p className="mt-2 text-sm font-medium text-white">Visitors and families</p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-5 lg:pl-8">
-            <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/95 shadow-[0_25px_70px_rgba(15,23,42,0.10)] backdrop-blur">
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
-                <Image
-                  src="/assets/bikes-row.jpg"
-                  alt="Rows of rental bikes inside Wander Bike Rentals"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
+          <div className="hero-anim hero-d4 grid gap-5 lg:pl-8">
+            <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/95 shadow-[0_25px_70px_rgba(15,23,42,0.30)] backdrop-blur">
               <div className="p-7">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -285,7 +289,7 @@ export default function Home() {
                     </div>
                     <div className="rounded-2xl bg-slate-50 p-4">
                       <p className="font-semibold text-slate-950">Hours shown</p>
-                      <p className="mt-1">10:00 AM to 9:00 PM</p>
+                      <p className="mt-1">9:00 AM to 10:00 PM</p>
                     </div>
                   </div>
                   <div className="rounded-2xl bg-teal-50 p-4 text-teal-900">
@@ -544,7 +548,7 @@ export default function Home() {
               </div>
               <div className="rounded-2xl bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Hours</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">10:00 AM to 9:00 PM</p>
+                <p className="mt-2 text-sm font-medium text-slate-900">9:00 AM to 10:00 PM</p>
               </div>
             </div>
           </div>

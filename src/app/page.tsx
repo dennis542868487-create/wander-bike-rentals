@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
+import ReviewsSection from "@/components/reviews-section";
 
 export const metadata: Metadata = {
   title: "Bike Rentals in Steveston, Richmond",
@@ -497,7 +498,7 @@ export default function Home() {
                 src="/assets/bikes-row.jpg"
                 alt="Rows of rental bikes ready for riders"
                 fill
-                className="object-cover"
+                className="reveal-img object-cover"
               />
             </div>
             <div className="p-5 text-sm font-semibold text-slate-700">Adult and rental bike lineup</div>
@@ -508,7 +509,7 @@ export default function Home() {
                 src="/assets/trailer-bike.jpg"
                 alt="Bike with family trailer inside Wander Bike Rentals"
                 fill
-                className="object-cover"
+                className="reveal-img object-cover"
               />
             </div>
             <div className="p-5 text-sm font-semibold text-slate-700">Trailer and family rental setup</div>
@@ -519,7 +520,7 @@ export default function Home() {
                 src="/assets/helmets.jpg"
                 alt="Helmet selection at Wander Bike Rentals"
                 fill
-                className="object-cover"
+                className="reveal-img object-cover"
               />
             </div>
             <div className="p-5 text-sm font-semibold text-slate-700">Helmets included with rentals</div>
@@ -599,6 +600,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <ReviewsSection />
 
       <section className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="rounded-[2.25rem] bg-slate-950 px-8 py-14 text-white shadow-[0_30px_80px_rgba(15,23,42,0.30)]">

@@ -110,6 +110,30 @@ export default function LocationPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Map</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Find us on the map
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-slate-600">
+            12071 First Ave #101, Richmond, BC V7E 3M1. Tap the map to open directions in Google Maps.
+          </p>
+        </div>
+        <div className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 shadow-[0_18px_50px_rgba(15,23,42,0.10)]">
+          <iframe
+            title="Map showing Wander Bike Rentals at 12071 First Ave #101, Richmond, BC"
+            src="https://www.google.com/maps?q=12071%20First%20Ave%20%23101%2C%20Richmond%2C%20BC%20V7E%203M1&output=embed"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-[340px] w-full border-0 sm:h-[440px]"
+            allowFullScreen
+          />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Before you visit</p>

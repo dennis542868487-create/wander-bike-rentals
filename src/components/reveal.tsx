@@ -22,9 +22,13 @@ export default function Reveal() {
     root.classList.add("reveal-ready");
 
     const targets = new Set<Element>();
-    document
-      .querySelectorAll("main > section:not(.hero)")
-      .forEach((el) => el.setAttribute("data-reveal", ""));
+    document.querySelectorAll("main > section:not(.hero)").forEach((section) => {
+      section.setAttribute("data-reveal", "");
+      // Let the first-level card grids inside each section cascade in.
+      section.querySelectorAll(":scope .grid").forEach((grid) => {
+        if (grid.children.length > 1) grid.setAttribute("data-reveal-cascade", "");
+      });
+    });
     document.querySelectorAll("[data-reveal]").forEach((el) => targets.add(el));
 
     const observer = new IntersectionObserver(

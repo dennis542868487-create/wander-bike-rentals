@@ -62,7 +62,7 @@ export default function BikeTrailerRentalRichmondPage() {
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
+                className="btn-brand px-6 py-3.5 text-sm"
               >
                 Call Now
               </a>
@@ -147,13 +147,13 @@ export default function BikeTrailerRentalRichmondPage() {
               </a>
               <Link
                 href="/guides/bike-trailer-rental-richmond-guide"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-6 py-3 text-sm"
               >
                 Trailer Guide
               </Link>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-6 py-3 text-sm"
               >
                 View Location
               </Link>

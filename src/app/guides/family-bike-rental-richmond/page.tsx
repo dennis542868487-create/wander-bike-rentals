@@ -70,7 +70,7 @@ export default function FamilyBikeRentalRichmondPage() {
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/kids-bike-rental-richmond"
-                className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
+                className="btn-brand px-6 py-3.5 text-sm"
               >
                 Kids Bikes
               </Link>
@@ -141,19 +141,19 @@ export default function FamilyBikeRentalRichmondPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/kids-bike-rental-richmond"
-                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-4 py-2 text-sm"
               >
                 Kids Bikes
               </Link>
               <Link
                 href="/bike-trailer-rental-richmond"
-                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-4 py-2 text-sm"
               >
                 Bike Trailers
               </Link>
               <Link
                 href="/bike-rental-richmond"
-                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-4 py-2 text-sm"
               >
                 Richmond Ride Ideas
               </Link>

@@ -233,7 +233,7 @@ export default function Home() {
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
-                className="btn-primary px-7 py-3.5 text-sm shadow-[0_16px_34px_rgba(15,23,42,0.16)]"
+                className="btn-brand px-7 py-3.5 text-sm"
               >
                 Call Now
               </a>
@@ -624,7 +624,7 @@ export default function Home() {
               </a>
               <Link
                 href="/location"
-                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="btn-outline-light px-6 py-3 text-sm"
               >
                 View location details
               </Link>

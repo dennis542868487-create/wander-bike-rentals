@@ -96,7 +96,7 @@ export default function RootLayout({
                 </p>
                 <a
                   href="tel:+17789521389"
-                  className="btn-primary mt-6 px-5 py-3 text-sm"
+                  className="btn-brand mt-6 px-5 py-3 text-sm"
                 >
                   Call Now
                 </a>

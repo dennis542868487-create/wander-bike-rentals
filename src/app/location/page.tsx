@@ -97,7 +97,7 @@ export default function LocationPage() {
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">The details most people want first</h2>
             <div className="mt-6 space-y-4">
               {contactCards.map((item) => (
-                <div key={item.label} className="rounded-2xl bg-slate-50 p-4">
+                <div key={item.label} className="rounded-2xl bg-[#f0fdf9] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
                   <p className="mt-2 text-sm font-medium text-slate-900">{item.value}</p>
                 </div>
@@ -144,7 +144,7 @@ export default function LocationPage() {
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {contactCards.map((item) => (
-                <div key={item.label} className="rounded-2xl bg-slate-50 p-4">
+                <div key={item.label} className="rounded-2xl bg-[#f0fdf9] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
                   <p className="mt-2 text-sm font-medium text-slate-900">{item.value}</p>
                 </div>
@@ -152,7 +152,7 @@ export default function LocationPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#f8fffd_0%,#eff6ff_100%)] p-8 shadow-sm">
+          <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#ecfdf5_0%,#f0fdf9_100%)] p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Related pages</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">Helpful next steps before you go</h2>
             <p className="mt-4 text-base leading-8 text-slate-600">

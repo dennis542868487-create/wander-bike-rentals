@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
-import IntercomMessenger from "@/components/intercom-messenger";
 import Reveal from "@/components/reveal";
 import "./globals.css";
 
@@ -65,7 +64,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[linear-gradient(180deg,#f6faf9_0%,#ffffff_30%)] text-slate-900">
+      <body className="min-h-full bg-[#f0fdf9] text-slate-900">
         <div className="min-h-screen">
           <Reveal />
           <SiteHeader />
@@ -133,7 +132,6 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
-        <IntercomMessenger />
       </body>
     </html>
   );

@@ -145,8 +145,8 @@ export default function AdultBikeRentalRichmondPage() {
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {pricing.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
+              <div key={item.label} className="rounded-2xl border border-teal-100/60 bg-[#f0fdf9] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">{item.label}</p>
                 <p className="mt-3 text-[2rem] font-bold tracking-tight text-teal-700 sm:text-3xl">{item.value}</p>
               </div>
             ))}

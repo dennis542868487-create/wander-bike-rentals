@@ -279,16 +279,16 @@ export default function Home() {
                 </div>
 
                 <div className="mt-7 space-y-5 text-sm text-slate-600">
-                  <div className="rounded-2xl bg-slate-50 p-4">
+                  <div className="rounded-2xl bg-[#f0fdf9] p-4">
                     <p className="font-semibold text-slate-950">Address</p>
                     <p className="mt-1">12071 First Ave #101, Richmond, BC V7E 3M1</p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="rounded-2xl bg-[#f0fdf9] p-4">
                       <p className="font-semibold text-slate-950">Phone</p>
                       <p className="mt-1">(778) 952-1389</p>
                     </div>
-                    <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="rounded-2xl bg-[#f0fdf9] p-4">
                       <p className="font-semibold text-slate-950">Hours shown</p>
                       <p className="mt-1">9:00 AM to 10:00 PM</p>
                     </div>
@@ -541,22 +541,22 @@ export default function Home() {
               If you are ready to visit, this is the quickest place to check the address, phone number, and basic shop details before you head over.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="rounded-2xl bg-[#f0fdf9] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Address</p>
                 <p className="mt-2 text-sm font-medium text-slate-900">12071 First Ave #101, Richmond</p>
               </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="rounded-2xl bg-[#f0fdf9] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Phone</p>
                 <p className="mt-2 text-sm font-medium text-slate-900">(778) 952-1389</p>
               </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
+              <div className="rounded-2xl bg-[#f0fdf9] p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Hours</p>
                 <p className="mt-2 text-sm font-medium text-slate-900">9:00 AM to 10:00 PM</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#f8fffd_0%,#eff6ff_100%)] p-8 shadow-sm">
+          <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#ecfdf5_0%,#f0fdf9_100%)] p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Visit or contact</p>
             <p className="mt-4 text-base leading-8 text-slate-600">
               You can open the full location page for the shop details or jump straight to the map when you are ready to go.

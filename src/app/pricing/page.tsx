@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <main className="pb-20 text-slate-900">
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative isolate overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_16%_14%,rgba(20,184,166,0.34),transparent_44%),radial-gradient(circle_at_84%_80%,rgba(14,165,233,0.22),transparent_48%),linear-gradient(135deg,#0f172a_0%,#052e2b_52%,#0b3b39_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:46px_46px] [mask-image:radial-gradient(circle_at_50%_40%,#000,transparent_75%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
@@ -54,30 +54,32 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
-            Adult Bike
-          </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-            Adult bike rental rates
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-            A simple option for solo rides, couples, and relaxed local trips around Steveston and Richmond.
-          </p>
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
+          <div className="rounded-[2rem] border border-teal-100/60 bg-[#f0fdf9] p-6 shadow-sm sm:p-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
+              Adult Bike
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Adult bike rental rates
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+              A simple option for solo rides, couples, and relaxed local trips around Steveston and Richmond.
+            </p>
 
-          <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Per hour</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$12.38</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Half day</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$40</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$64.76</p>
+            <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Per hour</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$12.38</p>
+              </div>
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Half day</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$40</p>
+              </div>
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Full day · 24 hr</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$64.76</p>
+              </div>
             </div>
           </div>
         </div>
@@ -96,46 +98,48 @@ export default function PricingPage() {
           </p>
 
           <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Per hour</p>
+            <div className="rounded-2xl border border-teal-100/60 bg-[#f0fdf9] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Per hour</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$9.52</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Half day</p>
+            <div className="rounded-2xl border border-teal-100/60 bg-[#f0fdf9] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Half day</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$30</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
+            <div className="rounded-2xl border border-teal-100/60 bg-[#f0fdf9] p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Full day · 24 hr</p>
               <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$50</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
-            Trailer
-          </p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-            Trailer rental rates
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
-            A practical family option when you want a smoother ride setup for younger children.
-          </p>
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
+          <div className="rounded-[2rem] border border-teal-100/60 bg-[#f0fdf9] p-6 shadow-sm sm:p-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">
+              Trailer
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+              Trailer rental rates
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600">
+              A practical family option when you want a smoother ride setup for younger children.
+            </p>
 
-          <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Per hour</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$9.52</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Half day</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$30</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Full day · 24 hr</p>
-              <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$50</p>
+            <div className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Per hour</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$9.52</p>
+              </div>
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Half day</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$30</p>
+              </div>
+              <div className="rounded-2xl border border-white/80 bg-white p-5 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Full day · 24 hr</p>
+                <p className="mt-3 text-[2rem] font-bold tracking-tight text-slate-950 sm:text-3xl">$50</p>
+              </div>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -9,49 +10,60 @@ export const metadata: Metadata = {
 
 const guidePoints = [
   {
-    title: "Start in Steveston Village",
-    text: "Begin where the waterfront, shops, restaurants, and harbour atmosphere are close together so the route can stay flexible from the start.",
+    title: "1. Start in Steveston Village",
+    text: "Begin at the waterfront where the shops, restaurants, and harbour sit close together. Easy parking and an easy start.",
   },
   {
-    title: "Ride to Garry Point Park",
-    text: "Make Garry Point Park the first stop for open views, fresh air, and an easy waterfront section that does not need a complicated route.",
+    title: "2. Ride to Garry Point Park",
+    text: "A short, flat waterfront stretch to Steveston’s best viewpoint — open water, grass fields, and driftwood beaches.",
   },
   {
-    title: "Stop at Fisherman’s Wharf",
-    text: "Return toward the village, lock up the bike, and enjoy the boats, seafood spots, and one of the most recognizable parts of Steveston.",
+    title: "3. Stop at Fisherman’s Wharf",
+    text: "Loop back toward the village, lock up, and grab fresh seafood off the boats at Steveston’s most recognizable spot.",
   },
   {
-    title: "Continue to Imperial Landing and Britannia Shipyards",
-    text: "Add more variety with village streets, river views, boardwalk sections, and a more historic waterfront feeling.",
+    title: "4. Imperial Landing & Britannia Shipyards",
+    text: "Roll east along the boardwalk past river views and heritage buildings for the most scenic stretch of the ride.",
   },
   {
-    title: "Optional longer ride: South Dyke Trail",
-    text: "If you want to keep going, follow the Fraser River for a quieter and more open ride away from the busiest village streets.",
+    title: "5. Optional: South Dyke Trail",
+    text: "Keep going east along the Fraser River for a quieter, more open ride away from the busy village streets.",
   },
 ];
 
 export default function StevestonBikeRideGuidePage() {
   return (
     <main className="pb-20 text-slate-900">
-      <section className="relative overflow-hidden border-b border-white/70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_30%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
+      <section className="hero relative isolate overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/assets/fishermans-wharf.webp"
+            alt="Steveston’s Fisherman’s Wharf with fishing boats, docks, and waterfront restaurants"
+            fill
+            priority
+            sizes="100vw"
+            className="hero-img-anim object-cover object-center"
+          />
+          <div className="hero-grad-anim absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-950/68 to-slate-900/50" />
+          <div className="hero-grad-anim absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.26),transparent_46%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.14),transparent_40%)]" />
+        </div>
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
           <div className="space-y-6">
-            <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+            <div className="hero-anim hero-d1 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-teal-100 shadow-sm backdrop-blur">
               Route guide
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
+              <h1 className="hero-anim hero-d2 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Steveston Bike Ride Guide
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              <p className="hero-anim hero-d3 max-w-2xl text-lg leading-8 text-slate-100/90">
                 A simple local route for riding from Steveston Village to Garry Point Park, Fisherman’s Wharf, Imperial Landing, Britannia Shipyards, and the South Dyke Trail.
               </p>
             </div>
-            <p className="max-w-2xl text-base leading-8 text-slate-600">
+            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
               Planning a bike ride in Steveston? This route can stay short and relaxed, or you can extend it into a longer waterfront ride toward London Farm and Finn Slough if you want more time outside.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
@@ -67,7 +79,7 @@ export default function StevestonBikeRideGuidePage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/40 bg-white/80 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">A simple Steveston route you can actually follow</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
@@ -117,6 +129,12 @@ export default function StevestonBikeRideGuidePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
+              <Link
+                href="/guides/best-places-to-bike-in-steveston"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Best Places to Bike
+              </Link>
               <Link
                 href="/bike-rental-steveston"
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"

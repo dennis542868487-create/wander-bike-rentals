@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -10,52 +11,63 @@ export const metadata: Metadata = {
 const guidePoints = [
   {
     title: "Kids Bikes",
-    text: "A good option for children who are comfortable riding on their own for short, relaxed rides around Steveston, Garry Point Park, and nearby waterfront paths.",
+    text: "For children comfortable riding on their own — short, flat rides around Steveston, Garry Point Park, and the waterfront paths.",
   },
   {
     title: "Bike Trailers",
-    text: "A helpful choice for younger children or kids who may get tired quickly, so the ride stays easier for the whole family.",
+    text: "For younger children or kids who tire quickly, so the whole family can keep riding without stopping early.",
   },
   {
     title: "Steveston Village + Garry Point Park",
-    text: "One of the easiest family-friendly ride ideas because the route can stay short, scenic, and flexible from start to finish.",
+    text: "The easiest family loop — short, flat, and scenic, with a park and driftwood beach at the turnaround.",
   },
   {
     title: "West Dyke Trail",
-    text: "A flat and scenic option for families who want a longer ride with more open space, marshland, and photo stops.",
+    text: "Flat and open with lots of room. From the shop, riding north toward the airport and back is about a 2-hour round trip — shorten it however you like.",
   },
   {
     title: "Terra Nova",
-    text: "A stronger option when the family wants a ride that includes a destination children can look forward to beyond the bike itself.",
+    text: "A natural destination kids can look forward to, with open space and play areas at the north end of the West Dyke Trail.",
   },
   {
     title: "Railway Greenway",
-    text: "Useful for families who want a more connected Richmond route instead of staying only around Steveston Village.",
+    text: "A connected, mostly car-free Richmond route when you want to ride beyond Steveston Village.",
   },
 ];
 
 export default function FamilyBikeRentalRichmondPage() {
   return (
     <main className="pb-20 text-slate-900">
-      <section className="relative overflow-hidden border-b border-white/70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_30%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-22">
+      <section className="hero relative isolate overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/assets/west-dyke-trail.jpg"
+            alt="West Dyke Trail sign in Richmond with parked rental bikes and riders on the path"
+            fill
+            priority
+            sizes="100vw"
+            className="hero-img-anim object-cover object-center"
+          />
+          <div className="hero-grad-anim absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-950/68 to-slate-900/50" />
+          <div className="hero-grad-anim absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.26),transparent_46%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.14),transparent_40%)]" />
+        </div>
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
           <div className="space-y-6">
-            <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+            <div className="hero-anim hero-d1 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-teal-100 shadow-sm backdrop-blur">
               Family ride guide
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
+              <h1 className="hero-anim hero-d2 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Family Bike Rentals in Richmond, BC
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              <p className="hero-anim hero-d3 max-w-2xl text-lg leading-8 text-slate-100/90">
                 A simple guide for families looking for kids bikes, bike trailers, and easy places to ride around Steveston and Richmond.
               </p>
             </div>
-            <p className="max-w-2xl text-base leading-8 text-slate-600">
+            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
               Planning a family ride in Richmond? Wander Bike Rentals offers adult bikes, kids bikes, and bike trailers for an easy day out near Steveston, Garry Point Park, the waterfront, and Richmond’s flat dyke trails.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/kids-bike-rental-richmond"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
@@ -77,7 +89,7 @@ export default function FamilyBikeRentalRichmondPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/40 bg-white/80 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why Richmond works well for family bike rides</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
@@ -138,6 +150,12 @@ export default function FamilyBikeRentalRichmondPage() {
                 className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Bike Trailers
+              </Link>
+              <Link
+                href="/bike-rental-richmond"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Richmond Ride Ideas
               </Link>
             </div>
           </div>

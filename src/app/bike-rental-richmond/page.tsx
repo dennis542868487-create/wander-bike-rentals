@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -25,40 +26,51 @@ const quickFacts = [
 const rentalTypes = [
   {
     title: "Ride the West Dyke Trail",
-    text: "A flat scenic route with open marshland, waterfront views, and plenty of space for a relaxed Richmond ride.",
+    text: "Flat, open marshland and waterfront views with plenty of room to ride. From the shop, riding north toward the airport and back is about a 2-hour round trip at an easy sightseeing pace.",
   },
   {
     title: "Visit Steveston Village",
-    text: "Start near Steveston and turn the ride into a fuller Richmond outing with village stops, food, and harbour views.",
+    text: "Start in Steveston for harbour views, food stops, and Garry Point Park before heading out along the dyke.",
   },
   {
     title: "Family-Friendly Rentals",
-    text: "Choose adult bikes, kids bikes, or trailers for an easier local ride with family-friendly flexibility.",
+    text: "Adult bikes, kids bikes, and trailers in one stop, so the whole family rides together.",
   },
 ];
 
 export default function BikeRentalRichmondPage() {
   return (
     <main className="pb-20 text-slate-900">
-      <section className="relative overflow-hidden border-b border-white/70">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_30%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-22">
+      <section className="hero relative isolate overflow-hidden border-b border-white/10">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/assets/west-dyke-ride.webp"
+            alt="Two cyclists riding the West Dyke Trail along the Richmond waterfront at golden hour"
+            fill
+            priority
+            sizes="100vw"
+            className="hero-img-anim object-cover object-center"
+          />
+          <div className="hero-grad-anim absolute inset-0 bg-gradient-to-br from-slate-950/85 via-slate-950/68 to-slate-900/50" />
+          <div className="hero-grad-anim absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.26),transparent_46%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.14),transparent_40%)]" />
+        </div>
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8 lg:py-28">
           <div className="space-y-6">
-            <div className="inline-flex rounded-full border border-teal-200 bg-white/90 px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm">
+            <div className="hero-anim hero-d1 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-teal-100 shadow-sm backdrop-blur">
               Richmond rentals
             </div>
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
+              <h1 className="hero-anim hero-d2 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
                 Bike Rental Richmond
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              <p className="hero-anim hero-d3 max-w-2xl text-lg leading-8 text-slate-100/90">
                 Explore Richmond by bike from Steveston. Ride flat waterfront trails, visit Garry Point Park, enjoy Steveston Village, and take in Richmond’s open dyke views with an easy local bike rental.
               </p>
             </div>
-            <p className="max-w-2xl text-base leading-8 text-slate-600">
+            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
               Adult bikes, kids bikes, and trailers are available, with helmet and lock included for a simpler ride around Richmond.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <a
                 href="tel:+17789521389"
                 className="btn-primary px-6 py-3.5 text-sm shadow-[0_14px_30px_rgba(15,23,42,0.16)]"
@@ -72,17 +84,17 @@ export default function BikeRentalRichmondPage() {
                 View Location
               </Link>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="hero-anim hero-d5 grid gap-4 sm:grid-cols-3">
               {quickFacts.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{item.value}</p>
+                <div key={item.label} className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-sm backdrop-blur">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-100/80">{item.label}</p>
+                  <p className="mt-2 text-sm font-medium text-white">{item.value}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/80 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)]">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/40 bg-white/80 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Richmond overview</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better way to see Richmond from the water and dyke trails</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">

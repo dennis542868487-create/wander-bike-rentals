@@ -94,7 +94,7 @@ export default function BikeRentalRichmondPage() {
             </div>
           </div>
 
-          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/40 bg-white/80 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/90 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Richmond overview</p>
             <h2 className="mt-3 text-2xl font-semibold text-slate-950">A better way to see Richmond from the water and dyke trails</h2>
             <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">

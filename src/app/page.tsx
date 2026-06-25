@@ -318,6 +318,8 @@ export default function Home() {
         </div>
       </section>
 
+      <ReviewsSection />
+
       <section className="mx-auto max-w-6xl px-6 py-18 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -600,8 +602,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      <ReviewsSection />
 
       <section className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="rounded-[2.25rem] bg-slate-950 px-8 py-14 text-white shadow-[0_30px_80px_rgba(15,23,42,0.30)]">

@@ -65,7 +65,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[radial-gradient(circle_at_top,#ecfdf5_0%,#f8fafc_24%,#ffffff_60%)] text-slate-900">
+      <body className="min-h-full bg-[linear-gradient(180deg,#f6faf9_0%,#ffffff_30%)] text-slate-900">
         <div className="min-h-screen">
           <Reveal />
           <SiteHeader />

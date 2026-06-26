@@ -8,10 +8,14 @@ const CHATBASE_ID = "WqLC1J0pcU0oSFy2BCPcT";
 // The launcher button Chatbase injects into the page. We hide it and drive it
 // from our own branded button so we control the look and the animation.
 const NATIVE_BUTTON_ID = "chatbase-bubble-button";
+// The chat panel Chatbase opens. We watch it so our launcher gets out of the
+// way while the chat is open.
+const NATIVE_WINDOW_ID = "chatbase-bubble-window";
 
 export default function ChatbaseWidget() {
   const [ready, setReady] = useState(false);
   const [teaser, setTeaser] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const dismissed = useRef(false);
 
   // Wait for Chatbase's native launcher to mount, hide it, then reveal ours.
@@ -30,6 +34,23 @@ export default function ChatbaseWidget() {
     }, 500);
     return () => window.clearInterval(id);
   }, []);
+
+  // Track whether the Chatbase panel is open so we can hide our launcher while
+  // it is — otherwise the FAB and teaser overlap and block the chat.
+  useEffect(() => {
+    if (!ready) return;
+    const win = document.getElementById(NATIVE_WINDOW_ID);
+    if (!win) return;
+    const sync = () => {
+      const open = window.getComputedStyle(win).display !== "none";
+      setChatOpen(open);
+      if (open) setTeaser(false);
+    };
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(win, { attributes: true, attributeFilter: ["style", "class"] });
+    return () => obs.disconnect();
+  }, [ready]);
 
   // Nudge the visitor once per session, a few seconds after the launcher is live.
   useEffect(() => {
@@ -61,7 +82,7 @@ export default function ChatbaseWidget() {
       </Script>
 
       {ready && (
-        <div className="wbr-launcher">
+        <div className="wbr-launcher" hidden={chatOpen}>
           {teaser && (
             <div className="wbr-teaser" role="status">
               <button

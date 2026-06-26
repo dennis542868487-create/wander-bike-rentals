@@ -24,7 +24,8 @@ const faqs = [
   ["What is the hourly rental price?", "Adult bike: $12.38/hr. Kids bike: $9.52/hr. Trailer: $9.52/hr."],
   ["Do I need an appointment for quick bike repair?", "No appointment is needed for quick bike repair. You can walk in and ask the shop to take a look."],
   ["What kinds of bike repairs do you handle?", "The shop can help with common issues such as flat tires, brake adjustment, gear tuning, wheel rubbing, chain cleaning, and basic safety checks. Final service depends on the bike condition after inspection."],
-  ["Do I need photo ID before renting?", "Yes, a valid photo ID may be required to verify your identity before renting. Please contact the shop for current rental requirements."],
+  ["Do I need photo ID before renting?", "Yes. A valid photo ID is required before renting — it's part of our insurance requirements. Any type of government-issued photo ID is accepted."],
+  ["Do I need to pay a deposit?", "No. No deposit is required to rent."],
   ["Where is Wander Bike located?", "12071 First Ave #101, Richmond, BC V7E 3M1."],
   ["What is the best way to contact the shop?", "Call (778) 952-1389 for direct contact."],
 ];

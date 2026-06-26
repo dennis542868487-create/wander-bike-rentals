@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
 import Reveal from "@/components/reveal";
+import ChatbaseWidget from "@/components/chatbase-widget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -132,6 +133,7 @@ export default function RootLayout({
             </div>
           </footer>
         </div>
+        <ChatbaseWidget />
       </body>
     </html>
   );

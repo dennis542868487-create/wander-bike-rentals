@@ -206,3 +206,114 @@ a {
     to { opacity: 1; transform: none; }
   }
 }
+
+/* ---------- Chatbase custom launcher ---------- */
+/* Hide Chatbase's default bubble and auto-popup only once our own launcher is
+   live — we drive the chat from our branded button and teaser instead. */
+html.wbr-custom-launcher #chatbase-bubble-button,
+html.wbr-custom-launcher #chatbase-message-bubbles { display: none !important; }
+
+.wbr-launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.wbr-fab {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: #ffffff;
+  background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+  box-shadow: 0 14px 30px rgba(13, 148, 136, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease, filter 220ms ease;
+}
+.wbr-fab:hover {
+  transform: scale(1.08) translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 18px 38px rgba(13, 148, 136, 0.5);
+}
+.wbr-fab:active { transform: scale(0.96); }
+.wbr-fab svg { position: relative; z-index: 1; }
+
+.wbr-fab-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.wbr-teaser {
+  position: relative;
+  display: flex;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+}
+.wbr-teaser-body {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: 600 14px/1.3 var(--font-geist-sans), Arial, sans-serif;
+  color: #0f172a;
+  padding: 12px 14px;
+  white-space: nowrap;
+}
+.wbr-teaser-body:hover { color: #0f766e; }
+.wbr-teaser-close {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 1px solid var(--card-border);
+  background: #ffffff;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+}
+.wbr-teaser-close:hover { color: #0f172a; }
+
+@media (max-width: 640px) {
+  .wbr-launcher { right: 16px; bottom: 16px; }
+  .wbr-fab { width: 54px; height: 54px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wbr-fab { animation: wbrPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .wbr-fab-ring { animation: wbrPulse 2.6s ease-out infinite; }
+  .wbr-teaser { animation: wbrTeaserIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  @keyframes wbrPopIn {
+    0% { opacity: 0; transform: scale(0) translateY(8px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes wbrPulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    70% { transform: scale(1.7); opacity: 0; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+  @keyframes wbrTeaserIn {
+    0% { opacity: 0; transform: translateX(12px) scale(0.96); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+  }
+}

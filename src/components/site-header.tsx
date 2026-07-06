@@ -21,10 +21,15 @@ type NavItem =
       type: "group";
       label: string;
       links: NavLink[];
+    }
+  | {
+      type: "services";
+      label: string;
+      rentalLinks: NavLink[];
+      repairLink: NavLink;
     };
 
 const rentalsLinks: NavLink[] = [
-  { href: "/booking", label: "Book Online" },
   { href: "/pricing", label: "Pricing" },
   { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
   { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },
@@ -41,8 +46,13 @@ const guidesLinks: NavLink[] = [
 
 const navItems: NavItem[] = [
   { type: "link", href: "/", label: "Home" },
-  { type: "group", label: "Rentals", links: rentalsLinks },
-  { type: "link", href: "/quick-bike-repair-richmond", label: "Quick Repair" },
+  {
+    type: "services",
+    label: "Our Services",
+    rentalLinks: rentalsLinks,
+    repairLink: { href: "/quick-bike-repair-richmond", label: "Quick Repair" },
+  },
+  { type: "link", href: "/booking", label: "Book Online" },
   { type: "group", label: "Guides", links: guidesLinks },
   { type: "link", href: "/location", label: "Location" },
   { type: "link", href: "/faq", label: "FAQ" },
@@ -124,6 +134,60 @@ export default function SiteHeader() {
                   <Link key={item.label} href={item.href} className={desktopLinkClass(active)}>
                     {item.label}
                   </Link>
+                );
+              }
+
+              if (item.type === "services") {
+                const active =
+                  groupIsActive(pathname, item.rentalLinks) ||
+                  isActive(pathname, item.repairLink.href);
+
+                return (
+                  <div key={item.label} className="group relative">
+                    <button type="button" className={desktopLinkClass(active)}>
+                      {item.label}
+                      <span className="ml-1 text-xs transition duration-200 group-hover:rotate-180 group-focus-within:rotate-180">▼</span>
+                    </button>
+                    <div className="pointer-events-none absolute left-0 top-full z-40 w-80 pt-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+                      <div className="rounded-[1.6rem] border border-slate-200 bg-white p-3 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+                        <div className="rounded-[1.2rem] bg-slate-50/80 p-2">
+                          <p className="px-3 pb-1.5 pt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            Rentals
+                          </p>
+                          {item.rentalLinks.map((link) => {
+                            const childActive = isActive(pathname, link.href);
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                className={[
+                                  "flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition",
+                                  childActive
+                                    ? "bg-[var(--brand-soft)] font-medium text-[var(--brand-strong)]"
+                                    : "text-slate-700 hover:bg-white hover:text-slate-950",
+                                ].join(" ")}
+                              >
+                                <span>{link.label}</span>
+                                <span className="text-xs text-slate-400">→</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                        <Link
+                          href={item.repairLink.href}
+                          className={[
+                            "mt-2 flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition",
+                            isActive(pathname, item.repairLink.href)
+                              ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                              : "text-slate-800 hover:bg-slate-50",
+                          ].join(" ")}
+                        >
+                          <span>{item.repairLink.label}</span>
+                          <span className="text-xs text-slate-400">→</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 );
               }
 
@@ -217,6 +281,60 @@ export default function SiteHeader() {
                     >
                       <span>{item.label}</span>
                     </Link>
+                  );
+                }
+
+                if (item.type === "services") {
+                  const expanded = openGroup === item.label;
+                  const active =
+                    groupIsActive(pathname, item.rentalLinks) ||
+                    isActive(pathname, item.repairLink.href);
+
+                  return (
+                    <div key={item.label} className="rounded-[1.4rem] border border-slate-200 bg-white p-2.5 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(item.label)}
+                        className={[mobileLinkClass(active), "min-h-12 px-4 py-3.5"].join(" ")}
+                      >
+                        <span className="font-semibold">{item.label}</span>
+                        <span className={["text-xs text-slate-500 transition duration-200", expanded ? "rotate-180 text-[var(--brand)]" : ""].join(" ")}>▼</span>
+                      </button>
+                      <div className={["overflow-hidden transition-all duration-300 ease-out", expanded ? "max-h-[32rem] opacity-100" : "max-h-0 opacity-0"].join(" ")}>
+                        <div className="mt-2 rounded-[1.15rem] bg-slate-50/80 p-2.5">
+                          <p className="px-3 pb-1.5 pt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Rentals</p>
+                          {item.rentalLinks.map((link) => (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              onClick={closeMenu}
+                              className={[
+                                "flex min-h-11 items-center justify-between rounded-xl px-3.5 py-3 text-sm transition",
+                                isActive(pathname, link.href)
+                                  ? "bg-[var(--brand-soft)] font-medium text-[var(--brand-strong)]"
+                                  : "text-slate-700 hover:bg-white hover:text-slate-950",
+                              ].join(" ")}
+                            >
+                              <span>{link.label}</span>
+                              <span className="text-xs text-slate-400">→</span>
+                            </Link>
+                          ))}
+                          <Link
+                            href={item.repairLink.href}
+                            onClick={closeMenu}
+                            className={[
+                              "mt-2 flex min-h-11 items-center justify-between rounded-xl border-t border-slate-200 px-3.5 py-3 text-sm font-semibold transition",
+                              isActive(pathname, item.repairLink.href)
+                                ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
+                                : "text-slate-800 hover:bg-white hover:text-slate-950",
+                            ].join(" ")}
+                          >
+                            <span>{item.repairLink.label}</span>
+                            <span className="text-xs text-slate-400">→</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
                   );
                 }
 

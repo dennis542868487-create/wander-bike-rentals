@@ -44,6 +44,40 @@ a {
   text-decoration: none;
 }
 
+.booking-input {
+  margin-top: 0.5rem;
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  padding: 0.8rem 0.95rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.booking-input:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.13);
+}
+
+.quantity-button {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #99f6e4;
+  border-radius: 9999px;
+  background: #fff;
+  color: #115e59;
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.quantity-button:hover { background: #ccfbf1; transform: translateY(-1px); }
+
 .btn-primary {
   display: inline-flex;
   align-items: center;

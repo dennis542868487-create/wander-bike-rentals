@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuthSession } from "@/hooks/use-auth-session";
 
 type NavLink = {
   href: string;
@@ -23,6 +24,7 @@ type NavItem =
     };
 
 const rentalsLinks: NavLink[] = [
+  { href: "/booking", label: "Book Online" },
   { href: "/pricing", label: "Pricing" },
   { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
   { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },
@@ -76,6 +78,7 @@ function mobileLinkClass(active: boolean) {
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const { session, ready: authReady } = useAuthSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
 
@@ -88,13 +91,9 @@ export default function SiteHeader() {
     setOpenGroup(null);
   };
 
-  useEffect(() => {
-    closeMenu();
-  }, [pathname]);
-
   return (
     <header className="site-header-anim sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/80">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3" onClick={closeMenu}>
             <div className="overflow-hidden rounded-[1.2rem] border border-[var(--card-border)] bg-white p-1 shadow-[0_14px_35px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5">
@@ -171,12 +170,13 @@ export default function SiteHeader() {
               );
             })}
 
-            <a
-              href="tel:+17789521389"
-              className="btn-primary px-5 py-2.5 text-sm"
+            <Link
+              href={session ? "/account/bookings" : "/auth"}
+              className="btn-secondary px-4 py-2.5 text-sm"
             >
-              Call Now
-            </a>
+              {authReady && session ? "My Bookings" : "Sign in"}
+            </Link>
+            <a href="tel:+17789521389" className="btn-primary px-5 py-2.5 text-sm">Call Now</a>
           </div>
 
           <div className="flex items-center gap-1.5 lg:hidden">
@@ -267,12 +267,16 @@ export default function SiteHeader() {
                 );
               })}
 
-            <a
-              href="tel:+17789521389"
+            <Link
+              href="/booking"
+              onClick={closeMenu}
               className="btn-primary w-full rounded-2xl px-4 py-3.5 text-sm"
             >
-              Call Now
-            </a>
+              Book Online
+            </Link>
+            <Link href={session ? "/account/bookings" : "/auth"} onClick={closeMenu} className="btn-secondary w-full rounded-2xl px-4 py-3.5 text-sm">
+              {authReady && session ? "My Bookings & Account" : "Sign in or create an account"}
+            </Link>
           </div>
         </div>
       </div>

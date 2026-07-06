@@ -113,6 +113,7 @@ export default function RootLayout({
                 <div>
                   <p className="font-semibold text-white">Rentals</p>
                   <ul className="mt-4 space-y-3.5 text-slate-400">
+                    <li><Link className="transition hover:text-white" href="/booking">Book Online</Link></li>
                     <li><Link className="transition hover:text-white" href="/adult-bike-rental-richmond">Adult Bikes</Link></li>
                     <li><Link className="transition hover:text-white" href="/kids-bike-rental-richmond">Kids Bikes</Link></li>
                     <li><Link className="transition hover:text-white" href="/bike-trailer-rental-richmond">Bike Trailers</Link></li>

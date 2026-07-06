@@ -4,6 +4,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://wanderbike.ca";
   const routes = [
     "",
+    "/booking",
+    "/pricing",
     "/bike-rental-richmond",
     "/bike-rental-steveston",
     "/adult-bike-rental-richmond",

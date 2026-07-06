@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // Chatbase chatbot id — dashboard URL /chatbot/<ID>/deploy
 const CHATBASE_ID = "WqLC1J0pcU0oSFy2BCPcT";
@@ -13,6 +14,8 @@ const NATIVE_BUTTON_ID = "chatbase-bubble-button";
 const NATIVE_WINDOW_ID = "chatbase-bubble-window";
 
 export default function ChatbaseWidget() {
+  const pathname = usePathname();
+  const isPrivatePage = pathname.startsWith("/booking") || pathname.startsWith("/auth") || pathname.startsWith("/account");
   const [ready, setReady] = useState(false);
   const [teaser, setTeaser] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -22,6 +25,7 @@ export default function ChatbaseWidget() {
   // If it never appears we leave Chatbase's own button alone so chat is never
   // unreachable.
   useEffect(() => {
+    if (isPrivatePage) return;
     let tries = 0;
     const id = window.setInterval(() => {
       if (document.getElementById(NATIVE_BUTTON_ID)) {
@@ -33,12 +37,12 @@ export default function ChatbaseWidget() {
       }
     }, 500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [isPrivatePage]);
 
   // Track whether the Chatbase panel is open so we can hide our launcher while
   // it is — otherwise the FAB and teaser overlap and block the chat.
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || isPrivatePage) return;
     const win = document.getElementById(NATIVE_WINDOW_ID);
     if (!win) return;
     const sync = () => {
@@ -50,17 +54,17 @@ export default function ChatbaseWidget() {
     const obs = new MutationObserver(sync);
     obs.observe(win, { attributes: true, attributeFilter: ["style", "class"] });
     return () => obs.disconnect();
-  }, [ready]);
+  }, [ready, isPrivatePage]);
 
   // Nudge the visitor once per session, a few seconds after the launcher is live.
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || isPrivatePage) return;
     try {
       if (sessionStorage.getItem("wbr-teaser-seen")) return;
     } catch {}
     const t = window.setTimeout(() => setTeaser(true), 4500);
     return () => window.clearTimeout(t);
-  }, [ready]);
+  }, [ready, isPrivatePage]);
 
   const closeTeaser = () => {
     setTeaser(false);
@@ -74,6 +78,8 @@ export default function ChatbaseWidget() {
     closeTeaser();
     document.getElementById(NATIVE_BUTTON_ID)?.click();
   };
+
+  if (isPrivatePage) return null;
 
   return (
     <>

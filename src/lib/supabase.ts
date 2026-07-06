@@ -29,7 +29,10 @@ export function getSupabaseBrowser() {
 
   if (!browserClient) {
     browserClient = createClient(url, publishableKey, {
-      auth: { flowType: "pkce", detectSessionInUrl: true, persistSession: true },
+      // The dedicated callback component exchanges the PKCE code. Disabling the
+      // automatic exchange prevents the header and callback from consuming the
+      // same one-time code concurrently.
+      auth: { flowType: "pkce", detectSessionInUrl: false, persistSession: true },
     });
   }
   return browserClient;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowser } from "@/lib/supabase";
 
@@ -9,16 +9,27 @@ export default function AuthCallback() {
   const router = useRouter();
   const params = useSearchParams();
   const [error, setError] = useState("");
+  const exchangeStarted = useRef(false);
   const missingCodeError = !params.get("code") ? params.get("error_description") || "The sign-in link is invalid or has expired." : "";
 
   useEffect(() => {
     const code = params.get("code");
     const nextValue = params.get("next");
     const next = nextValue?.startsWith("/") && !nextValue.startsWith("//") ? nextValue : "/account/bookings";
-    if (!code) return;
-    void getSupabaseBrowser().auth.exchangeCodeForSession(code).then(({ error: authError }) => {
-      if (authError) setError(authError.message);
-      else router.replace(next);
+    if (!code || exchangeStarted.current) return;
+    exchangeStarted.current = true;
+
+    const client = getSupabaseBrowser();
+    void client.auth.exchangeCodeForSession(code).then(async ({ error: authError }) => {
+      if (!authError) {
+        router.replace(next);
+        return;
+      }
+
+      // If another callback listener completed first, do not show a false error.
+      const { data } = await client.auth.getSession();
+      if (data.session) router.replace(next);
+      else setError(authError.message);
     });
   }, [params, router]);
 

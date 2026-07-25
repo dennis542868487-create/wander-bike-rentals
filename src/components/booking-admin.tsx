@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import type { Booking, BookingStatus } from "@/lib/booking-types";
-import { useGoogleAuth } from "@/hooks/use-google-auth";
+import { useSocialAuth } from "@/hooks/use-social-auth";
+import { SocialAuthButtons } from "@/components/social-auth-buttons";
+import type { SocialAuthProvider } from "@/lib/supabase/oauth-providers";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const statusStyles: Record<BookingStatus, string> = {
@@ -60,7 +62,7 @@ async function api(session: Session, url: string, init?: RequestInit) {
 function Login({ onLogin }: { onLogin: (session: Session) => void }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const googleEnabled = useGoogleAuth();
+  const socialAuth = useSocialAuth();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,11 +83,11 @@ function Login({ onLogin }: { onLogin: (session: Session) => void }) {
     }
   }
 
-  async function googleLogin() {
+  async function socialLogin(provider: SocialAuthProvider) {
     setLoading(true);
     setError("");
     const { error: authError } = await getSupabaseBrowser().auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: { redirectTo: `${window.location.origin}/auth/callback?next=/booking-admin` },
     });
     if (authError) {
@@ -100,10 +102,12 @@ function Login({ onLogin }: { onLogin: (session: Session) => void }) {
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-600 text-2xl text-white">🚲</div>
         <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-950">Booking calendar</h1>
         <p className="mt-2 text-sm leading-6 text-slate-500">Private staff access for Wander Bike Rentals.</p>
-        <button type="button" onClick={() => void googleLogin()} disabled={loading || !googleEnabled} className="mt-6 flex w-full items-center justify-center gap-3 rounded-full border border-slate-300 px-5 py-3 font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
-          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 .9-3.4.9a5.8 5.8 0 0 1-5.5-4H3.2v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.5 14a6 6 0 0 1 0-4V7.4H3.2a10 10 0 0 0 0 9.2L6.5 14Z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.8A9.6 9.6 0 0 0 3.2 7.4L6.5 10A5.8 5.8 0 0 1 12 6Z"/></svg>
-          {googleEnabled === false ? "Google sign-in — setup needed" : "Continue with Google"}
-        </button>
+        <SocialAuthButtons
+          availability={socialAuth}
+          busy={loading}
+          onSelect={socialLogin}
+          className="mt-6"
+        />
         <div className="my-5 flex items-center gap-3"><span className="h-px flex-1 bg-slate-200"/><span className="text-xs font-semibold uppercase tracking-wider text-slate-400">or email</span><span className="h-px flex-1 bg-slate-200"/></div>
         <label className="block text-sm font-semibold text-slate-700">Email
           <input name="email" type="email" autoComplete="email" required className="booking-input" />

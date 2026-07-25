@@ -28,10 +28,16 @@ Choose whether email confirmation is required in the Supabase dashboard. The
 application supports both configurations and completes PKCE sessions at
 `/auth/callback`.
 
-## Optional Google sign-in
+## Google and Apple sign-in
 
-Create a Google OAuth web client and use this authorized redirect URI, replacing
-the placeholder with the new project reference:
+Both buttons use the Supabase PKCE flow and return through `/auth/callback`.
+They stay disabled until the corresponding provider is enabled in the hosted
+Supabase project.
+
+### Google
+
+Create a Google OAuth web client and use this authorized redirect URI,
+replacing the placeholder with the new project reference:
 
 ```text
 https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
@@ -39,6 +45,35 @@ https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
 
 Enable Google under **Supabase Dashboard → Authentication → Providers** and
 store the Google secret there, not in this repository.
+
+The supplied Google credential file has the expected web-client fields, but its
+saved redirect URI points at a different Supabase project. Update the OAuth
+client in Google Cloud after the new project exists; editing the downloaded JSON
+file alone does not change Google's configuration.
+
+### Apple
+
+Sign in with Apple for this website requires an active Apple Developer Program
+membership and:
+
+- the 10-character Team ID
+- a primary App ID with the Sign in with Apple capability enabled
+- a Services ID for the website
+- the signing Key ID and its one-time-download `.p8` private key
+
+Configure the Services ID website domain as the new project's
+`YOUR_PROJECT_REF.supabase.co` hostname and its return URL as:
+
+```text
+https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+```
+
+The Services ID is the Apple client ID. The Team ID, Key ID, Services ID, and
+`.p8` key are used to generate the client secret stored only in Supabase. Apple
+OAuth client secrets expire after six months, so schedule rotation and retain
+the `.p8` file securely. Register the Wander Bike sending domain with Apple's
+private email relay before sending transactional email to hidden Apple relay
+addresses.
 
 ## Create the first administrator
 

@@ -12,7 +12,7 @@ acceptance run.
 ## Automated local evidence
 
 - [x] `npm run lint`
-- [x] `npm run test:unit` — 46 tests across pricing, fulfillment, validation,
+- [x] `npm run test:unit` — 49 tests across pricing, fulfillment, validation,
       Canada Post request/response handling, and Stripe reconciliation
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
@@ -104,6 +104,8 @@ acceptance run.
 
 ## Merchant console and customer access
 
+- [x] Google and Apple buttons share the same PKCE callback and fail closed
+      unless Supabase reports the provider as enabled.
 - [x] All merchant pages and mutations require a server-verified staff/admin
       profile role.
 - [x] Order details consolidate payment, fulfillment, shipping, refund, return,
@@ -120,6 +122,8 @@ acceptance run.
 - [ ] Complete common merchant workflows at desktop, tablet, and mobile widths.
 - [ ] Confirm one customer cannot read another customer's booking or order.
 - [ ] Confirm guest access works only with the matching order cookie.
+- [ ] Complete Google and Apple provider logins on the deployed domain and
+      confirm profile creation, callback routing, sign-out, and repeat sign-in.
 
 ## Notifications
 
@@ -148,6 +152,7 @@ acceptance run.
 ## Required merchant inputs
 
 - Supabase organization and project-cost confirmation
+- Apple Developer Team ID, App ID, Services ID, signing Key ID, and `.p8` key
 - Canada Post account type and Customer Number; Contract ID, Group ID, and MOBO
   Customer Number when applicable
 - Initial admin email

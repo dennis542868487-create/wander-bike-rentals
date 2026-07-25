@@ -36,6 +36,35 @@ test("core public pages render without client exceptions", async ({ page }) => {
   expect(pageErrors).toEqual([]);
 });
 
+test("account auth exposes safe Google, Apple, and email setup states", async ({
+  page,
+}) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/auth");
+  await expect(
+    page.getByRole("button", {
+      name: "Google sign-in — setup needed",
+    }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", {
+      name: "Apple sign-in — setup needed",
+    }),
+  ).toBeDisabled();
+
+  await page
+    .getByRole("button", { name: "Create account", exact: true })
+    .click();
+  await expect(page.getByLabel("Full name")).toBeVisible();
+  await expect(page.getByLabel("Password")).toHaveAttribute(
+    "autocomplete",
+    "new-password",
+  );
+  expect(pageErrors).toEqual([]);
+});
+
 test("shop filters the sandbox catalog", async ({ page }) => {
   await page.goto("/shop?q=helmet");
   await expect(page.getByText("[TEST] Family Ride Helmet")).toBeVisible();

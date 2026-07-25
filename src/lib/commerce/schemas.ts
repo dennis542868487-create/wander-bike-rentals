@@ -36,6 +36,7 @@ export const addressSchema = z.object({
 
 export const checkoutRequestSchema = z
   .object({
+    checkoutRequestId: z.uuid(),
     email: z.email().trim().max(320),
     firstName: z.string().trim().min(1).max(100),
     lastName: z.string().trim().min(1).max(100),
@@ -61,6 +62,56 @@ export const checkoutRequestSchema = z
         path: ["shippingQuoteId"],
         message: "Choose a current Canada Post rate.",
       });
+    }
+
+    if (value.fulfillmentMethod === "canada_post" && value.shippingAddress) {
+      const canadaPostFields: Array<{
+        path: string;
+        value: string;
+        maximum: number;
+        label: string;
+      }> = [
+        {
+          path: "firstName",
+          value: `${value.firstName} ${value.lastName}`.trim(),
+          maximum: 44,
+          label: "Recipient name",
+        },
+        {
+          path: "phone",
+          value: value.phone ?? "",
+          maximum: 25,
+          label: "Phone",
+        },
+        {
+          path: "shippingAddress.addressLine1",
+          value: value.shippingAddress.addressLine1,
+          maximum: 44,
+          label: "Address line 1",
+        },
+        {
+          path: "shippingAddress.addressLine2",
+          value: value.shippingAddress.addressLine2,
+          maximum: 44,
+          label: "Address line 2",
+        },
+        {
+          path: "shippingAddress.city",
+          value: value.shippingAddress.city,
+          maximum: 40,
+          label: "City",
+        },
+      ];
+
+      for (const field of canadaPostFields) {
+        if (field.value.length > field.maximum) {
+          context.addIssue({
+            code: "custom",
+            path: field.path.split("."),
+            message: `${field.label} must be ${field.maximum} characters or fewer for Canada Post.`,
+          });
+        }
+      }
     }
   });
 

@@ -172,6 +172,20 @@ function optionalElement(value: string | undefined) {
   return trimmed ? trimmed : undefined;
 }
 
+function assertCanadaPostField(
+  value: string | undefined,
+  maximum: number,
+  label: string,
+) {
+  if ((value?.trim().length ?? 0) > maximum) {
+    throw new CommerceError(
+      `${label} is too long for a Canada Post label.`,
+      "CANADA_POST_ADDRESS_INVALID",
+      422,
+    );
+  }
+}
+
 function shipmentDeliverySpec(input: {
   serviceCode: string;
   orderNumber: string;
@@ -181,6 +195,27 @@ function shipmentDeliverySpec(input: {
   contract: boolean;
   environment: ReturnType<typeof requireServerEnvironment>;
 }) {
+  assertCanadaPostField(input.sender.company, 44, "Sender company");
+  assertCanadaPostField(input.sender.contact, 44, "Sender contact");
+  assertCanadaPostField(input.sender.phone, 25, "Sender phone");
+  assertCanadaPostField(input.sender.addressLine1, 44, "Sender address line 1");
+  assertCanadaPostField(input.sender.addressLine2, 44, "Sender address line 2");
+  assertCanadaPostField(input.sender.city, 40, "Sender city");
+  assertCanadaPostField(input.destination.name, 44, "Recipient name");
+  assertCanadaPostField(input.destination.company, 44, "Recipient company");
+  assertCanadaPostField(input.destination.phone, 25, "Recipient phone");
+  assertCanadaPostField(
+    input.destination.addressLine1,
+    44,
+    "Recipient address line 1",
+  );
+  assertCanadaPostField(
+    input.destination.addressLine2,
+    44,
+    "Recipient address line 2",
+  );
+  assertCanadaPostField(input.destination.city, 40, "Recipient city");
+
   const senderAddress: UnknownRecord = {
     "address-line-1": input.sender.addressLine1,
   };
@@ -203,7 +238,9 @@ function shipmentDeliverySpec(input: {
   destinationAddress.city = input.destination.city;
   destinationAddress["prov-state"] = input.destination.province;
   destinationAddress["country-code"] = input.destination.country;
-  destinationAddress["postal-zip-code"] = input.destination.postalCode;
+  destinationAddress["postal-zip-code"] = normalizeCanadianPostalCode(
+    input.destination.postalCode,
+  );
 
   const destination: UnknownRecord = {
     name: input.destination.name,

@@ -325,6 +325,8 @@ create table public.orders (
   shipping_service_code text,
   customer_note text,
   internal_note text,
+  checkout_request_id uuid unique,
+  checkout_request_fingerprint text,
   guest_access_token_hash text,
   stripe_checkout_session_id text unique,
   stripe_payment_intent_id text unique,
@@ -349,6 +351,13 @@ create table public.orders (
   constraint orders_refund_limit check (refunded_total_cents <= total_cents),
   constraint orders_guest_access check (
     user_id is not null or guest_access_token_hash is not null
+  ),
+  constraint orders_checkout_request_pair check (
+    (checkout_request_id is null) = (checkout_request_fingerprint is null)
+  ),
+  constraint orders_checkout_request_fingerprint check (
+    checkout_request_fingerprint is null
+    or checkout_request_fingerprint ~ '^[0-9a-f]{64}$'
   ),
   constraint orders_shipping_address_required check (
     fulfillment_method = 'pickup' or shipping_address is not null
@@ -1188,28 +1197,116 @@ grant select on table
   public.product_categories,
   public.product_brands,
   public.products,
-  public.product_variants,
   public.product_images,
-  public.inventory_levels,
   public.storefront_inventory
 to anon, authenticated;
+
+grant select (
+  id,
+  product_id,
+  sku,
+  title,
+  option_values,
+  price_cents,
+  compare_at_price_cents,
+  weight_grams,
+  length_cm,
+  width_cm,
+  height_cm,
+  pickup_eligible,
+  local_delivery_eligible,
+  canada_post_eligible,
+  shipping_profile,
+  is_active,
+  sort_order,
+  created_at,
+  updated_at
+) on public.product_variants to anon, authenticated;
+
+grant select (
+  variant_id,
+  location_id,
+  allow_backorder,
+  available,
+  updated_at
+) on public.inventory_levels to anon, authenticated;
 
 grant select on table
   public.profiles,
   public.shipping_quotes,
-  public.orders,
   public.order_items,
   public.inventory_reservations,
   public.inventory_ledger,
   public.payments,
-  public.shipments,
   public.refunds,
-  public.returns,
   public.integration_events,
   public.notification_outbox,
   public.store_settings,
   public.audit_log
 to authenticated;
+
+grant select (
+  id,
+  public_id,
+  order_number,
+  user_id,
+  location_id,
+  email,
+  customer_first_name,
+  customer_last_name,
+  phone,
+  status,
+  payment_status,
+  fulfillment_status,
+  fulfillment_method,
+  currency,
+  subtotal_cents,
+  discount_total_cents,
+  shipping_total_cents,
+  tax_total_cents,
+  total_cents,
+  refunded_total_cents,
+  shipping_address,
+  billing_address,
+  shipping_service_code,
+  customer_note,
+  checkout_expires_at,
+  paid_at,
+  cancelled_at,
+  completed_at,
+  created_at,
+  updated_at
+) on public.orders to authenticated;
+
+grant select (
+  id,
+  order_id,
+  provider,
+  service_code,
+  service_name,
+  tracking_pin,
+  tracking_url,
+  status,
+  is_sandbox,
+  shipped_at,
+  delivered_at,
+  created_at,
+  updated_at
+) on public.shipments to authenticated;
+
+grant select (
+  id,
+  order_id,
+  return_number,
+  status,
+  reason,
+  resolution,
+  items,
+  received_at,
+  completed_at,
+  created_at,
+  updated_at
+) on public.returns to authenticated;
 
 grant update (full_name) on public.profiles to authenticated;
 
@@ -1222,6 +1319,8 @@ create or replace function public.commerce_create_checkout_order(
   p_customer_last_name text,
   p_fulfillment_method text,
   p_items jsonb,
+  p_checkout_request_id uuid,
+  p_checkout_request_fingerprint text,
   p_guest_access_token_hash text,
   p_user_id uuid default null,
   p_phone text default null,
@@ -1265,6 +1364,51 @@ declare
   v_shippable_unit_count integer := 0;
   v_order public.orders%rowtype;
 begin
+  if p_checkout_request_id is null
+    or coalesce(p_checkout_request_fingerprint, '') !~ '^[0-9a-f]{64}$'
+  then
+    raise exception 'Checkout request identity is invalid'
+      using errcode = '22023';
+  end if;
+
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(p_checkout_request_id::text, 0)
+  );
+
+  select *
+  into v_order
+  from public.orders
+  where checkout_request_id = p_checkout_request_id;
+
+  if found then
+    if v_order.checkout_request_fingerprint <> p_checkout_request_fingerprint
+      or v_order.guest_access_token_hash <> p_guest_access_token_hash
+    then
+      raise exception 'Checkout request identity was reused with different details'
+        using errcode = '23514';
+    end if;
+
+    if v_order.status <> 'pending_payment'
+      or v_order.checkout_expires_at <= now()
+    then
+      raise exception 'Checkout request is no longer active'
+        using errcode = '23514';
+    end if;
+
+    return query
+    select
+      v_order.id,
+      v_order.public_id,
+      v_order.order_number,
+      v_order.subtotal_cents,
+      v_order.shipping_total_cents,
+      v_order.tax_total_cents,
+      v_order.total_cents,
+      v_order.currency,
+      v_order.checkout_expires_at;
+    return;
+  end if;
+
   if p_fulfillment_method not in ('pickup', 'local_delivery', 'canada_post') then
     raise exception 'Unsupported fulfillment method'
       using errcode = '22023';
@@ -1310,6 +1454,27 @@ begin
 
   if p_fulfillment_method <> 'pickup' and p_shipping_address is null then
     raise exception 'A shipping address is required'
+      using errcode = '22023';
+  end if;
+
+  if p_fulfillment_method = 'canada_post'
+    and (
+      char_length(
+        trim(p_customer_first_name) || ' ' || trim(p_customer_last_name)
+      ) > 44
+      or char_length(trim(coalesce(p_phone, ''))) > 25
+      or char_length(
+        trim(coalesce(p_shipping_address ->> 'addressLine1', ''))
+      ) > 44
+      or char_length(
+        trim(coalesce(p_shipping_address ->> 'addressLine2', ''))
+      ) > 44
+      or char_length(
+        trim(coalesce(p_shipping_address ->> 'city', ''))
+      ) > 40
+    )
+  then
+    raise exception 'Customer details exceed Canada Post label limits'
       using errcode = '22023';
   end if;
 
@@ -1428,6 +1593,8 @@ begin
     billing_address,
     shipping_service_code,
     customer_note,
+    checkout_request_id,
+    checkout_request_fingerprint,
     guest_access_token_hash,
     checkout_expires_at
   )
@@ -1450,6 +1617,8 @@ begin
     coalesce(p_billing_address, p_shipping_address),
     v_shipping_service_code,
     nullif(trim(p_customer_note), ''),
+    p_checkout_request_id,
+    p_checkout_request_fingerprint,
     nullif(trim(p_guest_access_token_hash), ''),
     p_checkout_expires_at
   )
@@ -1678,6 +1847,8 @@ revoke all on function public.commerce_create_checkout_order(
   text,
   text,
   jsonb,
+  uuid,
+  text,
   text,
   uuid,
   text,
@@ -1696,6 +1867,8 @@ grant execute on function public.commerce_create_checkout_order(
   text,
   text,
   jsonb,
+  uuid,
+  text,
   text,
   uuid,
   text,
@@ -1732,7 +1905,10 @@ begin
       checkout_expires_at = least(checkout_expires_at, p_checkout_expires_at)
   where id = p_order_id
     and status = 'pending_payment'
-    and stripe_checkout_session_id is null;
+    and (
+      stripe_checkout_session_id is null
+      or stripe_checkout_session_id = p_checkout_session_id
+    );
 
   v_updated := found;
 
@@ -1944,6 +2120,7 @@ create or replace function public.commerce_mark_stripe_checkout_pending(
   p_event_type text,
   p_payload jsonb,
   p_checkout_session_id text,
+  p_order_id bigint,
   p_payment_intent_id text,
   p_amount_total_cents bigint,
   p_currency text
@@ -1986,6 +2163,35 @@ begin
   for update;
 
   if not found then
+    select *
+    into v_order
+    from public.orders
+    where id = p_order_id
+      and stripe_checkout_session_id is null
+    for update;
+
+    if found then
+      update public.orders
+      set stripe_checkout_session_id = p_checkout_session_id
+      where id = v_order.id;
+      v_order.stripe_checkout_session_id := p_checkout_session_id;
+    end if;
+  elsif v_order.id <> p_order_id then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'Checkout Session order metadata did not match.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'order_reference_mismatch'
+    );
+  end if;
+
+  if not found then
     update public.integration_events
     set status = 'failed',
         last_error = 'No order matches the pending Checkout Session.',
@@ -2002,6 +2208,23 @@ begin
     where id = v_event_id;
 
     return jsonb_build_object('status', 'already_paid', 'order_id', v_order.id);
+  end if;
+
+  if v_order.status <> 'pending_payment' then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'The referenced order is not awaiting payment.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'order_not_payable',
+      'order_id',
+      v_order.id
+    );
   end if;
 
   if upper(coalesce(p_currency, '')) <> v_order.currency
@@ -2083,6 +2306,7 @@ revoke all on function public.commerce_mark_stripe_checkout_pending(
   text,
   jsonb,
   text,
+  bigint,
   text,
   bigint,
   text
@@ -2092,6 +2316,7 @@ grant execute on function public.commerce_mark_stripe_checkout_pending(
   text,
   jsonb,
   text,
+  bigint,
   text,
   bigint,
   text
@@ -2102,6 +2327,7 @@ create or replace function public.commerce_mark_stripe_checkout_paid(
   p_event_type text,
   p_payload jsonb,
   p_checkout_session_id text,
+  p_order_id bigint,
   p_payment_intent_id text,
   p_amount_total_cents bigint,
   p_currency text
@@ -2149,6 +2375,35 @@ begin
   for update;
 
   if not found then
+    select *
+    into v_order
+    from public.orders
+    where id = p_order_id
+      and stripe_checkout_session_id is null
+    for update;
+
+    if found then
+      update public.orders
+      set stripe_checkout_session_id = p_checkout_session_id
+      where id = v_order.id;
+      v_order.stripe_checkout_session_id := p_checkout_session_id;
+    end if;
+  elsif v_order.id <> p_order_id then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'Checkout Session order metadata did not match.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'order_reference_mismatch'
+    );
+  end if;
+
+  if not found then
     update public.integration_events
     set status = 'failed',
         last_error = 'No order matches the Checkout Session.',
@@ -2171,6 +2426,23 @@ begin
       v_order.id,
       'order_number',
       v_order.order_number
+    );
+  end if;
+
+  if v_order.status <> 'pending_payment' then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'The referenced order is not awaiting payment.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'order_not_payable',
+      'order_id',
+      v_order.id
     );
   end if;
 
@@ -2234,6 +2506,38 @@ begin
       'failed',
       'reason',
       'inventory_inconsistent',
+      'order_id',
+      v_order.id
+    );
+  end if;
+
+  if exists (
+    select 1
+    from public.order_items oi
+    join public.products p
+      on p.id = oi.product_id
+    where oi.order_id = v_order.id
+      and p.track_inventory
+      and not exists (
+        select 1
+        from public.inventory_reservations ir
+        where ir.order_id = v_order.id
+          and ir.variant_id = oi.variant_id
+          and ir.status = 'active'
+          and ir.quantity = oi.quantity
+      )
+  ) then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'Tracked inventory is no longer reserved for this payment.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'inventory_reservation_missing',
       'order_id',
       v_order.id
     );
@@ -2383,6 +2687,7 @@ revoke all on function public.commerce_mark_stripe_checkout_paid(
   text,
   jsonb,
   text,
+  bigint,
   text,
   bigint,
   text
@@ -2392,6 +2697,7 @@ grant execute on function public.commerce_mark_stripe_checkout_paid(
   text,
   jsonb,
   text,
+  bigint,
   text,
   bigint,
   text
@@ -2401,7 +2707,8 @@ create or replace function public.commerce_expire_stripe_checkout(
   p_external_event_id text,
   p_event_type text,
   p_payload jsonb,
-  p_checkout_session_id text
+  p_checkout_session_id text,
+  p_order_id bigint
 )
 returns jsonb
 language plpgsql
@@ -2448,6 +2755,39 @@ begin
   from public.orders
   where stripe_checkout_session_id = p_checkout_session_id
   for update;
+
+  if not found then
+    select id, order_number, status, email, public_id
+    into
+      v_order_id,
+      v_order_number,
+      v_order_status,
+      v_order_email,
+      v_order_public_id
+    from public.orders
+    where id = p_order_id
+      and stripe_checkout_session_id is null
+    for update;
+
+    if found then
+      update public.orders
+      set stripe_checkout_session_id = p_checkout_session_id
+      where id = v_order_id;
+    end if;
+  elsif v_order_id <> p_order_id then
+    update public.integration_events
+    set status = 'failed',
+        last_error = 'Checkout Session order metadata did not match.',
+        processed_at = now()
+    where id = v_event_id;
+
+    return jsonb_build_object(
+      'status',
+      'failed',
+      'reason',
+      'order_reference_mismatch'
+    );
+  end if;
 
   if not found then
     update public.integration_events
@@ -2543,9 +2883,21 @@ begin
 end;
 $$;
 
-revoke all on function public.commerce_expire_stripe_checkout(text, text, jsonb, text)
+revoke all on function public.commerce_expire_stripe_checkout(
+  text,
+  text,
+  jsonb,
+  text,
+  bigint
+)
   from public, anon, authenticated;
-grant execute on function public.commerce_expire_stripe_checkout(text, text, jsonb, text)
+grant execute on function public.commerce_expire_stripe_checkout(
+  text,
+  text,
+  jsonb,
+  text,
+  bigint
+)
   to service_role;
 
 create or replace function public.commerce_expire_stale_orders(
@@ -2569,7 +2921,8 @@ begin
     select id
     from public.orders
     where status = 'pending_payment'
-      and checkout_expires_at < now()
+      and stripe_checkout_session_id is null
+      and checkout_expires_at < now() - interval '1 hour'
     order by id
     for update skip locked
     limit p_limit
@@ -2732,6 +3085,8 @@ comment on function public.commerce_create_checkout_order(
   text,
   text,
   jsonb,
+  uuid,
+  text,
   text,
   uuid,
   text,
@@ -2750,6 +3105,7 @@ comment on function public.commerce_mark_stripe_checkout_paid(
   text,
   jsonb,
   text,
+  bigint,
   text,
   bigint,
   text
@@ -5756,6 +6112,25 @@ begin
     end if;
   else
     v_shipping_address := null;
+  end if;
+
+  if v_order.fulfillment_method = 'canada_post'
+    and (
+      char_length(v_first_name || ' ' || v_last_name) > 44
+      or char_length(coalesce(v_phone, '')) > 25
+      or char_length(
+        trim(coalesce(v_shipping_address ->> 'addressLine1', ''))
+      ) > 44
+      or char_length(
+        trim(coalesce(v_shipping_address ->> 'addressLine2', ''))
+      ) > 44
+      or char_length(
+        trim(coalesce(v_shipping_address ->> 'city', ''))
+      ) > 40
+    )
+  then
+    raise exception 'Customer details exceed Canada Post label limits'
+      using errcode = '22023';
   end if;
 
   v_before := jsonb_build_object(

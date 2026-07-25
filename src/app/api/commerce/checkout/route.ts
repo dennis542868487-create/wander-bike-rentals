@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import type Stripe from "stripe";
-import { createGuestAccessToken } from "@/lib/commerce/guest-access";
+import { hashGuestAccessToken } from "@/lib/commerce/guest-access";
 import {
   assertFulfillmentAllowed,
   buildCanadaPostPackage,
@@ -72,7 +73,11 @@ async function cancelDatabaseOrder(orderId: number, reason: string) {
     p_order_id: orderId,
     p_reason: reason,
   });
-  if (error) console.error("Failed to release checkout inventory", { orderId });
+  if (error) {
+    console.error("Failed to release checkout inventory", { orderId });
+    return false;
+  }
+  return true;
 }
 
 export async function POST(request: Request) {
@@ -85,6 +90,7 @@ export async function POST(request: Request) {
 
   let createdOrder: CreatedOrder | null = null;
   let stripeSessionId: string | null = null;
+  let stripeSessionCreateStarted = false;
 
   try {
     const body: unknown = await request.json();
@@ -146,7 +152,10 @@ export async function POST(request: Request) {
 
     const auth = await requireUser(request);
     const userId = auth.ok ? auth.user.id : null;
-    const guestAccess = createGuestAccessToken();
+    const guestAccess = {
+      token: parsed.data.checkoutRequestId,
+      hash: hashGuestAccessToken(parsed.data.checkoutRequestId),
+    };
     const checkoutExpiresAt = new Date(Date.now() + 40 * 60 * 1000);
     const shippingAddress = parsed.data.shippingAddress
       ? {
@@ -246,12 +255,34 @@ export async function POST(request: Request) {
       rates: settings.tax.rates,
       enabled: settings.tax.enabled,
     });
+    const normalizedItems = databaseCartItems(parsed.data.items);
+    const checkoutRequestFingerprint = createHash("sha256")
+      .update(
+        JSON.stringify({
+          userId,
+          email: parsed.data.email.toLowerCase(),
+          firstName: parsed.data.firstName,
+          lastName: parsed.data.lastName,
+          phone: parsed.data.phone || null,
+          fulfillmentMethod: parsed.data.fulfillmentMethod,
+          items: normalizedItems,
+          shippingAddress,
+          shippingQuoteId: parsed.data.shippingQuoteId ?? null,
+          shippingCents,
+          taxCents,
+          customerNote: parsed.data.customerNote || null,
+          locationCode: "steveston",
+        }),
+      )
+      .digest("hex");
     const orderResult = await supabase.rpc("commerce_create_checkout_order", {
+      p_checkout_request_id: parsed.data.checkoutRequestId,
+      p_checkout_request_fingerprint: checkoutRequestFingerprint,
       p_customer_email: parsed.data.email,
       p_customer_first_name: parsed.data.firstName,
       p_customer_last_name: parsed.data.lastName,
       p_fulfillment_method: parsed.data.fulfillmentMethod,
-      p_items: databaseCartItems(parsed.data.items),
+      p_items: normalizedItems,
       p_guest_access_token_hash: guestAccess.hash,
       p_user_id: userId,
       p_phone: parsed.data.phone || null,
@@ -350,6 +381,7 @@ export async function POST(request: Request) {
           }
         : undefined;
     const stripe = getStripeClient();
+    stripeSessionCreateStarted = true;
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",
@@ -358,7 +390,9 @@ export async function POST(request: Request) {
         line_items: lineItems,
         billing_address_collection: "required",
         automatic_tax: { enabled: false },
-        expires_at: Math.floor(checkoutExpiresAt.getTime() / 1000),
+        expires_at: Math.floor(
+          new Date(createdOrder.checkout_expires_at).getTime() / 1000,
+        ),
         success_url: `${siteUrl}/orders/${createdOrder.public_id}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${siteUrl}/checkout?cancelled=1`,
         metadata: orderMetadata,
@@ -392,11 +426,9 @@ export async function POST(request: Request) {
     });
 
     if (attached.error || attached.data !== true) {
-      await stripe.checkout.sessions.expire(session.id).catch(() => undefined);
-      stripeSessionId = null;
       throw new CommerceError(
-        "The payment session could not be attached to the order.",
-        "STRIPE_SESSION_ATTACH_FAILED",
+        "The payment session could not be attached to the order and must be reconciled before inventory is released.",
+        "STRIPE_SESSION_RECONCILIATION_REQUIRED",
         503,
       );
     }
@@ -422,23 +454,59 @@ export async function POST(request: Request) {
     );
     return response;
   } catch (error) {
+    let responseError = error;
     if (createdOrder) {
+      let stripeSessionIsClosed =
+        stripeSessionId === null && !stripeSessionCreateStarted;
       if (stripeSessionId) {
-        await getStripeClient()
+        stripeSessionIsClosed = await getStripeClient()
           .checkout.sessions.expire(stripeSessionId)
-          .catch(() => undefined);
+          .then((session) => session.status === "expired")
+          .catch(() => false);
       }
-      await cancelDatabaseOrder(createdOrder.order_id, "Stripe Checkout setup failed");
+      if (stripeSessionIsClosed) {
+        const cancelled = await cancelDatabaseOrder(
+          createdOrder.order_id,
+          "Stripe Checkout setup failed",
+        );
+        if (
+          !cancelled ||
+          (responseError instanceof CommerceError &&
+            responseError.code === "STRIPE_SESSION_RECONCILIATION_REQUIRED")
+        ) {
+          responseError = cancelled
+            ? new CommerceError(
+                "The Stripe payment session was closed safely. Retry checkout to create a new session.",
+                "CHECKOUT_SETUP_FAILED",
+                503,
+              )
+            : new CommerceError(
+                "The payment session is closed, but the order still requires database reconciliation.",
+                "STRIPE_SESSION_RECONCILIATION_REQUIRED",
+                503,
+              );
+        }
+      } else {
+        console.error("Checkout inventory retained for Stripe reconciliation", {
+          orderId: createdOrder.order_id,
+          checkoutSessionId: stripeSessionId,
+        });
+        responseError = new CommerceError(
+          "Stripe did not confirm whether the payment session is open. Retry this checkout without changing its details so it can be reconciled safely.",
+          "STRIPE_SESSION_RECONCILIATION_REQUIRED",
+          503,
+        );
+      }
     }
 
-    if (!(error instanceof CommerceError)) {
-      const stripeError = error as { type?: string; code?: string };
+    if (!(responseError instanceof CommerceError)) {
+      const stripeError = responseError as { type?: string; code?: string };
       console.error("Checkout request failed", {
         type: stripeError?.type,
         code: stripeError?.code,
       });
     }
-    const response = publicCommerceError(error);
+    const response = publicCommerceError(responseError);
     return NextResponse.json(response.body, { status: response.status });
   }
 }

@@ -386,6 +386,29 @@ export const adminStoreSettingsSchema = z
         message: "Add at least one positive tax rate before enabling tax.",
       });
     }
+    if (settings.canadaPostEnabled) {
+      const canadaPostSenderFields: Array<{
+        path: keyof typeof settings.shippingOrigin;
+        maximum: number;
+        label: string;
+      }> = [
+        { path: "company", maximum: 44, label: "Company" },
+        { path: "contact", maximum: 44, label: "Contact" },
+        { path: "phone", maximum: 25, label: "Phone" },
+        { path: "addressLine1", maximum: 44, label: "Address line 1" },
+        { path: "addressLine2", maximum: 44, label: "Address line 2" },
+        { path: "city", maximum: 40, label: "City" },
+      ];
+      for (const field of canadaPostSenderFields) {
+        if (settings.shippingOrigin[field.path].length > field.maximum) {
+          context.addIssue({
+            code: "custom",
+            path: ["shippingOrigin", field.path],
+            message: `${field.label} must be ${field.maximum} characters or fewer for Canada Post.`,
+          });
+        }
+      }
+    }
     if (
       new Set(settings.hours.days.map((day) => day.day)).size !==
       storeDayKeys.length

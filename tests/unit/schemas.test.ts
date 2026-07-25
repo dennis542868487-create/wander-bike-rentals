@@ -42,6 +42,7 @@ describe("commerce input schemas", () => {
 
   it("requires a current quote for Canada Post checkout", () => {
     const base = {
+      checkoutRequestId: "6ba4747a-8f3e-4bc5-9fb0-b5e610099f1b",
       email: "rider@example.com",
       firstName: "River",
       lastName: "Chen",
@@ -63,6 +64,29 @@ describe("commerce input schemas", () => {
         shippingQuoteId: "b31a3554-a682-43bf-bd68-4ee550f89db0",
       }).success,
     ).toBe(true);
+  });
+
+  it("rejects recipient fields that cannot fit a Canada Post label", () => {
+    expect(
+      checkoutRequestSchema.safeParse({
+        checkoutRequestId: "46e62661-3640-4963-8811-c9ef8da26c9f",
+        email: "rider@example.com",
+        firstName: "River",
+        lastName: "Chen",
+        phone: "604-555-0123",
+        fulfillmentMethod: "canada_post",
+        shippingAddress: {
+          addressLine1: "1".repeat(45),
+          addressLine2: "",
+          city: "Richmond",
+          province: "BC",
+          postalCode: "V7E 3M1",
+          country: "CA",
+        },
+        shippingQuoteId: "b31a3554-a682-43bf-bd68-4ee550f89db0",
+        items: [{ variantId: 1003, quantity: 1 }],
+      }).success,
+    ).toBe(false);
   });
 
   it("validates package numbering for multi-parcel labels", () => {
@@ -150,6 +174,20 @@ describe("operational settings", () => {
           enabled: true,
           feeCents: 900,
           postalCodePrefixes: [],
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("will not enable Canada Post with sender fields that exceed label limits", () => {
+    const settings = getDefaultCommerceStoreSettings();
+    expect(
+      adminStoreSettingsSchema.safeParse({
+        ...settings,
+        canadaPostEnabled: true,
+        shippingOrigin: {
+          ...settings.shippingOrigin,
+          company: "W".repeat(45),
         },
       }).success,
     ).toBe(false);

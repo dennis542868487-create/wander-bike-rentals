@@ -29,7 +29,8 @@ production shipping labels until the merchant explicitly approves go-live.
 - Resend transactional email
 - Vercel hosting and Cron
 
-Use Node.js `>=20.9`. Install and run locally:
+Use Node.js `>=22`. Next.js 16 supports Node 20.9+, but the current Supabase
+JavaScript client no longer supports Node 20. Install and run locally:
 
 ```bash
 npm install

@@ -11,7 +11,13 @@ import {
   Store,
   Truck,
 } from "lucide-react";
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { useCart } from "@/components/commerce/cart-provider";
 import { formatCad } from "@/lib/commerce/money";
 import {
@@ -171,6 +177,10 @@ export function CheckoutForm({
   const [localDeliveryLoading, setLocalDeliveryLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const checkoutAttempt = useRef<{
+    fingerprint: string;
+    requestId: string;
+  } | null>(null);
 
   const items = useMemo(
     () =>
@@ -325,7 +335,7 @@ export function CheckoutForm({
       return;
     }
 
-    const payload = {
+    const checkoutDetails = {
       ...contact,
       fulfillmentMethod,
       shippingAddress:
@@ -339,6 +349,17 @@ export function CheckoutForm({
         fulfillmentMethod === "canada_post" ? selectedRateId || undefined : undefined,
       customerNote,
       items,
+    };
+    const fingerprint = JSON.stringify(checkoutDetails);
+    if (checkoutAttempt.current?.fingerprint !== fingerprint) {
+      checkoutAttempt.current = {
+        fingerprint,
+        requestId: crypto.randomUUID(),
+      };
+    }
+    const payload = {
+      ...checkoutDetails,
+      checkoutRequestId: checkoutAttempt.current.requestId,
     };
     const parsed = checkoutRequestSchema.safeParse(payload);
 
@@ -365,9 +386,16 @@ export function CheckoutForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
-      const data = (await response.json()) as { error?: string; url?: string };
+      const data = (await response.json()) as {
+        code?: string;
+        error?: string;
+        url?: string;
+      };
 
       if (!response.ok || !data.url) {
+        if (data.code !== "STRIPE_SESSION_RECONCILIATION_REQUIRED") {
+          checkoutAttempt.current = null;
+        }
         throw new Error(data.error ?? "Checkout could not be started.");
       }
 

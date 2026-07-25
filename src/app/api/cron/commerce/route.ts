@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { processNotificationOutbox } from "@/lib/email/process-outbox";
 import { requireServerEnvironment } from "@/lib/env";
+import { reconcileStaleStripeCheckouts } from "@/lib/stripe/reconcile-checkouts";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
   }
 
   try {
+    const stripeCheckouts = await reconcileStaleStripeCheckouts(25);
     const expired = await getSupabaseAdmin().rpc("commerce_expire_stale_orders", {
       p_limit: 200,
     });
@@ -27,6 +29,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       {
+        stripeCheckouts,
         expiredOrders: Number(expired.data ?? 0),
         notifications,
       },

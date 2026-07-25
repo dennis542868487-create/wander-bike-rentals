@@ -3,6 +3,11 @@ import type Stripe from "stripe";
 import { scheduleNotificationDelivery } from "@/lib/email/schedule";
 import { requireServerEnvironment } from "@/lib/env";
 import { getStripeClient } from "@/lib/stripe/client";
+import {
+  getStripeCheckoutOrderId,
+  getStripePaymentIntentId,
+  stripeCheckoutSnapshot,
+} from "@/lib/stripe/checkout-session";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -15,27 +20,13 @@ type RpcResult = {
   order_number?: string;
 };
 
-function paymentIntentId(session: Stripe.Checkout.Session) {
-  if (typeof session.payment_intent === "string") return session.payment_intent;
-  return session.payment_intent?.id ?? null;
-}
-
 function eventPayload(event: Stripe.Event, session: Stripe.Checkout.Session) {
   return {
     eventId: event.id,
     eventType: event.type,
     created: event.created,
     livemode: event.livemode,
-    checkoutSession: {
-      id: session.id,
-      clientReferenceId: session.client_reference_id,
-      paymentIntentId: paymentIntentId(session),
-      paymentStatus: session.payment_status,
-      status: session.status,
-      amountTotal: session.amount_total,
-      currency: session.currency,
-      metadata: session.metadata,
-    },
+    checkoutSession: stripeCheckoutSnapshot(session),
   };
 }
 
@@ -63,7 +54,8 @@ async function markCheckout(
   if (
     session.amount_total == null ||
     !session.currency ||
-    !paymentIntentId(session)
+    !getStripePaymentIntentId(session) ||
+    !getStripeCheckoutOrderId(session)
   ) {
     return { status: "ignored", reason: "incomplete_payment_details" };
   }
@@ -74,7 +66,8 @@ async function markCheckout(
     p_event_type: event.type,
     p_payload: eventPayload(event, session),
     p_checkout_session_id: session.id,
-    p_payment_intent_id: paymentIntentId(session),
+    p_order_id: getStripeCheckoutOrderId(session),
+    p_payment_intent_id: getStripePaymentIntentId(session),
     p_amount_total_cents: session.amount_total,
     p_currency: session.currency,
   });
@@ -110,6 +103,10 @@ async function releaseCheckout(
   event: Stripe.Event,
   session: Stripe.Checkout.Session,
 ) {
+  const orderId = getStripeCheckoutOrderId(session);
+  if (!orderId) {
+    return { status: "ignored", reason: "invalid_order_reference" };
+  }
   const result = await getSupabaseAdmin().rpc(
     "commerce_expire_stripe_checkout",
     {
@@ -117,6 +114,7 @@ async function releaseCheckout(
       p_event_type: event.type,
       p_payload: eventPayload(event, session),
       p_checkout_session_id: session.id,
+      p_order_id: orderId,
     },
   );
   if (result.error) throw result.error;

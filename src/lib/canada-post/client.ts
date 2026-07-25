@@ -4,9 +4,16 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { requireServerEnvironment } from "@/lib/env";
 import { CommerceError } from "@/lib/commerce/errors";
 import type { CanadaPostPackage } from "@/lib/commerce/cart-server";
+import {
+  canadaPostParcelLimitViolation,
+  normalizeCanadaPostParcelDimensions,
+} from "@/lib/commerce/canada-post-limits";
 import { normalizeCanadianPostalCode } from "@/lib/commerce/schemas";
 
 type UnknownRecord = Record<string, unknown>;
+
+const canadaPostSandboxOrigin = "https://ct.soa-gw.canadapost.ca";
+const maximumCanadaPostLabelBytes = 10 * 1024 * 1024;
 
 export type CanadaPostRate = {
   serviceCode: string;
@@ -127,12 +134,40 @@ function parseCanadaPostResponse(responseText: string) {
   );
 }
 
-function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
-  let url: URL;
+function canadaPostSandboxApiBase(baseUrl: string) {
   let base: URL;
   try {
-    url = new URL(rawUrl);
     base = new URL(baseUrl);
+  } catch {
+    throw new CommerceError(
+      "Canada Post sandbox configuration is invalid.",
+      "LIVE_SHIPPING_DISABLED",
+      503,
+    );
+  }
+
+  if (
+    base.origin !== canadaPostSandboxOrigin ||
+    base.username ||
+    base.password ||
+    base.pathname !== "/" ||
+    base.search ||
+    base.hash
+  ) {
+    throw new CommerceError(
+      "Only the Canada Post sandbox API is enabled.",
+      "LIVE_SHIPPING_DISABLED",
+      503,
+    );
+  }
+  return canadaPostSandboxOrigin;
+}
+
+function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
+  let url: URL;
+  const base = new URL(canadaPostSandboxApiBase(baseUrl));
+  try {
+    url = new URL(rawUrl);
   } catch {
     throw new CommerceError(
       "Canada Post returned an invalid resource link.",
@@ -141,7 +176,12 @@ function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
     );
   }
 
-  if (url.protocol !== "https:" || url.hostname !== base.hostname) {
+  if (
+    url.protocol !== "https:" ||
+    url.origin !== base.origin ||
+    url.username ||
+    url.password
+  ) {
     throw new CommerceError(
       "Canada Post returned an unexpected resource host.",
       "CANADA_POST_INVALID_RESPONSE",
@@ -195,6 +235,16 @@ function shipmentDeliverySpec(input: {
   contract: boolean;
   environment: ReturnType<typeof requireServerEnvironment>;
 }) {
+  const packageLimitViolation = canadaPostParcelLimitViolation(input.package);
+  if (packageLimitViolation) {
+    throw new CommerceError(
+      packageLimitViolation,
+      "CANADA_POST_PACKAGE_INVALID",
+      422,
+    );
+  }
+  const parcel = normalizeCanadaPostParcelDimensions(input.package);
+
   assertCanadaPostField(input.sender.company, 44, "Sender company");
   assertCanadaPostField(input.sender.contact, 44, "Sender contact");
   assertCanadaPostField(input.sender.phone, 25, "Sender phone");
@@ -261,11 +311,11 @@ function shipmentDeliverySpec(input: {
     },
     destination,
     "parcel-characteristics": {
-      weight: input.package.weightKg.toFixed(3),
+      weight: parcel.weightKg.toFixed(3),
       dimensions: {
-        length: input.package.lengthCm.toFixed(1),
-        width: input.package.widthCm.toFixed(1),
-        height: input.package.heightCm.toFixed(1),
+        length: parcel.lengthCm.toFixed(1),
+        width: parcel.widthCm.toFixed(1),
+        height: parcel.heightCm.toFixed(1),
       },
     },
   };
@@ -316,6 +366,9 @@ export async function createCanadaPostShipment(input: {
       503,
     );
   }
+  const apiBase = canadaPostSandboxApiBase(
+    environment.CANADA_POST_API_BASE,
+  );
   if (!environment.CANADA_POST_ACCOUNT_TYPE) {
     throw new CommerceError(
       "Canada Post account type has not been configured.",
@@ -376,7 +429,7 @@ export async function createCanadaPostShipment(input: {
         mailedOnBehalfOf,
       )}/shipment`
     : `/rs/${encodeURIComponent(customerNumber)}/ncshipment`;
-  const endpoint = new URL(endpointPath, environment.CANADA_POST_API_BASE).toString();
+  const endpoint = new URL(endpointPath, apiBase).toString();
 
   let response: Response;
   try {
@@ -421,7 +474,7 @@ export async function createCanadaPostShipment(input: {
     );
   }
 
-  const links = responseLinks(responseRoot, environment.CANADA_POST_API_BASE);
+  const links = responseLinks(responseRoot, apiBase);
   const labelLink = links.find((link) => link.rel === "label");
   if (!labelLink || labelLink.mediaType !== "application/pdf") {
     throw new CommerceError(
@@ -469,6 +522,51 @@ async function fetchCanadaPostResource(link: CanadaPostLink) {
   });
 }
 
+async function readBoundedLabelBytes(response: Response) {
+  const contentLength = Number(response.headers.get("content-length"));
+  if (
+    Number.isFinite(contentLength) &&
+    contentLength > maximumCanadaPostLabelBytes
+  ) {
+    throw new CommerceError(
+      "Canada Post returned a label larger than the storage limit.",
+      "CANADA_POST_INVALID_LABEL",
+      502,
+    );
+  }
+
+  if (!response.body) {
+    return new Uint8Array();
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+    if (totalBytes > maximumCanadaPostLabelBytes) {
+      await reader.cancel();
+      throw new CommerceError(
+        "Canada Post returned a label larger than the storage limit.",
+        "CANADA_POST_INVALID_LABEL",
+        502,
+      );
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
 export async function getCanadaPostLabelArtifact(link: CanadaPostLink) {
   let response: Response;
   try {
@@ -488,7 +586,7 @@ export async function getCanadaPostLabelArtifact(link: CanadaPostLink) {
     );
   }
 
-  const bytes = new Uint8Array(await response.arrayBuffer());
+  const bytes = await readBoundedLabelBytes(response);
   const signature = new TextDecoder().decode(bytes.slice(0, 5));
   if (bytes.byteLength < 100 || signature !== "%PDF-") {
     throw new CommerceError(
@@ -725,7 +823,19 @@ export async function getCanadaPostRates(input: {
       503,
     );
   }
+  const apiBase = canadaPostSandboxApiBase(
+    environment.CANADA_POST_API_BASE,
+  );
 
+  const packageLimitViolation = canadaPostParcelLimitViolation(input.package);
+  if (packageLimitViolation) {
+    throw new CommerceError(
+      packageLimitViolation,
+      "CANADA_POST_PACKAGE_INVALID",
+      422,
+    );
+  }
+  const parcel = normalizeCanadaPostParcelDimensions(input.package);
   const scenario: UnknownRecord = {
     "@_xmlns": "http://www.canadapost.ca/ws/ship/rate-v4",
   };
@@ -738,16 +848,20 @@ export async function getCanadaPostRates(input: {
   }
 
   scenario["parcel-characteristics"] = {
-    weight: input.package.weightKg.toFixed(3),
+    weight: parcel.weightKg.toFixed(3),
     dimensions: {
-      length: input.package.lengthCm.toFixed(1),
-      width: input.package.widthCm.toFixed(1),
-      height: input.package.heightCm.toFixed(1),
+      length: parcel.lengthCm.toFixed(1),
+      width: parcel.widthCm.toFixed(1),
+      height: parcel.heightCm.toFixed(1),
     },
   };
-  scenario["origin-postal-code"] = input.originPostalCode;
+  scenario["origin-postal-code"] = normalizeCanadianPostalCode(
+    input.originPostalCode,
+  );
   scenario.destination = {
-    domestic: { "postal-code": input.destinationPostalCode },
+    domestic: {
+      "postal-code": normalizeCanadianPostalCode(input.destinationPostalCode),
+    },
   };
 
   const xml = new XMLBuilder({
@@ -757,7 +871,7 @@ export async function getCanadaPostRates(input: {
   }).build({ "mailing-scenario": scenario });
   const endpoint = new URL(
     "/rs/ship/price",
-    environment.CANADA_POST_API_BASE,
+    apiBase,
   ).toString();
   const authorization = Buffer.from(
     `${environment.CANADA_POST_USERNAME}:${environment.CANADA_POST_PASSWORD}`,

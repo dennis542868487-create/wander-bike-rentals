@@ -93,6 +93,8 @@ viewport. `npm run test:all` runs the full sequence.
 - Authentication and first-admin setup: `docs/AUTH_SETUP.md`
 - Environment, sandbox validation, Vercel CLI deployment, and rollback:
   `docs/DEPLOYMENT.md`
+- Requirement-by-requirement evidence and pending hosted checks:
+  `docs/SANDBOX_ACCEPTANCE.md`
 
 Never commit `.env.local`, Supabase secret keys, Stripe secrets, Canada Post
 credentials, Resend keys, or webhook signing secrets.

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { addressSchema } from "@/lib/commerce/schemas";
+import { canadaPostParcelLimitViolation } from "@/lib/commerce/canada-post-limits";
 import {
   canadianProvinceCodes,
   storeDayKeys,
@@ -122,6 +123,28 @@ const productVariantSchema = z
     }
 
     if (
+      variant.canadaPostEligible &&
+      variant.weightGrams !== null &&
+      variant.lengthCm !== null &&
+      variant.widthCm !== null &&
+      variant.heightCm !== null
+    ) {
+      const violation = canadaPostParcelLimitViolation({
+        weightKg: variant.weightGrams / 1000,
+        lengthCm: variant.lengthCm,
+        widthCm: variant.widthCm,
+        heightCm: variant.heightCm,
+      });
+      if (violation) {
+        context.addIssue({
+          code: "custom",
+          path: ["canadaPostEligible"],
+          message: `${violation} Disable automatic Canada Post fulfillment or change the packaged dimensions.`,
+        });
+      }
+    }
+
+    if (
       !variant.pickupEligible &&
       !variant.localDeliveryEligible &&
       !variant.canadaPostEligible
@@ -205,17 +228,32 @@ export const adminProductSchema = z
 
 export const shippingLabelRequestSchema = z.object({
   idempotencyKey: z.uuid(),
-  package: z.object({
-    packageNumber: z.number().int().min(1).max(50),
-    packageCount: z.number().int().min(1).max(50),
-    weightKg: z.number().positive().max(30),
-    lengthCm: z.number().positive().max(300),
-    widthCm: z.number().positive().max(300),
-    heightCm: z.number().positive().max(300),
-  }).refine(
-    (value) => value.packageNumber <= value.packageCount,
-    "Package number cannot exceed the package count.",
-  ),
+  package: z
+    .object({
+      packageNumber: z.number().int().min(1).max(50),
+      packageCount: z.number().int().min(1).max(50),
+      weightKg: z.number().positive().max(30),
+      lengthCm: z.number().positive().max(200),
+      widthCm: z.number().positive().max(200),
+      heightCm: z.number().positive().max(200),
+    })
+    .superRefine((value, context) => {
+      if (value.packageNumber > value.packageCount) {
+        context.addIssue({
+          code: "custom",
+          path: ["packageNumber"],
+          message: "Package number cannot exceed the package count.",
+        });
+      }
+      const violation = canadaPostParcelLimitViolation(value);
+      if (violation) {
+        context.addIssue({
+          code: "custom",
+          path: ["lengthCm"],
+          message: violation,
+        });
+      }
+    }),
 });
 
 export const shipmentCancellationSchema = z.object({

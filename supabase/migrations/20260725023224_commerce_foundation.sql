@@ -160,6 +160,30 @@ create table public.product_variants (
     and (width_cm is null or width_cm >= 0)
     and (height_cm is null or height_cm >= 0)
   ),
+  constraint product_variants_canada_post_package_valid check (
+    not canada_post_eligible
+    or (
+      weight_grams is not null
+      and weight_grams between 1 and 30000
+      and length_cm is not null
+      and length_cm > 0
+      and length_cm <= 200
+      and width_cm is not null
+      and width_cm > 0
+      and width_cm <= 200
+      and height_cm is not null
+      and height_cm > 0
+      and height_cm <= 200
+      and greatest(length_cm, width_cm, height_cm)
+        + 2 * (
+          length_cm
+          + width_cm
+          + height_cm
+          - greatest(length_cm, width_cm, height_cm)
+        ) <= 300
+      and shipping_profile <> 'special'
+    )
+  ),
   constraint product_variants_shipping_profile_valid check (
     shipping_profile in ('standard', 'large', 'special')
   ),
@@ -4454,6 +4478,10 @@ declare
   v_shipment public.shipments%rowtype;
   v_package_number integer;
   v_package_count integer;
+  v_weight_kg numeric;
+  v_length_cm numeric;
+  v_width_cm numeric;
+  v_height_cm numeric;
 begin
   if not exists (
     select 1
@@ -4479,6 +4507,34 @@ begin
     or v_package_number > v_package_count
   then
     raise exception 'Package number and count are invalid'
+      using errcode = '22023';
+  end if;
+
+  v_weight_kg := nullif(p_package_details ->> 'weightKg', '')::numeric;
+  v_length_cm := nullif(p_package_details ->> 'lengthCm', '')::numeric;
+  v_width_cm := nullif(p_package_details ->> 'widthCm', '')::numeric;
+  v_height_cm := nullif(p_package_details ->> 'heightCm', '')::numeric;
+  if v_weight_kg is null
+    or v_weight_kg <= 0
+    or v_weight_kg > 30
+    or v_length_cm is null
+    or v_length_cm <= 0
+    or v_length_cm > 200
+    or v_width_cm is null
+    or v_width_cm <= 0
+    or v_width_cm > 200
+    or v_height_cm is null
+    or v_height_cm <= 0
+    or v_height_cm > 200
+    or greatest(v_length_cm, v_width_cm, v_height_cm)
+      + 2 * (
+        v_length_cm
+        + v_width_cm
+        + v_height_cm
+        - greatest(v_length_cm, v_width_cm, v_height_cm)
+      ) > 300
+  then
+    raise exception 'Package weight or dimensions exceed Canada Post limits'
       using errcode = '22023';
   end if;
 

@@ -10,6 +10,10 @@ import type {
   ShippingProfile,
 } from "@/lib/commerce/types";
 import { getCartFulfillmentAvailability } from "@/lib/commerce/fulfillment-availability";
+import {
+  canadaPostParcelLimitViolation,
+  normalizeCanadaPostParcelDimensions,
+} from "@/lib/commerce/canada-post-limits";
 
 type CartItemInput = z.infer<typeof cartItemInputSchema>;
 type UnknownRow = Record<string, unknown>;
@@ -364,11 +368,23 @@ export function buildCanadaPostPackage(cart: ResolvedCart): CanadaPostPackage {
   );
   const packedHeightCm = Math.max(tallestItemCm, totalVolume / (lengthCm * widthCm));
 
-  return {
+  const parcel = normalizeCanadaPostParcelDimensions({
     weightKg: Math.ceil(weightGrams) / 1000,
     lengthCm: roundPackageDimension(lengthCm),
     widthCm: roundPackageDimension(widthCm),
     heightCm: roundPackageDimension(packedHeightCm),
+  });
+  const packageLimitViolation = canadaPostParcelLimitViolation(parcel);
+  if (packageLimitViolation) {
+    throw new CommerceError(
+      `${packageLimitViolation} Choose pickup, local delivery, or contact Wander Bike for a shipping quote.`,
+      "CANADA_POST_PACKAGE_LIMIT_EXCEEDED",
+      422,
+    );
+  }
+
+  return {
+    ...parcel,
     packagingAllowanceGrams,
   };
 }

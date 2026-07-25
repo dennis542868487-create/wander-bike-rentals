@@ -105,6 +105,22 @@ describe("commerce input schemas", () => {
     ).toBe(false);
   });
 
+  it("rejects a package whose length plus girth exceeds Canada Post limits", () => {
+    expect(
+      shippingLabelRequestSchema.safeParse({
+        idempotencyKey: "f76adf9f-a593-4d3d-833a-58bafba67ab2",
+        package: {
+          packageNumber: 1,
+          packageCount: 1,
+          weightKg: 1,
+          lengthCm: 100,
+          widthCm: 60,
+          heightCm: 50,
+        },
+      }).success,
+    ).toBe(false);
+  });
+
   it("accepts a corrected Canadian delivery address for an unfulfilled order", () => {
     expect(
       orderDetailsUpdateSchema.safeParse({
@@ -270,6 +286,18 @@ describe("catalog fulfillment schema", () => {
       ...product.variants[0],
       shippingProfile: "special" as const,
       canadaPostEligible: true,
+    };
+    expect(
+      adminProductSchema.safeParse({ ...product, variants: [variant] }).success,
+    ).toBe(false);
+  });
+
+  it("keeps over-limit parcels out of automatic Canada Post checkout", () => {
+    const variant = {
+      ...product.variants[0],
+      lengthCm: 100,
+      widthCm: 60,
+      heightCm: 50,
     };
     expect(
       adminProductSchema.safeParse({ ...product, variants: [variant] }).success,

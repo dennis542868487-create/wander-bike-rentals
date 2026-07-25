@@ -235,9 +235,9 @@ export function CanadaPostLabelAction({
                   {(
                     [
                       ["weightKg", "Weight (kg)", "0.001", "30", "0.001"],
-                      ["lengthCm", "Length (cm)", "0.1", "300", "0.1"],
-                      ["widthCm", "Width (cm)", "0.1", "300", "0.1"],
-                      ["heightCm", "Height (cm)", "0.1", "300", "0.1"],
+                      ["lengthCm", "Length (cm)", "0.1", "200", "0.1"],
+                      ["widthCm", "Width (cm)", "0.1", "200", "0.1"],
+                      ["heightCm", "Height (cm)", "0.1", "200", "0.1"],
                     ] as const
                   ).map(([field, label, min, max, step]) => (
                     <label

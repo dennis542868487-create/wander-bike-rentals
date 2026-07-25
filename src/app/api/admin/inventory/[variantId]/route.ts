@@ -43,9 +43,33 @@ export async function PATCH(
       p_actor_user_id: auth.user.id,
     });
     if (result.error) {
+      if (result.error.code === "23514") {
+        return NextResponse.json(
+          { error: "The inventory adjustment would conflict with active reservations." },
+          { status: 409 },
+        );
+      }
+
+      if (result.error.code === "22023") {
+        return NextResponse.json(
+          { error: "The inventory adjustment is invalid." },
+          { status: 400 },
+        );
+      }
+
+      if (result.error.code === "42501") {
+        return NextResponse.json(
+          { error: "A staff account is required." },
+          { status: 403 },
+        );
+      }
+
+      console.error("Inventory adjustment RPC failed", {
+        code: result.error.code,
+      });
       return NextResponse.json(
-        { error: "The inventory adjustment would conflict with active reservations." },
-        { status: 409 },
+        { error: "Inventory could not be adjusted." },
+        { status: 500 },
       );
     }
 

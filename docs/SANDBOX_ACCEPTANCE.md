@@ -74,6 +74,12 @@ acceptance run.
       order and one Checkout Session.
 - [x] Inventory reservations, sales, releases, refund restocks, adjustments, and
       ledger entries are implemented as database transactions.
+- [x] Execute a hosted staff `+1` inventory adjustment, verify the immutable
+      ledger and audit path, then execute `-1` to restore the test stock to 5.
+- [x] Exercise every commerce `RETURNS TABLE` function, including the
+      notification claim path inside a rolled-back transaction; checkout,
+      refund, inventory, and outbox calls complete without output-column
+      ambiguity.
 - [ ] Exercise two concurrent hosted checkouts for the final unit and prove that
       only one reservation succeeds.
 - [ ] Verify abandoned, expired, cancelled, and failed test checkouts release
@@ -205,7 +211,7 @@ acceptance run.
 - [ ] Run Resend delivery and final Apple authorization checks after their
       remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_6qDyhMdGEvtDzHLEg7kMAGKbmd9h`) as the rollback
+      CLI Preview (`dpl_ArtCESs2mDpp9ctAsgmGFtui6kYz`) as the rollback
       candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs
@@ -227,6 +233,8 @@ acceptance run.
   payment, one sale ledger entry, and one integration-event row.
 - The completed return restored the test helmet inventory from 4 to 5 with zero
   reserved units.
+- A staff adjustment moved the USB light from 5 to 6 and back to 5, with both
+  changes preserved in the inventory ledger.
 - Canada Post quote `DOM.RP` was saved, one sandbox label was stored privately,
   and the unused label was voided.
 - Rental booking creation, customer edit, admin confirmation, and customer

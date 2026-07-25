@@ -16,7 +16,7 @@ acceptance run.
       Canada Post request/response handling, and Stripe reconciliation
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
-- [x] `npm run test:e2e` — desktop Chrome and Pixel 7 viewport
+- [x] `npm run test:e2e` — desktop Chrome, iPad, and Pixel 7 viewports
 - [x] `npm audit --omit=dev` — zero production dependency vulnerabilities
 - [x] Repository scan finds no supplied Stripe, Canada Post, Supabase, Resend, or
       webhook secrets in tracked changes
@@ -43,7 +43,7 @@ acceptance run.
 - [x] Product and variant fulfillment eligibility covers pickup, local delivery,
       standard parcels, bicycle-size parcels, and special handling.
 - [x] Cart quantity, search/filter behavior, and the disabled pre-setup checkout
-      gate are browser tested on desktop and mobile.
+      gate are browser tested on desktop, tablet, and mobile.
 - [x] Checkout prices, shipping, and tax are recalculated on the server.
 - [x] A client checkout request ID, database advisory lock, unique constraint,
       and Stripe idempotency key make identical checkout retries converge on one
@@ -106,6 +106,9 @@ acceptance run.
 
 - [x] Google and Apple buttons share the same PKCE callback and fail closed
       unless Supabase reports the provider as enabled.
+- [x] Google is enabled in the new hosted Supabase project without committing
+      its client secret; Apple remains disabled until its developer credentials
+      are supplied.
 - [x] All merchant pages and mutations require a server-verified staff/admin
       profile role.
 - [x] Order details consolidate payment, fulfillment, shipping, refund, return,
@@ -142,7 +145,8 @@ acceptance run.
 - [x] The GitHub remote is authenticated with repository admin access.
 - [x] Commerce defaults to sandbox and checkout disabled.
 - [x] The deployment and forward-only database rollback runbook is documented.
-- [ ] Create and migrate the new `ca-central-1` Supabase project.
+- [x] Create and migrate the new `ca-central-1` Supabase project, load the
+      sandbox catalog, and run the hosted database advisors.
 - [ ] Push the completed branch to GitHub.
 - [ ] Configure all sandbox environment variables without exposing values.
 - [ ] Deploy with Vercel CLI and inspect the terminal deployment result.
@@ -151,7 +155,6 @@ acceptance run.
 
 ## Required merchant inputs
 
-- Supabase organization and project-cost confirmation
 - Apple Developer Team ID, App ID, Services ID, signing Key ID, and `.p8` key
 - Canada Post account type and Customer Number; Contract ID, Group ID, and MOBO
   Customer Number when applicable

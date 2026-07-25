@@ -36,20 +36,20 @@ Supabase project.
 
 ### Google
 
-Create a Google OAuth web client and use this authorized redirect URI,
-replacing the placeholder with the new project reference:
+The sandbox project uses this authorized redirect URI:
 
 ```text
-https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+https://gvuaitmjpenggvosshqm.supabase.co/auth/v1/callback
 ```
 
 Enable Google under **Supabase Dashboard → Authentication → Providers** and
 store the Google secret there, not in this repository.
 
 The supplied Google credential file has the expected web-client fields, but its
-saved redirect URI points at a different Supabase project. Update the OAuth
-client in Google Cloud after the new project exists; editing the downloaded JSON
-file alone does not change Google's configuration.
+saved redirect URI points at a different Supabase project. Google is enabled in
+the new Supabase project, but the OAuth client in Google Cloud must also include
+the callback above; editing the downloaded JSON file alone does not change
+Google's configuration.
 
 ### Apple
 

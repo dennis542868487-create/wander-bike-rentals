@@ -85,7 +85,7 @@ npm run build
 npm run test:e2e
 ```
 
-`npm run test:e2e` exercises production-rendered desktop Chrome and a Pixel 7
+`npm run test:e2e` exercises production-rendered desktop Chrome, an iPad, and a Pixel 7
 viewport. `npm run test:all` runs the full sequence.
 
 ## Operations and deployment

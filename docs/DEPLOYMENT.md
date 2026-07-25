@@ -24,7 +24,7 @@ storefront.
 
 ## 2. Supabase
 
-Create a new project in `ca-central-1`, then apply the two migration files in
+Create a new project in `ca-central-1`, then apply all migration files in
 timestamp order. The test seed may be loaded only while
 `COMMERCE_SANDBOX_MODE=true`.
 
@@ -51,7 +51,7 @@ Vercel CLI or the dashboard, never committed.
 
 | Variable | Sandbox value or purpose |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | `https://www.wanderbike.ca` |
+| `NEXT_PUBLIC_SITE_URL` | Exact Preview URL during acceptance; canonical domain only for Production |
 | `NEXT_PUBLIC_SUPABASE_URL` | New project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | New publishable key |
 | `SUPABASE_SECRET_KEY` | Server-only new secret key |
@@ -78,10 +78,10 @@ Both it and the environment gate must be enabled for test checkout.
 
 ## 4. Stripe test webhook
 
-Create a test-mode webhook endpoint:
+Create a test-mode webhook endpoint using the exact deployed host:
 
 ```text
-https://www.wanderbike.ca/api/stripe/webhook
+https://YOUR_DEPLOYMENT_HOST/api/stripe/webhook
 ```
 
 Subscribe to:
@@ -106,15 +106,17 @@ From the repository root:
 npm ci
 npm run test:all
 npx vercel pull --yes
-npx vercel deploy --prod
+npx vercel deploy
 ```
 
-After deployment, verify the exact production URL returned by the CLI before
+This creates a Preview deployment and does not change the production alias.
+After sandbox acceptance and a separate production approval, use
+`npx vercel deploy --prod`. Verify the exact URL returned by the CLI before
 changing DNS or aliases.
 
 ## 6. Sandbox acceptance
 
-Verify at desktop and mobile widths:
+Verify at desktop, tablet, and mobile widths:
 
 1. Existing rental pages, booking, guides, location, and redirects.
 2. Search/filter, variant selection, cart quantity, and guest checkout.

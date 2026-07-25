@@ -22,6 +22,13 @@ export default defineConfig({
       name: "mobile-chromium",
       use: { ...devices["Pixel 7"] },
     },
+    {
+      name: "tablet-chromium",
+      use: {
+        ...devices["iPad (gen 11)"],
+        browserName: "chromium",
+      },
+    },
   ],
   webServer: {
     command: "npm run start -- --hostname 127.0.0.1 --port 3100",

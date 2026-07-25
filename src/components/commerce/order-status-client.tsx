@@ -12,9 +12,11 @@ export function OrderStatusClient({
   returnedFromStripe: boolean;
 }) {
   const router = useRouter();
-  const { clearCart } = useCart();
+  const { clearCart, ready } = useCart();
 
   useEffect(() => {
+    if (!ready) return;
+
     if (["paid", "partially_refunded", "refunded"].includes(paymentStatus)) {
       clearCart();
       return;
@@ -29,7 +31,7 @@ export function OrderStatusClient({
     }, 2500);
 
     return () => window.clearInterval(interval);
-  }, [clearCart, paymentStatus, returnedFromStripe, router]);
+  }, [clearCart, paymentStatus, ready, returnedFromStripe, router]);
 
   return null;
 }

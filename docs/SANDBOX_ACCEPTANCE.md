@@ -80,10 +80,11 @@ acceptance run.
       notification claim path inside a rolled-back transaction; checkout,
       refund, inventory, and outbox calls complete without output-column
       ambiguity.
-- [ ] Exercise two concurrent hosted checkouts for the final unit and prove that
+- [x] Exercise two concurrent hosted checkouts for the final unit and prove that
       only one reservation succeeds.
-- [ ] Verify abandoned, expired, cancelled, and failed test checkouts release
-      inventory.
+- [x] Verify a cancelled Stripe return keeps the cart, then expire the open
+      Session and confirm the signed webhook cancels the order and releases all
+      reserved inventory.
 - [x] Verify successful payment converts the reservation exactly once.
 
 ## Stripe test mode
@@ -101,12 +102,14 @@ acceptance run.
 - [x] Create the deployed test webhook for all required events and save its
       signing secret in the protected Vercel Preview branch.
 - [x] Complete a successful test payment and confirm order/payment/inventory.
-- [ ] Complete cancellation, expiry, and asynchronous failure tests.
+- [x] Complete cancellation and provider expiry tests.
+- [ ] Complete a separate asynchronous payment failure test.
 - [x] Replay the same verified webhook and prove no duplicate order, payment, or
       stock movement.
 - [x] Complete a full test refund with inspected-item restock and confirm
       `refund.created` and `refund.updated` webhook reconciliation.
-- [ ] Complete a separate partial test refund.
+- [x] Complete a separate partial test refund, verify the intermediate
+      `partially_refunded` state, then refund the balance and restore stock.
 
 ## Fulfillment and Canada Post sandbox
 
@@ -171,7 +174,8 @@ acceptance run.
       tested.
 - [ ] Complete common merchant workflows at desktop, tablet, and mobile widths.
 - [ ] Confirm one customer cannot read another customer's booking or order.
-- [ ] Confirm guest access works only with the matching order cookie.
+- [x] Confirm guest access works only with the matching order cookie; missing
+      and mismatched cookies both receive `404`.
 - [x] Complete Google provider login on the deployed domain and confirm profile
       creation, callback routing, and merchant authorization.
 - [ ] Complete Apple authorization, sign-out, and repeat-sign-in checks.
@@ -211,7 +215,7 @@ acceptance run.
 - [ ] Run Resend delivery and final Apple authorization checks after their
       remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_ArtCESs2mDpp9ctAsgmGFtui6kYz`) as the rollback
+      CLI Preview (`dpl_CjhKJN8mhRrRWkm9iAyvmMVT8qiS`) as the rollback
       candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs
@@ -229,6 +233,14 @@ acceptance run.
 ## Hosted transaction evidence
 
 - Test order `WB-260725-001000` captured and then refunded CAD 124.70.
+- Test order `WB-260725-001001` captured CAD 178.00, entered a verified
+  CAD 89.00 partial-refund state, then refunded the remaining CAD 89.00 and
+  restored its two units to sellable stock.
+- Cancelling and expiring test order `WB-260725-001002` processed one signed
+  `checkout.session.expired` event and released its two reserved units.
+- Two simultaneous three-unit checkouts against five available units produced
+  exactly one `201` and one `409`; expiring the accepted Session returned the
+  inventory to five available units.
 - Replaying the signed `checkout.session.completed` event left one order, one
   payment, one sale ledger entry, and one integration-event row.
 - The completed return restored the test helmet inventory from 4 to 5 with zero

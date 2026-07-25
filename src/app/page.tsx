@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     description:
       "Adult bikes, kids bikes, and trailer rentals in Steveston, Richmond with helmet and lock included.",
-    url: "https://wanderbike.ca/",
+    url: "https://www.wanderbike.ca/",
   },
 };
 
@@ -112,11 +112,11 @@ const faqs = [
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
-  "@id": "https://wanderbike.ca/#business",
+  "@id": "https://www.wanderbike.ca/#business",
   name: "Wander Bike Rentals",
   description:
     "Bike rentals in Steveston, Richmond offering adult bikes, kids bikes, and trailer rentals.",
-  url: "https://wanderbike.ca/",
+  url: "https://www.wanderbike.ca/",
   telephone: "+1-778-952-1389",
   priceRange: "$$",
   address: {

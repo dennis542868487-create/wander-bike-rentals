@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import { getDefaultCommerceStoreSettings } from "@/lib/commerce/settings-defaults";
 import { getCommerceStoreSettings } from "@/lib/commerce/settings";
 
 const policyNames = {
@@ -15,6 +17,25 @@ function policyKey(value: string): value is PolicyKey {
   return value in policyNames;
 }
 
+const getPolicySettings = cache(async () => {
+  try {
+    return await getCommerceStoreSettings();
+  } catch {
+    return getDefaultCommerceStoreSettings();
+  }
+});
+
+function policyContent(
+  policy: PolicyKey,
+  settings: Awaited<ReturnType<typeof getPolicySettings>>,
+) {
+  return policy === "shipping"
+    ? settings.policies.shipping
+    : policy === "refund"
+      ? settings.policies.refund
+      : settings.policies.returns;
+}
+
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -24,9 +45,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { policy } = await params;
   if (!policyKey(policy)) return {};
+  const settings = await getPolicySettings();
+  const content = policyContent(policy, settings);
   return {
     title: policyNames[policy],
     description: `${policyNames[policy]} for Wander Bike sales orders.`,
+    alternates: { canonical: `/policies/${policy}` },
+    robots: content
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
   };
 }
 
@@ -38,13 +65,8 @@ export default async function PolicyPage({
   const { policy } = await params;
   if (!policyKey(policy)) notFound();
 
-  const settings = await getCommerceStoreSettings();
-  const content =
-    policy === "shipping"
-      ? settings.policies.shipping
-      : policy === "refund"
-        ? settings.policies.refund
-        : settings.policies.returns;
+  const settings = await getPolicySettings();
+  const content = policyContent(policy, settings);
 
   return (
     <main className="min-h-[70vh] bg-[#fbfaf6] px-6 py-14 sm:px-8">

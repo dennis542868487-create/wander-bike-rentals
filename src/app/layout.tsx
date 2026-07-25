@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://wanderbike.ca"),
+  metadataBase: new URL("https://www.wanderbike.ca"),
   title: {
     default: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     template: "%s | Wander Bike Rentals",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "Bike Rentals in Steveston, Richmond | Wander Bike Rentals",
     description:
       "Adult bikes, kids bikes, and trailer rentals in Steveston, Richmond. Helmet and lock included.",
-    url: "https://wanderbike.ca",
+    url: "https://www.wanderbike.ca",
     siteName: "Wander Bike Rentals",
     locale: "en_CA",
     type: "website",

@@ -2,9 +2,24 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { InventoryAdjustment } from "@/components/admin/inventory-adjustment";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { getAdminInventory } from "@/lib/admin/products";
+import {
+  getAdminInventory,
+  getAdminInventoryLedger,
+} from "@/lib/admin/products";
 
 export const dynamic = "force-dynamic";
+
+function dateTime(value: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/Vancouver",
+  }).format(new Date(value));
+}
+
+function signedDelta(value: number) {
+  return value > 0 ? `+${value}` : String(value);
+}
 
 export default async function AdminInventoryPage({
   searchParams,
@@ -12,7 +27,10 @@ export default async function AdminInventoryPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const filters = await searchParams;
-  const inventory = await getAdminInventory(filters.q);
+  const [inventory, ledger] = await Promise.all([
+    getAdminInventory(filters.q),
+    getAdminInventoryLedger(filters.q),
+  ]);
 
   return (
     <div>
@@ -110,6 +128,78 @@ export default async function AdminInventoryPage({
                 <tr>
                   <td colSpan={8} className="px-5 py-16 text-center text-slate-500">
                     No inventory rows match this search.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4">
+          <h2 className="font-semibold text-slate-950">
+            Recent inventory movements
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Immutable reservation, sale, release, return, and staff-adjustment
+            records.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[980px] text-left text-sm">
+            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="px-5 py-3">Time</th>
+                <th className="px-5 py-3">Product / SKU</th>
+                <th className="px-5 py-3">Event</th>
+                <th className="px-5 py-3 text-right">On hand</th>
+                <th className="px-5 py-3 text-right">Reserved</th>
+                <th className="px-5 py-3">Order / operator</th>
+                <th className="px-5 py-3">Reason</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 align-top">
+              {ledger.map((entry) => (
+                <tr key={entry.id}>
+                  <td className="whitespace-nowrap px-5 py-4 text-xs text-slate-500">
+                    {dateTime(entry.createdAt)}
+                  </td>
+                  <td className="px-5 py-4">
+                    <p className="font-semibold text-slate-900">
+                      {entry.productName}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {entry.variantTitle} · {entry.sku}
+                    </p>
+                  </td>
+                  <td className="px-5 py-4">
+                    <StatusBadge value={entry.eventType} />
+                  </td>
+                  <td className="px-5 py-4 text-right font-semibold">
+                    {signedDelta(entry.deltaOnHand)}
+                  </td>
+                  <td className="px-5 py-4 text-right font-semibold">
+                    {signedDelta(entry.deltaReserved)}
+                  </td>
+                  <td className="px-5 py-4 text-slate-600">
+                    <p>{entry.orderNumber || "No order"}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {entry.actorName}
+                    </p>
+                  </td>
+                  <td className="max-w-sm px-5 py-4 text-slate-600">
+                    {entry.reason || "—"}
+                  </td>
+                </tr>
+              ))}
+              {ledger.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-5 py-12 text-center text-slate-500"
+                  >
+                    No inventory movements match this search.
                   </td>
                 </tr>
               ) : null}

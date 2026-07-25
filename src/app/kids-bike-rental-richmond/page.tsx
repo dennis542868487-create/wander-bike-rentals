@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Kids Bike Rental Richmond | Wander Bike Rentals",
     description:
       "Family-friendly kids bike rental in Richmond near Steveston with helmet and lock included.",
-    url: "https://wanderbike.ca/kids-bike-rental-richmond",
+    url: "https://www.wanderbike.ca/kids-bike-rental-richmond",
   },
 };
 

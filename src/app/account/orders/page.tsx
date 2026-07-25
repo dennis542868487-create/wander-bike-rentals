@@ -83,10 +83,23 @@ export default async function AccountOrdersPage() {
                           {dateTime(order.createdAt)} ·{" "}
                           {order.fulfillmentMethod.replaceAll("_", " ")}
                         </p>
-                        {order.shipment?.trackingPin ? (
-                          <p className="mt-2 text-sm text-slate-600">
-                            Tracking {order.shipment.trackingPin}
-                          </p>
+                        {order.shipments.some(
+                          (shipment) => shipment.trackingPin,
+                        ) ? (
+                          <ul className="mt-2 space-y-1 text-sm text-slate-600">
+                            {order.shipments
+                              .filter((shipment) => shipment.trackingPin)
+                              .map((shipment, index) => (
+                                <li
+                                  key={`${shipment.trackingPin}-${index}`}
+                                  className="break-all"
+                                >
+                                  Package{" "}
+                                  {shipment.packageNumber ?? index + 1}:{" "}
+                                  {shipment.trackingPin}
+                                </li>
+                              ))}
+                          </ul>
                         ) : null}
                       </div>
                       <div className="sm:text-right">

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { bookingStatuses, parseBookingInput } from "@/lib/booking-types";
+import { isSameOriginRequest } from "@/lib/http/security";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireBookingAdmin } from "@/lib/supabase/auth";
 
 export async function PATCH(request: Request, context: RouteContext<"/api/booking-admin/bookings/[id]">) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+  }
+
   try {
     const auth = await requireBookingAdmin(request);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });

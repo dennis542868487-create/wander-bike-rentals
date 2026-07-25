@@ -9,8 +9,9 @@ production shipping labels until the merchant explicitly approves go-live.
 
 - Existing rental, repair, guide, location, and SEO pages
 - Rental requests and customer booking history
-- Product catalog, variants, images, search, filters, cart, and guest checkout
-- Atomic inventory reservations and an auditable inventory ledger
+- Product catalog, variants, sortable images, search, filters, cart, and guest checkout
+- Per-variant pickup/delivery eligibility plus standard, large, and special packing rules
+- Atomic inventory reservations and a merchant-visible immutable inventory ledger
 - Stripe-hosted Checkout, verified webhooks, and full or partial refunds
 - Store pickup, configurable local delivery, and Canada Post sandbox shipping
 - Multi-package labels, PDFs, tracking, voids, and refund requests

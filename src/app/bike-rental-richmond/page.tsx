@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: "Bike Rental Richmond | Wander Bike Rentals",
     description:
       "Adult bikes, kids bikes, and trailer rentals for riders looking for bike rental in Richmond near Steveston.",
-    url: "https://wanderbike.ca/bike-rental-richmond",
+    url: "https://www.wanderbike.ca/bike-rental-richmond",
   },
 };
 

@@ -83,7 +83,14 @@ function mapProduct(row: UnknownRow): CatalogProduct {
               variant.width_cm == null ? null : asNumber(variant.width_cm),
             heightCm:
               variant.height_cm == null ? null : asNumber(variant.height_cm),
+            pickupEligible: variant.pickup_eligible !== false,
+            localDeliveryEligible: variant.local_delivery_eligible !== false,
             canadaPostEligible: variant.canada_post_eligible !== false,
+            shippingProfile:
+              variant.shipping_profile === "large" ||
+              variant.shipping_profile === "special"
+                ? variant.shipping_profile
+                : "standard",
             available,
             isAvailable: available > 0 || allowBackorder,
             allowBackorder,
@@ -153,7 +160,10 @@ async function loadDatabaseCatalog(): Promise<CatalogProduct[]> {
         length_cm,
         width_cm,
         height_cm,
+        pickup_eligible,
+        local_delivery_eligible,
         canada_post_eligible,
+        shipping_profile,
         is_active,
         sort_order,
         inventory_levels ( available, allow_backorder )

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  adminProductSchema,
   adminStoreSettingsSchema,
   catalogTaxonomySchema,
   orderDetailsUpdateSchema,
@@ -165,6 +166,75 @@ describe("operational settings", () => {
         websiteUrl: "http://example.com",
         isActive: true,
       }).success,
+    ).toBe(false);
+  });
+});
+
+describe("catalog fulfillment schema", () => {
+  const product = {
+    productId: null,
+    categoryId: null,
+    brandId: null,
+    slug: "test-product",
+    name: "Test product",
+    shortDescription: "",
+    description: "",
+    productType: "physical" as const,
+    status: "draft" as const,
+    tags: ["sandbox"],
+    trackInventory: true,
+    requiresShipping: true,
+    seoTitle: "",
+    seoDescription: "",
+    images: [],
+    variants: [
+      {
+        id: null,
+        sku: "TEST-SKU-1",
+        barcode: "",
+        title: "Default",
+        optionValues: {},
+        priceCents: 1000,
+        compareAtPriceCents: null,
+        costCents: null,
+        weightGrams: 500,
+        lengthCm: 20,
+        widthCm: 15,
+        heightCm: 10,
+        pickupEligible: true,
+        localDeliveryEligible: true,
+        canadaPostEligible: true,
+        shippingProfile: "standard" as const,
+        taxCode: "",
+        isActive: true,
+        sortOrder: 0,
+        initialOnHand: 1,
+        reorderPoint: 0,
+        allowBackorder: false,
+      },
+    ],
+  };
+
+  it("requires at least one fulfillment method per variant", () => {
+    const variant = {
+      ...product.variants[0],
+      pickupEligible: false,
+      localDeliveryEligible: false,
+      canadaPostEligible: false,
+    };
+    expect(
+      adminProductSchema.safeParse({ ...product, variants: [variant] }).success,
+    ).toBe(false);
+  });
+
+  it("keeps special handling out of automatic Canada Post checkout", () => {
+    const variant = {
+      ...product.variants[0],
+      shippingProfile: "special" as const,
+      canadaPostEligible: true,
+    };
+    expect(
+      adminProductSchema.safeParse({ ...product, variants: [variant] }).success,
     ).toBe(false);
   });
 });

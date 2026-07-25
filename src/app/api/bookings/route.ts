@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseBookingInput } from "@/lib/booking-types";
+import { isSameOriginRequest } from "@/lib/http/security";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/supabase/auth";
 
@@ -23,6 +24,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+  }
+
   try {
     const auth = await requireUser(request);
     if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });

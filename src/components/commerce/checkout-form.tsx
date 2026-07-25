@@ -20,6 +20,7 @@ import {
   shippingRateRequestSchema,
 } from "@/lib/commerce/schemas";
 import { calculateManualTax } from "@/lib/commerce/pricing";
+import { getCartFulfillmentAvailability } from "@/lib/commerce/fulfillment-availability";
 import type {
   CanadianProvinceCode,
   PublicCheckoutSettings,
@@ -188,7 +189,19 @@ export function CheckoutForm({
   const activeSelectedRate = activeRates.find(
     (rate) => rate.id === selectedRateId,
   );
-  const pickupRequired = lines.some((line) => !line.canadaPostEligible);
+  const productFulfillment = getCartFulfillmentAvailability(lines);
+  const pickupUnavailable =
+    !checkoutSettings.pickupEnabled || !productFulfillment.pickup.available;
+  const localDeliveryUnavailable =
+    !checkoutSettings.localDelivery.enabled ||
+    !productFulfillment.localDelivery.available;
+  const canadaPostUnavailable =
+    !checkoutSettings.canadaPostEnabled ||
+    !productFulfillment.canadaPost.available;
+  const selectedFulfillmentUnavailable =
+    (fulfillmentMethod === "pickup" && pickupUnavailable) ||
+    (fulfillmentMethod === "local_delivery" && localDeliveryUnavailable) ||
+    (fulfillmentMethod === "canada_post" && canadaPostUnavailable);
   const activeLocalDeliveryQuote =
     localDeliveryRequestKey === currentRateKey ? localDeliveryQuote : null;
   const shippingCents =
@@ -306,6 +319,11 @@ export function CheckoutForm({
   async function submitCheckout(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    if (selectedFulfillmentUnavailable) {
+      setError("Choose a fulfillment method available for every item in this cart.");
+      return;
+    }
 
     const payload = {
       ...contact,
@@ -489,13 +507,15 @@ export function CheckoutForm({
           <div className="mt-6 grid gap-3">
             <FulfillmentCard
               checked={fulfillmentMethod === "pickup"}
-              disabled={!checkoutSettings.pickupEnabled}
+              disabled={pickupUnavailable}
               icon={<Store aria-hidden="true" className="h-5 w-5" />}
               title="Pickup in Steveston · Free"
               detail={
-                checkoutSettings.pickupEnabled
-                  ? `${checkoutSettings.profile.addressLine1} ${checkoutSettings.profile.addressLine2}. ${checkoutSettings.pickupInstructions}`
-                  : "Store pickup is not currently available."
+                !checkoutSettings.pickupEnabled
+                  ? "Store pickup is not currently available."
+                  : !productFulfillment.pickup.available
+                    ? "One or more cart items are not available for store pickup."
+                    : `${checkoutSettings.profile.addressLine1} ${checkoutSettings.profile.addressLine2}. ${checkoutSettings.pickupInstructions}`
               }
               onChange={() => {
                 setFulfillmentMethod("pickup");
@@ -504,15 +524,25 @@ export function CheckoutForm({
             />
             <FulfillmentCard
               checked={fulfillmentMethod === "canada_post"}
-              disabled={!checkoutSettings.canadaPostEnabled || pickupRequired}
+              disabled={canadaPostUnavailable}
               icon={<Package aria-hidden="true" className="h-5 w-5" />}
               title="Canada Post sandbox rate"
               detail={
-                pickupRequired
-                  ? "A bicycle or another cart item is marked pickup-only."
-                  : checkoutSettings.canadaPostEnabled
-                    ? "Live sandbox rates based on your postal code and package."
-                    : "Canada Post shipping is not currently enabled."
+                !checkoutSettings.canadaPostEnabled
+                  ? "Canada Post shipping is not currently enabled."
+                  : productFulfillment.canadaPost.restriction ===
+                      "no_shippable_items"
+                    ? "This cart does not contain an item that requires shipping."
+                    : productFulfillment.canadaPost.restriction ===
+                        "special_handling_required"
+                      ? "A special-handling item requires staff fulfillment."
+                      : productFulfillment.canadaPost.restriction ===
+                          "large_item_separate_shipment"
+                        ? "Large items must ship alone; use separate orders, pickup, or local delivery."
+                        : productFulfillment.canadaPost.restriction ===
+                            "item_not_canada_post_eligible"
+                          ? "One or more cart items are not available for Canada Post."
+                          : "Live sandbox rates based on your postal code and package."
               }
               onChange={() => {
                 setFulfillmentMethod("canada_post");
@@ -521,13 +551,15 @@ export function CheckoutForm({
             />
             <FulfillmentCard
               checked={fulfillmentMethod === "local_delivery"}
-              disabled={!checkoutSettings.localDelivery.enabled}
+              disabled={localDeliveryUnavailable}
               icon={<Truck aria-hidden="true" className="h-5 w-5" />}
               title="Local delivery"
               detail={
-                checkoutSettings.localDelivery.enabled
-                  ? "Enter your address and check whether it is inside the configured delivery area."
-                  : "Local delivery is not currently enabled."
+                !checkoutSettings.localDelivery.enabled
+                  ? "Local delivery is not currently enabled."
+                  : !productFulfillment.localDelivery.available
+                    ? "One or more cart items are not available for local delivery."
+                    : "Enter your address and check whether it is inside the configured delivery area."
               }
               onChange={() => {
                 setFulfillmentMethod("local_delivery");
@@ -833,6 +865,7 @@ export function CheckoutForm({
           disabled={
             submitting ||
             !checkoutEnabled ||
+            selectedFulfillmentUnavailable ||
             (fulfillmentMethod === "canada_post" && !activeSelectedRate) ||
             (fulfillmentMethod === "local_delivery" &&
               !activeLocalDeliveryQuote?.eligible)

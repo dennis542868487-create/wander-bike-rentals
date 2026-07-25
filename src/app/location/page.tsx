@@ -4,9 +4,9 @@ import Link from "next/link";
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
-  "@id": "https://wanderbike.ca/#business",
+  "@id": "https://www.wanderbike.ca/#business",
   name: "Wander Bike Rentals",
-  url: "https://wanderbike.ca/location",
+  url: "https://www.wanderbike.ca/location",
   telephone: "+1-778-952-1389",
   address: {
     "@type": "PostalAddress",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: "Location and Contact | Wander Bike Rentals",
     description:
       "Address, phone number, hours, and directions for Wander Bike Rentals in Steveston, Richmond.",
-    url: "https://wanderbike.ca/location",
+    url: "https://www.wanderbike.ca/location",
   },
 };
 

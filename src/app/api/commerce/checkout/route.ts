@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { createGuestAccessToken } from "@/lib/commerce/guest-access";
 import {
+  assertFulfillmentAllowed,
+  buildCanadaPostPackage,
   databaseCartItems,
   resolveDatabaseCart,
+  shippingRequestFingerprint,
 } from "@/lib/commerce/cart-server";
 import {
   CommerceError,
@@ -12,6 +15,7 @@ import {
 import {
   checkoutRequestSchema,
   formatCanadianPostalCode,
+  normalizeCanadianPostalCode,
   type StoreAddress,
 } from "@/lib/commerce/schemas";
 import { getServerEnvironment } from "@/lib/env";
@@ -138,6 +142,7 @@ export async function POST(request: Request) {
     }
 
     const cart = await resolveDatabaseCart(parsed.data.items);
+    assertFulfillmentAllowed(cart, parsed.data.fulfillmentMethod);
 
     const auth = await requireUser(request);
     const userId = auth.ok ? auth.user.id : null;
@@ -190,16 +195,33 @@ export async function POST(request: Request) {
         rules: settings.shippingRules,
       });
     } else if (parsed.data.fulfillmentMethod === "canada_post") {
+      const destinationPostalCode = normalizeCanadianPostalCode(
+        shippingAddress?.postalCode ?? "",
+      );
+      const expectedQuoteFingerprint = shippingRequestFingerprint({
+        provider: "canada_post",
+        originPostalCode: normalizeCanadianPostalCode(
+          settings.shippingOrigin.postalCode,
+        ),
+        destinationPostalCode,
+        cartItems: databaseCartItems(parsed.data.items),
+        packageDetails: buildCanadaPostPackage(cart),
+        shippingRules: settings.shippingRules,
+      });
       const quote = await supabase
         .from("shipping_quotes")
-        .select("amount_cents")
+        .select("amount_cents, request_fingerprint")
         .eq("id", parsed.data.shippingQuoteId ?? "")
         .eq("provider", "canada_post")
         .gt("expires_at", new Date().toISOString())
         .maybeSingle();
-      if (quote.error || !quote.data) {
+      if (
+        quote.error ||
+        !quote.data ||
+        quote.data.request_fingerprint !== expectedQuoteFingerprint
+      ) {
         throw new CommerceError(
-          "The Canada Post rate is missing or expired.",
+          "The Canada Post rate is missing, expired, or no longer matches this cart.",
           "SHIPPING_QUOTE_EXPIRED",
           409,
         );

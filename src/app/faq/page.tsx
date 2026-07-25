@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "FAQ | Wander Bike Rentals",
     description:
       "Answers to common questions about bike rentals, kids bikes, trailer rentals, helmets, and location.",
-    url: "https://wanderbike.ca/faq",
+    url: "https://www.wanderbike.ca/faq",
   },
 };
 

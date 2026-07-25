@@ -116,16 +116,19 @@ insert into public.product_variants (
   length_cm,
   width_cm,
   height_cm,
-  canada_post_eligible
+  pickup_eligible,
+  local_delivery_eligible,
+  canada_post_eligible,
+  shipping_profile
 )
 overriding system value
 values
-  (1001, 1001, 'TEST-BIKE-CITY-M-GREEN', 'Medium / Harbour Green', '{"size":"Medium","colour":"Harbour Green"}', 89900, 13500, 170, 25, 95, false),
-  (1002, 1002, 'TEST-BIKE-COMFORT-M-NAVY', 'Medium / Deep Navy', '{"size":"Medium","colour":"Deep Navy"}', 74900, 14200, 175, 27, 98, false),
-  (1003, 1003, 'TEST-HELMET-FAMILY-M-TEAL', 'Medium / Teal', '{"size":"Medium","colour":"Teal"}', 8900, 420, 32, 24, 20, true),
-  (1004, 1004, 'TEST-BASKET-REAR-BLACK', 'Black', '{"colour":"Black"}', 6400, 1100, 42, 32, 28, true),
-  (1005, 1005, 'TEST-LIGHT-USB-BLACK', 'Black', '{"colour":"Black"}', 4900, 180, 12, 8, 6, true),
-  (1006, 1006, 'TEST-HELMET-KIDS-S-MINT', 'Small / Mint', '{"size":"Small","colour":"Mint"}', 5900, 360, 28, 22, 18, true)
+  (1001, 1001, 'TEST-BIKE-CITY-M-GREEN', 'Medium / Harbour Green', '{"size":"Medium","colour":"Harbour Green"}', 89900, 13500, 170, 25, 95, true, true, false, 'large'),
+  (1002, 1002, 'TEST-BIKE-COMFORT-M-NAVY', 'Medium / Deep Navy', '{"size":"Medium","colour":"Deep Navy"}', 74900, 14200, 175, 27, 98, true, true, false, 'large'),
+  (1003, 1003, 'TEST-HELMET-FAMILY-M-TEAL', 'Medium / Teal', '{"size":"Medium","colour":"Teal"}', 8900, 420, 32, 24, 20, true, true, true, 'standard'),
+  (1004, 1004, 'TEST-BASKET-REAR-BLACK', 'Black', '{"colour":"Black"}', 6400, 1100, 42, 32, 28, true, true, true, 'standard'),
+  (1005, 1005, 'TEST-LIGHT-USB-BLACK', 'Black', '{"colour":"Black"}', 4900, 180, 12, 8, 6, true, true, true, 'standard'),
+  (1006, 1006, 'TEST-HELMET-KIDS-S-MINT', 'Small / Mint', '{"size":"Small","colour":"Mint"}', 5900, 360, 28, 22, 18, true, true, true, 'standard')
 on conflict (id) do nothing;
 
 insert into public.product_images (

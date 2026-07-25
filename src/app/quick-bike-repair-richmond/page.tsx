@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Quick Repair in Richmond | Wander Bike Rentals",
     description:
       "Walk in for quick bike repair and basic maintenance in Steveston, Richmond. Flat repair, brake and gear adjustment, chain cleaning, and basic safety checks.",
-    url: "https://wanderbike.ca/quick-bike-repair-richmond",
+    url: "https://www.wanderbike.ca/quick-bike-repair-richmond",
   },
 };
 

@@ -44,7 +44,10 @@ export type AdminProductVariant = {
   lengthCm: number | null;
   widthCm: number | null;
   heightCm: number | null;
+  pickupEligible: boolean;
+  localDeliveryEligible: boolean;
   canadaPostEligible: boolean;
+  shippingProfile: "standard" | "large" | "special";
   taxCode: string;
   isActive: boolean;
   sortOrder: number;
@@ -102,4 +105,19 @@ export type AdminInventoryRow = {
   available: number;
   reorderPoint: number;
   allowBackorder: boolean;
+};
+
+export type AdminInventoryLedgerEntry = {
+  id: number;
+  productName: string;
+  variantTitle: string;
+  sku: string;
+  locationName: string;
+  orderNumber: string;
+  actorName: string;
+  eventType: string;
+  deltaOnHand: number;
+  deltaReserved: number;
+  reason: string;
+  createdAt: string;
 };

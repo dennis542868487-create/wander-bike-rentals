@@ -3,10 +3,12 @@ import "server-only";
 import { cache } from "react";
 import type {
   AdminInventoryRow,
+  AdminInventoryLedgerEntry,
   AdminBrand,
   AdminCategory,
   AdminProductEditorValue,
   AdminProductListItem,
+  AdminProductVariant,
   AdminTaxonomyOption,
 } from "@/lib/admin/product-types";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -39,6 +41,12 @@ function asString(value: unknown) {
 
 function asBoolean(value: unknown, fallback = false) {
   return typeof value === "boolean" ? value : fallback;
+}
+
+function asShippingProfile(
+  value: unknown,
+): AdminProductVariant["shippingProfile"] {
+  return value === "large" || value === "special" ? value : "standard";
 }
 
 function asStringRecord(value: unknown): Record<string, string> {
@@ -248,7 +256,13 @@ export const getAdminProduct = cache(
           lengthCm: asNullableNumber(variant.length_cm),
           widthCm: asNullableNumber(variant.width_cm),
           heightCm: asNullableNumber(variant.height_cm),
+          pickupEligible: asBoolean(variant.pickup_eligible, true),
+          localDeliveryEligible: asBoolean(
+            variant.local_delivery_eligible,
+            true,
+          ),
           canadaPostEligible: asBoolean(variant.canada_post_eligible, true),
+          shippingProfile: asShippingProfile(variant.shipping_profile),
           taxCode: asString(variant.tax_code),
           isActive: asBoolean(variant.is_active, true),
           sortOrder: asNumber(variant.sort_order),
@@ -347,5 +361,90 @@ export async function getAdminInventory(query?: string): Promise<AdminInventoryR
         !normalizedQuery ||
         row.productName.toLowerCase().includes(normalizedQuery) ||
         row.sku.toLowerCase().includes(normalizedQuery),
+    );
+}
+
+export async function getAdminInventoryLedger(
+  query?: string,
+): Promise<AdminInventoryLedgerEntry[]> {
+  const supabase = getSupabaseAdmin();
+  const result = await supabase
+    .from("inventory_ledger")
+    .select(`
+      id,
+      actor_user_id,
+      event_type,
+      delta_on_hand,
+      delta_reserved,
+      reason,
+      created_at,
+      store_locations!inner ( name ),
+      orders ( order_number ),
+      product_variants!inner (
+        sku,
+        title,
+        products!inner ( name )
+      )
+    `)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (result.error) throw new Error("Inventory history is unavailable.");
+
+  const rows = (result.data ?? []) as UnknownRecord[];
+  const actorIds = [
+    ...new Set(
+      rows
+        .map((row) => asString(row.actor_user_id))
+        .filter((value) => value.length > 0),
+    ),
+  ];
+  const profiles =
+    actorIds.length > 0
+      ? await supabase
+          .from("profiles")
+          .select("id, email, full_name")
+          .in("id", actorIds)
+      : { data: [], error: null };
+
+  if (profiles.error) throw new Error("Inventory operator details are unavailable.");
+
+  const actors = new Map(
+    ((profiles.data ?? []) as UnknownRecord[]).map((profile) => [
+      asString(profile.id),
+      asString(profile.full_name) || asString(profile.email),
+    ]),
+  );
+  const normalizedQuery = query?.trim().toLowerCase();
+
+  return rows
+    .map((row) => {
+      const variant = asRecord(row.product_variants);
+      const product = asRecord(variant?.products);
+      const location = asRecord(row.store_locations);
+      const order = asRecord(row.orders);
+      const actorId = asString(row.actor_user_id);
+      return {
+        id: asNumber(row.id),
+        productName: asString(product?.name),
+        variantTitle: asString(variant?.title),
+        sku: asString(variant?.sku),
+        locationName: asString(location?.name),
+        orderNumber: asString(order?.order_number),
+        actorName: actorId ? actors.get(actorId) || "Staff user" : "System",
+        eventType: asString(row.event_type),
+        deltaOnHand: asNumber(row.delta_on_hand),
+        deltaReserved: asNumber(row.delta_reserved),
+        reason: asString(row.reason),
+        createdAt: asString(row.created_at),
+      };
+    })
+    .filter(
+      (entry) =>
+        !normalizedQuery ||
+        entry.productName.toLowerCase().includes(normalizedQuery) ||
+        entry.sku.toLowerCase().includes(normalizedQuery) ||
+        entry.orderNumber.toLowerCase().includes(normalizedQuery) ||
+        entry.reason.toLowerCase().includes(normalizedQuery),
     );
 }

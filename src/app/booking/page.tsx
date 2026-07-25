@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Book a Bike Rental | Wander Bike Rentals",
     description: "Choose your rental date, time, and bikes online.",
-    url: "https://wanderbike.ca/booking",
+    url: "https://www.wanderbike.ca/booking",
   },
 };
 

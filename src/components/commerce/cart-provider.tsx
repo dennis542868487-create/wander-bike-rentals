@@ -22,7 +22,7 @@ type CartContextValue = {
   clearCart: () => void;
 };
 
-const STORAGE_KEY = "wander-bike-cart-v2";
+const STORAGE_KEY = "wander-bike-cart-v3";
 const CartContext = createContext<CartContextValue | null>(null);
 
 function clampQuantity(line: CartLine, quantity: number) {
@@ -43,7 +43,13 @@ function isCartLine(value: unknown): value is CartLine {
     typeof line.quantity === "number" &&
     typeof line.available === "number" &&
     typeof line.allowBackorder === "boolean" &&
-    typeof line.canadaPostEligible === "boolean"
+    typeof line.requiresShipping === "boolean" &&
+    typeof line.pickupEligible === "boolean" &&
+    typeof line.localDeliveryEligible === "boolean" &&
+    typeof line.canadaPostEligible === "boolean" &&
+    (line.shippingProfile === "standard" ||
+      line.shippingProfile === "large" ||
+      line.shippingProfile === "special")
   );
 }
 

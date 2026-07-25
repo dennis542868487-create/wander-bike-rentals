@@ -84,7 +84,10 @@ const productVariantSchema = z
     lengthCm: nullableDimension,
     widthCm: nullableDimension,
     heightCm: nullableDimension,
+    pickupEligible: z.boolean(),
+    localDeliveryEligible: z.boolean(),
     canadaPostEligible: z.boolean(),
+    shippingProfile: z.enum(["standard", "large", "special"]),
     taxCode: z.string().trim().max(80),
     isActive: z.boolean(),
     sortOrder: z.number().int().min(-10_000).max(10_000),
@@ -115,6 +118,27 @@ const productVariantSchema = z
         path: ["canadaPostEligible"],
         message:
           "Canada Post variants require a positive weight, length, width, and height.",
+      });
+    }
+
+    if (
+      !variant.pickupEligible &&
+      !variant.localDeliveryEligible &&
+      !variant.canadaPostEligible
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["pickupEligible"],
+        message: "Choose at least one fulfillment method for this variant.",
+      });
+    }
+
+    if (variant.shippingProfile === "special" && variant.canadaPostEligible) {
+      context.addIssue({
+        code: "custom",
+        path: ["shippingProfile"],
+        message:
+          "Special-handling variants require staff fulfillment and cannot use automatic Canada Post checkout.",
       });
     }
   });

@@ -166,24 +166,41 @@ export default async function OrderPage({
                   Service: {order.shippingServiceCode}
                 </p>
               ) : null}
-              {order.shipment?.trackingPin ? (
+              {order.shipments.some((shipment) => shipment.trackingPin) ? (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Tracking
                   </p>
-                  <p className="mt-1 break-all text-sm font-semibold text-slate-800">
-                    {order.shipment.trackingPin}
-                  </p>
-                  {order.shipment.trackingUrl ? (
-                    <a
-                      href={order.shipment.trackingUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-3 inline-flex text-sm font-semibold text-teal-800"
-                    >
-                      Track with Canada Post →
-                    </a>
-                  ) : null}
+                  <ul className="mt-2 space-y-3">
+                    {order.shipments
+                      .filter((shipment) => shipment.trackingPin)
+                      .map((shipment, index) => (
+                        <li
+                          key={`${shipment.trackingPin}-${index}`}
+                          className="rounded-xl bg-slate-50 p-3"
+                        >
+                          <p className="text-xs text-slate-500">
+                            Package {shipment.packageNumber ?? index + 1}
+                            {shipment.serviceName
+                              ? ` · ${shipment.serviceName}`
+                              : ""}
+                          </p>
+                          <p className="mt-1 break-all text-sm font-semibold text-slate-800">
+                            {shipment.trackingPin}
+                          </p>
+                          {shipment.trackingUrl ? (
+                            <a
+                              href={shipment.trackingUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-2 inline-flex text-sm font-semibold text-teal-800"
+                            >
+                              Track package →
+                            </a>
+                          ) : null}
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               ) : null}
             </section>

@@ -5,6 +5,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { CommerceError } from "@/lib/commerce/errors";
 import type { z } from "zod";
 import type { cartItemInputSchema } from "@/lib/commerce/schemas";
+import type {
+  FulfillmentMethod,
+  ShippingProfile,
+} from "@/lib/commerce/types";
+import { getCartFulfillmentAvailability } from "@/lib/commerce/fulfillment-availability";
 
 type CartItemInput = z.infer<typeof cartItemInputSchema>;
 type UnknownRow = Record<string, unknown>;
@@ -21,7 +26,10 @@ export type ResolvedCartLine = {
   lengthCm: number | null;
   widthCm: number | null;
   heightCm: number | null;
+  pickupEligible: boolean;
+  localDeliveryEligible: boolean;
   canadaPostEligible: boolean;
+  shippingProfile: ShippingProfile;
   requiresShipping: boolean;
   available: number;
   allowBackorder: boolean;
@@ -110,7 +118,10 @@ export async function resolveDatabaseCart(
         length_cm,
         width_cm,
         height_cm,
+        pickup_eligible,
+        local_delivery_eligible,
         canada_post_eligible,
+        shipping_profile,
         is_active,
         products!inner (
           id,
@@ -222,7 +233,14 @@ export async function resolveDatabaseCart(
       lengthCm: variant.length_cm == null ? null : asNumber(variant.length_cm),
       widthCm: variant.width_cm == null ? null : asNumber(variant.width_cm),
       heightCm: variant.height_cm == null ? null : asNumber(variant.height_cm),
+      pickupEligible: variant.pickup_eligible !== false,
+      localDeliveryEligible: variant.local_delivery_eligible !== false,
       canadaPostEligible: variant.canada_post_eligible !== false,
+      shippingProfile:
+        variant.shipping_profile === "large" ||
+        variant.shipping_profile === "special"
+          ? variant.shipping_profile
+          : "standard",
       requiresShipping: product.requires_shipping !== false,
       available,
       allowBackorder,
@@ -241,10 +259,38 @@ function roundPackageDimension(value: number) {
   return Math.ceil(value * 10) / 10;
 }
 
+export function assertFulfillmentAllowed(
+  cart: ResolvedCart,
+  method: FulfillmentMethod,
+) {
+  const availability = getCartFulfillmentAvailability(cart.items);
+
+  if (method === "pickup" && !availability.pickup.available) {
+    throw new CommerceError(
+      "One or more cart items are not available for store pickup.",
+      "PICKUP_UNAVAILABLE_FOR_ITEM",
+      422,
+    );
+  }
+
+  if (method === "local_delivery" && !availability.localDelivery.available) {
+    throw new CommerceError(
+      "One or more cart items are not available for local delivery.",
+      "LOCAL_DELIVERY_UNAVAILABLE_FOR_ITEM",
+      422,
+    );
+  }
+
+  if (method === "canada_post") {
+    buildCanadaPostPackage(cart);
+  }
+}
+
 export function buildCanadaPostPackage(cart: ResolvedCart): CanadaPostPackage {
   const shippable = cart.items.filter((item) => item.requiresShipping);
+  const availability = getCartFulfillmentAvailability(cart.items);
 
-  if (shippable.length === 0) {
+  if (availability.canadaPost.restriction === "no_shippable_items") {
     throw new CommerceError(
       "This cart does not contain an item that requires shipping.",
       "NO_SHIPPABLE_ITEMS",
@@ -252,11 +298,32 @@ export function buildCanadaPostPackage(cart: ResolvedCart): CanadaPostPackage {
     );
   }
 
-  const pickupOnly = shippable.filter((item) => !item.canadaPostEligible);
-  if (pickupOnly.length > 0) {
+  if (
+    availability.canadaPost.restriction ===
+    "item_not_canada_post_eligible"
+  ) {
     throw new CommerceError(
-      "One or more cart items require pickup at the Steveston shop.",
-      "PICKUP_REQUIRED",
+      "One or more cart items are not available for Canada Post shipping.",
+      "CANADA_POST_UNAVAILABLE_FOR_ITEM",
+      422,
+    );
+  }
+
+  if (availability.canadaPost.restriction === "special_handling_required") {
+    throw new CommerceError(
+      "One or more cart items require special handling by the Steveston team.",
+      "SPECIAL_HANDLING_REQUIRED",
+      422,
+    );
+  }
+
+  if (
+    availability.canadaPost.restriction ===
+    "large_item_separate_shipment"
+  ) {
+    throw new CommerceError(
+      "Large items must ship alone. Use pickup or local delivery for this cart, or place separate orders.",
+      "LARGE_ITEM_SEPARATE_SHIPMENT",
       422,
     );
   }

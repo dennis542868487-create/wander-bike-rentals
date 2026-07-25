@@ -14,11 +14,6 @@ function text(value: unknown) {
   return typeof value === "string" ? value : "";
 }
 
-function firstRecord(value: unknown): UnknownRecord | null {
-  if (Array.isArray(value)) return (value[0] as UnknownRecord | undefined) ?? null;
-  return value && typeof value === "object" ? (value as UnknownRecord) : null;
-}
-
 export async function getCustomerOrderSummaries() {
   const user = await getCurrentUser();
   if (!user) return null;
@@ -40,6 +35,7 @@ export async function getCustomerOrderSummaries() {
         service_name,
         tracking_pin,
         tracking_url,
+        package_details,
         created_at
       )
     `)
@@ -53,10 +49,9 @@ export async function getCustomerOrderSummaries() {
     orders: ((result.data ?? []) as UnknownRecord[]).map((row) => {
       const shipments = Array.isArray(row.shipments)
         ? ([...row.shipments] as UnknownRecord[]).sort((left, right) =>
-            text(right.created_at).localeCompare(text(left.created_at)),
+            text(left.created_at).localeCompare(text(right.created_at)),
           )
         : [];
-      const shipment = firstRecord(shipments);
       return {
         publicId: text(row.public_id),
         orderNumber: text(row.order_number),
@@ -67,14 +62,31 @@ export async function getCustomerOrderSummaries() {
         totalCents: number(row.total_cents),
         refundedTotalCents: number(row.refunded_total_cents),
         createdAt: text(row.created_at),
-        shipment: shipment
-          ? {
+        shipments: shipments
+          .filter(
+            (shipment) =>
+              ![
+                "cancelled",
+                "voided",
+                "refund_pending",
+                "refunded",
+                "exception",
+              ].includes(text(shipment.status)),
+          )
+          .map((shipment) => {
+            const packageDetails =
+              shipment.package_details &&
+              typeof shipment.package_details === "object"
+                ? (shipment.package_details as UnknownRecord)
+                : {};
+            return {
               status: text(shipment.status),
               serviceName: text(shipment.service_name),
               trackingPin: text(shipment.tracking_pin),
               trackingUrl: text(shipment.tracking_url),
-            }
-          : null,
+              packageNumber: number(packageDetails.packageNumber) || null,
+            };
+          }),
       };
     }),
   };

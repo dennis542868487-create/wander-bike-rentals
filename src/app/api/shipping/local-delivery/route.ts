@@ -7,7 +7,10 @@ import {
   applyShippingRules,
   cartSubtotalCents,
 } from "@/lib/commerce/pricing";
-import { resolveDatabaseCart } from "@/lib/commerce/cart-server";
+import {
+  assertFulfillmentAllowed,
+  resolveDatabaseCart,
+} from "@/lib/commerce/cart-server";
 import { shippingRateRequestSchema } from "@/lib/commerce/schemas";
 import { CommerceError, publicCommerceError } from "@/lib/commerce/errors";
 import { isSameOriginRequest } from "@/lib/http/security";
@@ -40,6 +43,7 @@ export async function POST(request: Request) {
       getCommerceStoreSettings(),
       resolveDatabaseCart(parsed.data.items),
     ]);
+    assertFulfillmentAllowed(cart, "local_delivery");
     const eligibility = localDeliveryEligibility(
       parsed.data.postalCode,
       settings.localDelivery,

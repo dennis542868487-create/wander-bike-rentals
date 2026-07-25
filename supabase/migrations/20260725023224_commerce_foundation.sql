@@ -135,7 +135,10 @@ create table public.product_variants (
   length_cm numeric(8,2),
   width_cm numeric(8,2),
   height_cm numeric(8,2),
+  pickup_eligible boolean not null default true,
+  local_delivery_eligible boolean not null default true,
   canada_post_eligible boolean not null default true,
+  shipping_profile text not null default 'standard',
   tax_code text,
   is_active boolean not null default true,
   sort_order integer not null default 0,
@@ -156,6 +159,9 @@ create table public.product_variants (
     (length_cm is null or length_cm >= 0)
     and (width_cm is null or width_cm >= 0)
     and (height_cm is null or height_cm >= 0)
+  ),
+  constraint product_variants_shipping_profile_valid check (
+    shipping_profile in ('standard', 'large', 'special')
   ),
   constraint product_variants_options_object check (jsonb_typeof(option_values) = 'object')
 );
@@ -1256,6 +1262,7 @@ declare
   v_item record;
   v_variant record;
   v_inventory record;
+  v_shippable_unit_count integer := 0;
   v_order public.orders%rowtype;
 begin
   if p_fulfillment_method not in ('pickup', 'local_delivery', 'canada_post') then
@@ -1347,6 +1354,15 @@ begin
       using errcode = 'P0002';
   end if;
 
+  select coalesce(sum((item ->> 'quantity')::integer), 0)::integer
+  into v_shippable_unit_count
+  from jsonb_array_elements(v_normalized_items) as item
+  join public.product_variants pv
+    on pv.id = (item ->> 'variant_id')::bigint
+  join public.products p
+    on p.id = pv.product_id
+  where p.requires_shipping;
+
   if p_fulfillment_method = 'canada_post' then
     select
       amount_cents,
@@ -1360,6 +1376,7 @@ begin
       v_shipping_cart_items
     from public.shipping_quotes
     where id = p_shipping_quote_id
+      and provider = 'canada_post'
       and location_id = v_location_id
       and currency = 'CAD'
       and is_sandbox
@@ -1462,8 +1479,13 @@ begin
       pv.option_values,
       pv.price_cents,
       pv.weight_grams,
+      pv.pickup_eligible,
+      pv.local_delivery_eligible,
+      pv.canada_post_eligible,
+      pv.shipping_profile,
       p.name as product_name,
-      p.track_inventory
+      p.track_inventory,
+      p.requires_shipping
     into v_variant
     from public.product_variants pv
     join public.products p on p.id = pv.product_id
@@ -1476,6 +1498,45 @@ begin
     if not found then
       raise exception 'A cart item is unavailable'
         using errcode = 'P0002';
+    end if;
+
+    if p_fulfillment_method = 'pickup'
+      and not v_variant.pickup_eligible
+    then
+      raise exception 'SKU % is not available for store pickup', v_variant.sku
+        using errcode = '23514';
+    end if;
+
+    if p_fulfillment_method = 'local_delivery'
+      and not v_variant.local_delivery_eligible
+    then
+      raise exception 'SKU % is not available for local delivery', v_variant.sku
+        using errcode = '23514';
+    end if;
+
+    if p_fulfillment_method = 'canada_post'
+      and v_variant.requires_shipping
+      and not v_variant.canada_post_eligible
+    then
+      raise exception 'SKU % is not available for Canada Post shipping', v_variant.sku
+        using errcode = '23514';
+    end if;
+
+    if p_fulfillment_method = 'canada_post'
+      and v_variant.requires_shipping
+      and v_variant.shipping_profile = 'special'
+    then
+      raise exception 'SKU % requires special handling', v_variant.sku
+        using errcode = '23514';
+    end if;
+
+    if p_fulfillment_method = 'canada_post'
+      and v_variant.requires_shipping
+      and v_variant.shipping_profile = 'large'
+      and v_shippable_unit_count > 1
+    then
+      raise exception 'Large SKU % must ship alone', v_variant.sku
+        using errcode = '23514';
     end if;
 
     if v_variant.track_inventory then
@@ -3808,7 +3869,10 @@ begin
         length_cm,
         width_cm,
         height_cm,
+        pickup_eligible,
+        local_delivery_eligible,
         canada_post_eligible,
+        shipping_profile,
         tax_code,
         is_active,
         sort_order
@@ -3826,7 +3890,10 @@ begin
         nullif(v_variant ->> 'length_cm', '')::numeric,
         nullif(v_variant ->> 'width_cm', '')::numeric,
         nullif(v_variant ->> 'height_cm', '')::numeric,
+        coalesce((v_variant ->> 'pickup_eligible')::boolean, true),
+        coalesce((v_variant ->> 'local_delivery_eligible')::boolean, true),
         coalesce((v_variant ->> 'canada_post_eligible')::boolean, true),
+        coalesce(nullif(v_variant ->> 'shipping_profile', ''), 'standard'),
         nullif(v_variant ->> 'tax_code', ''),
         coalesce((v_variant ->> 'is_active')::boolean, true),
         coalesce((v_variant ->> 'sort_order')::integer, 0)
@@ -3863,9 +3930,21 @@ begin
           length_cm = nullif(v_variant ->> 'length_cm', '')::numeric,
           width_cm = nullif(v_variant ->> 'width_cm', '')::numeric,
           height_cm = nullif(v_variant ->> 'height_cm', '')::numeric,
+          pickup_eligible = coalesce(
+            (v_variant ->> 'pickup_eligible')::boolean,
+            true
+          ),
+          local_delivery_eligible = coalesce(
+            (v_variant ->> 'local_delivery_eligible')::boolean,
+            true
+          ),
           canada_post_eligible = coalesce(
             (v_variant ->> 'canada_post_eligible')::boolean,
             true
+          ),
+          shipping_profile = coalesce(
+            nullif(v_variant ->> 'shipping_profile', ''),
+            'standard'
           ),
           tax_code = nullif(v_variant ->> 'tax_code', ''),
           is_active = coalesce((v_variant ->> 'is_active')::boolean, true),

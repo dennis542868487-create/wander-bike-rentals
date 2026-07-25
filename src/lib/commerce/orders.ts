@@ -36,12 +36,13 @@ export type OrderDetails = {
     unitPriceCents: number;
     lineTotalCents: number;
   }>;
-  shipment: {
+  shipments: Array<{
     status: string;
     serviceName: string | null;
     trackingPin: string | null;
     trackingUrl: string | null;
-  } | null;
+    packageNumber: number | null;
+  }>;
   returns: Array<{
     returnNumber: string;
     status: string;
@@ -123,7 +124,7 @@ export const getOrderForViewer = cache(
     if (!viewerOwnsOrder && !guestHasAccess) return null;
 
     const orderId = asNumber(order.id);
-    const [itemsResult, shipmentResult, returnsResult] = await Promise.all([
+    const [itemsResult, shipmentsResult, returnsResult] = await Promise.all([
       supabase
         .from("order_items")
         .select(
@@ -133,11 +134,11 @@ export const getOrderForViewer = cache(
         .order("id", { ascending: true }),
       supabase
         .from("shipments")
-        .select("status, service_name, tracking_pin, tracking_url")
+        .select(
+          "status, service_name, tracking_pin, tracking_url, package_details, created_at",
+        )
         .eq("order_id", orderId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+        .order("created_at", { ascending: true }),
       supabase
         .from("returns")
         .select("return_number, status, reason, resolution, created_at")
@@ -145,9 +146,11 @@ export const getOrderForViewer = cache(
         .order("created_at", { ascending: false }),
     ]);
 
-    if (itemsResult.error || returnsResult.error) return null;
+    if (itemsResult.error || shipmentsResult.error || returnsResult.error) {
+      return null;
+    }
     const itemRows = (itemsResult.data ?? []) as UnknownRecord[];
-    const shipment = shipmentResult.data as UnknownRecord | null;
+    const shipmentRows = (shipmentsResult.data ?? []) as UnknownRecord[];
 
     return {
       publicId: String(order.public_id),
@@ -185,8 +188,21 @@ export const getOrderForViewer = cache(
         unitPriceCents: asNumber(item.unit_price_cents),
         lineTotalCents: asNumber(item.line_total_cents),
       })),
-      shipment: shipment
-        ? {
+      shipments: shipmentRows
+        .filter(
+          (shipment) =>
+            ![
+              "cancelled",
+              "voided",
+              "refund_pending",
+              "refunded",
+              "exception",
+            ].includes(String(shipment.status)),
+        )
+        .map((shipment) => {
+          const packageDetails = asRecord(shipment.package_details);
+          const packageNumber = asNumber(packageDetails?.packageNumber);
+          return {
             status: String(shipment.status),
             serviceName:
               typeof shipment.service_name === "string"
@@ -200,8 +216,9 @@ export const getOrderForViewer = cache(
               typeof shipment.tracking_url === "string"
                 ? shipment.tracking_url
                 : null,
-          }
-        : null,
+            packageNumber: packageNumber > 0 ? packageNumber : null,
+          };
+        }),
       returns: ((returnsResult.data ?? []) as UnknownRecord[]).map((entry) => ({
         returnNumber: String(entry.return_number),
         status: String(entry.status),

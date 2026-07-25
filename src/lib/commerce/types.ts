@@ -1,4 +1,5 @@
 export type ProductOptionValues = Record<string, string>;
+export type ShippingProfile = "standard" | "large" | "special";
 
 export type CatalogImage = {
   id: number;
@@ -19,7 +20,10 @@ export type CatalogVariant = {
   lengthCm: number | null;
   widthCm: number | null;
   heightCm: number | null;
+  pickupEligible: boolean;
+  localDeliveryEligible: boolean;
   canadaPostEligible: boolean;
+  shippingProfile: ShippingProfile;
   available: number;
   isAvailable: boolean;
   allowBackorder: boolean;
@@ -58,7 +62,11 @@ export type CartLine = {
   quantity: number;
   available: number;
   allowBackorder: boolean;
+  requiresShipping: boolean;
+  pickupEligible: boolean;
+  localDeliveryEligible: boolean;
   canadaPostEligible: boolean;
+  shippingProfile: ShippingProfile;
 };
 
 export type FulfillmentMethod = "pickup" | "local_delivery" | "canada_post";

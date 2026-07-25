@@ -36,7 +36,11 @@ export function ProductPurchasePanel({ product }: { product: CatalogProduct }) {
       quantity,
       available: variant.available,
       allowBackorder: variant.allowBackorder,
+      requiresShipping: product.requiresShipping,
+      pickupEligible: variant.pickupEligible,
+      localDeliveryEligible: variant.localDeliveryEligible,
       canadaPostEligible: variant.canadaPostEligible,
+      shippingProfile: variant.shippingProfile,
     });
     setAdded(true);
     if (goToCart) router.push("/cart");
@@ -60,10 +64,18 @@ export function ProductPurchasePanel({ product }: { product: CatalogProduct }) {
         </div>
       ) : null}
 
-      <p className="text-3xl font-semibold text-slate-950">
-        {formatCad(variant.priceCents)}
-        <span className="ml-1 text-sm font-medium text-slate-500">CAD</span>
-      </p>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <p className="text-3xl font-semibold text-slate-950">
+          {formatCad(variant.priceCents)}
+          <span className="ml-1 text-sm font-medium text-slate-500">CAD</span>
+        </p>
+        {variant.compareAtPriceCents !== null &&
+        variant.compareAtPriceCents > variant.priceCents ? (
+          <p className="text-base text-slate-500 line-through">
+            {formatCad(variant.compareAtPriceCents)}
+          </p>
+        ) : null}
+      </div>
       <p
         className={`mt-3 flex items-center gap-2 text-sm font-semibold ${
           variant.isAvailable ? "text-emerald-800" : "text-rose-800"
@@ -71,8 +83,12 @@ export function ProductPurchasePanel({ product }: { product: CatalogProduct }) {
       >
         <Check aria-hidden="true" className="h-4 w-4" />
         {variant.isAvailable
-          ? `Available for pickup in Steveston${
-              variant.available > 0 ? ` · ${variant.available} in test stock` : ""
+          ? `Available${
+              variant.available > 0
+                ? ` · ${variant.available} ${
+                    product.isSandboxProduct ? "in test stock" : "in stock"
+                  }`
+                : ""
             }`
           : "Currently unavailable"}
       </p>
@@ -98,7 +114,15 @@ export function ProductPurchasePanel({ product }: { product: CatalogProduct }) {
                 } disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400`}
               >
                 <span className="font-semibold">{item.title}</span>
-                <span className="mt-1 block text-xs">{formatCad(item.priceCents)}</span>
+                <span className="mt-1 block text-xs">
+                  {formatCad(item.priceCents)}
+                  {item.compareAtPriceCents !== null &&
+                  item.compareAtPriceCents > item.priceCents ? (
+                    <span className="ml-2 text-slate-400 line-through">
+                      {formatCad(item.compareAtPriceCents)}
+                    </span>
+                  ) : null}
+                </span>
               </button>
             ))}
           </div>
@@ -162,33 +186,48 @@ export function ProductPurchasePanel({ product }: { product: CatalogProduct }) {
           Choose how to receive your order
         </h2>
         <div className="mt-4 space-y-3 text-sm">
-          <div className="flex gap-3 border border-teal-300 bg-teal-50 p-4">
-            <Store aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
-            <div>
-              <p className="font-semibold text-slate-900">Pickup in Steveston</p>
-              <p className="mt-1 leading-5 text-slate-600">
-                Free pickup at 12071 First Ave #101 after staff confirmation.
-              </p>
+          {variant.pickupEligible ? (
+            <div className="flex gap-3 border border-teal-300 bg-teal-50 p-4">
+              <Store aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
+              <div>
+                <p className="font-semibold text-slate-900">Pickup in Steveston</p>
+                <p className="mt-1 leading-5 text-slate-600">
+                  Free pickup at 12071 First Ave #101 after staff confirmation.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-3 border border-slate-200 p-4">
-            <Truck aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
-            <div>
-              <p className="font-semibold text-slate-900">Local delivery</p>
-              <p className="mt-1 leading-5 text-slate-600">
-                Availability and fee are checked from your postal code at checkout.
-              </p>
+          ) : null}
+          {variant.localDeliveryEligible ? (
+            <div className="flex gap-3 border border-slate-200 p-4">
+              <Truck aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
+              <div>
+                <p className="font-semibold text-slate-900">Local delivery</p>
+                <p className="mt-1 leading-5 text-slate-600">
+                  Availability and fee are checked from your postal code at checkout.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-3 border border-slate-200 p-4">
-            <Package aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
-            <div>
-              <p className="font-semibold text-slate-900">Canada Post shipping</p>
-              <p className="mt-1 leading-5 text-slate-600">
-                Sandbox rates are calculated from package weight and destination.
-              </p>
+          ) : null}
+          {product.requiresShipping && variant.canadaPostEligible ? (
+            <div className="flex gap-3 border border-slate-200 p-4">
+              <Package aria-hidden="true" className="mt-0.5 h-5 w-5 text-teal-800" />
+              <div>
+                <p className="font-semibold text-slate-900">
+                  Canada Post shipping
+                </p>
+                <p className="mt-1 leading-5 text-slate-600">
+                  {variant.shippingProfile === "large"
+                    ? "This large item must ship by itself in one parcel."
+                    : "Sandbox rates are calculated from package weight and destination."}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
+          {variant.shippingProfile === "special" ? (
+            <div className="border border-amber-200 bg-amber-50 p-4 text-amber-950">
+              Special handling is arranged directly with the Steveston team.
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

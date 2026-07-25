@@ -48,10 +48,19 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         </p>
 
         <div className="mt-auto pt-5">
-          <p className="text-xl font-semibold text-slate-950">
-            {variant ? formatCad(variant.priceCents) : "Contact us"}
-            <span className="ml-1 text-xs font-medium text-slate-500">CAD</span>
-          </p>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <p className="text-xl font-semibold text-slate-950">
+              {variant ? formatCad(variant.priceCents) : "Contact us"}
+              <span className="ml-1 text-xs font-medium text-slate-500">CAD</span>
+            </p>
+            {variant?.compareAtPriceCents !== null &&
+            variant?.compareAtPriceCents !== undefined &&
+            variant.compareAtPriceCents > variant.priceCents ? (
+              <p className="text-sm text-slate-400 line-through">
+                {formatCad(variant.compareAtPriceCents)}
+              </p>
+            ) : null}
+          </div>
           <div className="mt-3 space-y-1.5 text-xs text-slate-600">
             <p className="flex items-center gap-2">
               <PackageCheck
@@ -72,9 +81,13 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               <MapPin aria-hidden="true" className="h-4 w-4 text-teal-700" />
               {!product.requiresShipping
                 ? "No shipping required"
-                : variant?.canadaPostEligible
-                  ? "Pickup, local delivery, or shipping"
-                  : "Pickup or eligible local delivery"}
+                : [
+                    variant?.pickupEligible ? "pickup" : null,
+                    variant?.localDeliveryEligible ? "local delivery" : null,
+                    variant?.canadaPostEligible ? "Canada Post" : null,
+                  ]
+                    .filter(Boolean)
+                    .join(", ") || "Contact the shop for fulfillment"}
             </p>
           </div>
         </div>

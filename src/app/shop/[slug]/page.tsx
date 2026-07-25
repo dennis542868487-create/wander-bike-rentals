@@ -25,7 +25,7 @@ export async function generateMetadata({
     openGraph: {
       title: product.name,
       description: product.shortDescription,
-      url: `https://wanderbike.ca/shop/${product.slug}`,
+      url: `https://www.wanderbike.ca/shop/${product.slug}`,
       images: product.images[0] ? [{ url: product.images[0].src }] : undefined,
     },
   };
@@ -62,7 +62,7 @@ export default async function ProductPage({
               availability: product.variants[0].isAvailable
                 ? "https://schema.org/InStock"
                 : "https://schema.org/OutOfStock",
-              url: `https://wanderbike.ca/shop/${product.slug}`,
+              url: `https://www.wanderbike.ca/shop/${product.slug}`,
             }
           : undefined,
       };
@@ -206,9 +206,23 @@ export default async function ProductPage({
               <dd className="text-slate-600">
                 {!product.requiresShipping
                   ? "No shipping required"
-                  : product.variants.some((variant) => variant.canadaPostEligible)
-                    ? "Pickup, eligible local delivery, or Canada Post shipping"
-                    : "Pickup or eligible local delivery"}
+                  : [
+                      product.variants.some((variant) => variant.pickupEligible)
+                        ? "pickup"
+                        : null,
+                      product.variants.some(
+                        (variant) => variant.localDeliveryEligible,
+                      )
+                        ? "local delivery"
+                        : null,
+                      product.variants.some(
+                        (variant) => variant.canadaPostEligible,
+                      )
+                        ? "Canada Post"
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(", ") || "Contact the shop"}
               </dd>
             </div>
             <div className="grid grid-cols-[9rem_1fr] gap-4 py-4">

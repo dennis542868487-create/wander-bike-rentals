@@ -24,6 +24,15 @@ test("core public pages render without client exceptions", async ({ page }) => {
     }),
   ).toBeVisible();
   await expect(page.getByText("Sandbox catalog:")).toBeVisible();
+
+  await page.goto("/policies/returns");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Return policy" }),
+  ).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    /noindex/,
+  );
   expect(pageErrors).toEqual([]);
 });
 
@@ -77,15 +86,37 @@ test("customer can add a product, change quantity, and reach the safe checkout g
   ).toBeDisabled();
 });
 
-test("admin mutation routes reject a cross-origin request before authentication", async ({
+test("commerce and rental mutations reject cross-origin requests before authentication", async ({
   request,
 }) => {
-  const response = await request.post("/api/admin/settings", {
+  const requestOptions = {
     headers: {
       Origin: "https://attacker.example",
       "Content-Type": "application/json",
     },
     data: {},
-  });
-  expect(response.status()).toBe(403);
+  };
+  const responses = await Promise.all([
+    request.post("/api/admin/settings", requestOptions),
+    request.post("/api/bookings", requestOptions),
+    request.patch("/api/bookings/not-a-booking", requestOptions),
+    request.patch("/api/booking-admin/bookings/not-a-booking", requestOptions),
+  ]);
+
+  expect(responses.map((response) => response.status())).toEqual([
+    403, 403, 403, 403,
+  ]);
+});
+
+test("sitemap includes commerce but excludes sandbox products", async ({
+  request,
+}) => {
+  const response = await request.get("/sitemap.xml");
+  expect(response.ok()).toBe(true);
+  const xml = await response.text();
+  expect(xml).toContain("<loc>https://www.wanderbike.ca/shop</loc>");
+  expect(xml).toContain(
+    "<loc>https://www.wanderbike.ca/quick-bike-repair-richmond</loc>",
+  );
+  expect(xml).not.toContain("test-family-ride-helmet");
 });

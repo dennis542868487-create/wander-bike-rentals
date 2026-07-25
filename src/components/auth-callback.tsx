@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getSupabaseBrowser } from "@/lib/supabase";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 export default function AuthCallback() {
   const router = useRouter();

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { parseBookingInput } from "@/lib/booking-types";
-import { getSupabaseAdmin, requireUser } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { requireUser } from "@/lib/supabase/auth";
 
 async function ownedEditableBooking(request: Request, id: string) {
   const auth = await requireUser(request);

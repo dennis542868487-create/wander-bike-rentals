@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { Booking, BookingStatus } from "@/lib/booking-types";
 import { useAuthSession } from "@/hooks/use-auth-session";
-import { getSupabaseBrowser } from "@/lib/supabase";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 
 const statusStyle: Record<BookingStatus, string> = {
   pending: "bg-amber-100 text-amber-800",

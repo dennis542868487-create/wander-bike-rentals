@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthSession } from "@/hooks/use-auth-session";
+import { CartButton } from "@/components/commerce/cart-button";
 
 type NavLink = {
   href: string;
@@ -52,6 +53,7 @@ const navItems: NavItem[] = [
     rentalLinks: rentalsLinks,
     repairLink: { href: "/quick-bike-repair-richmond", label: "Quick Repair" },
   },
+  { type: "link", href: "/shop", label: "Shop" },
   { type: "link", href: "/booking", label: "Book Online" },
   { type: "group", label: "Guides", links: guidesLinks },
   { type: "link", href: "/location", label: "Location" },
@@ -235,12 +237,12 @@ export default function SiteHeader() {
             })}
 
             <Link
-              href={session ? "/account/bookings" : "/auth"}
+              href={session ? "/account" : "/auth"}
               className="btn-secondary px-4 py-2.5 text-sm"
             >
-              {authReady && session ? "My Bookings" : "Sign in"}
+              {authReady && session ? "My Account" : "Sign in"}
             </Link>
-            <a href="tel:+17789521389" className="btn-primary px-5 py-2.5 text-sm">Call Now</a>
+            <CartButton />
           </div>
 
           <div className="flex items-center gap-1.5 lg:hidden">
@@ -392,9 +394,12 @@ export default function SiteHeader() {
             >
               Book Online
             </Link>
-            <Link href={session ? "/account/bookings" : "/auth"} onClick={closeMenu} className="btn-secondary w-full rounded-2xl px-4 py-3.5 text-sm">
+            <Link href={session ? "/account" : "/auth"} onClick={closeMenu} className="btn-secondary w-full rounded-2xl px-4 py-3.5 text-sm">
               {authReady && session ? "My Bookings & Account" : "Sign in or create an account"}
             </Link>
+            <div>
+              <CartButton mobile />
+            </div>
           </div>
         </div>
       </div>

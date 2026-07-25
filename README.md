@@ -1,54 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wander Bike Rentals
 
-## Getting Started
+Wander Bike is a single Next.js website for bike rentals, retail, repair
+information, customer accounts, and merchant operations. Commerce is
+sandboxed by default: the repository must not capture live payments or buy
+production shipping labels until the merchant explicitly approves go-live.
 
-First, run the development server:
+## What is included
+
+- Existing rental, repair, guide, location, and SEO pages
+- Rental requests and customer booking history
+- Product catalog, variants, images, search, filters, cart, and guest checkout
+- Atomic inventory reservations and an auditable inventory ledger
+- Stripe-hosted Checkout, verified webhooks, and full or partial refunds
+- Store pickup, configurable local delivery, and Canada Post sandbox shipping
+- Multi-package labels, PDFs, tracking, voids, and refund requests
+- Customer order status and account order history
+- Role-protected merchant dashboard for orders, catalog, stock, and settings
+- Durable Resend notification outbox with Vercel Cron retries
+- Supabase Auth, PostgreSQL migrations, Storage, RLS, and server-side role checks
+
+## Stack
+
+- Next.js 16 App Router and React 19
+- Supabase PostgreSQL, Auth, and Storage
+- Stripe Checkout in test mode
+- Canada Post REST/XML APIs in sandbox
+- Resend transactional email
+- Vercel hosting and Cron
+
+Use Node.js `>=20.9`. Install and run locally:
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site is available at `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The chronological files in `supabase/migrations/` are the only schema source of
+truth. `supabase/schema.sql` is a legacy pointer and must not be run as a
+standalone schema.
 
-## Learn More
+For a local Supabase stack:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx supabase start
+npx supabase db reset
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For a new linked cloud project:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push --include-all --include-seed
+```
 
-## Deploy on Vercel
+The seed is deliberately marked `[TEST]` and enables only the sandbox catalog.
+Do not load it into a live customer catalog.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Safety gates
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All three conditions are required before Stripe Checkout can open:
 
-## Booking and account setup
+- `COMMERCE_SANDBOX_MODE=true`
+- `COMMERCE_CHECKOUT_ENABLED=true`
+- `commerce.checkout_enabled=true` in merchant settings
 
-The public booking form lives at `/booking`. Customers sign in at `/auth` and
-manage their own requests at `/account/bookings`. The private staff calendar
-lives at `/booking-admin` and requires a `staff` or `admin` role.
+Keep `COMMERCE_CHECKOUT_ENABLED=false` until Supabase migrations, the Stripe
+test webhook, and sandbox order reconciliation have been verified. Canada Post
+uses its sandbox host by default and independently requires
+`fulfillment.canada_post_enabled=true`.
 
-1. Create a Supabase project and run `supabase/schema.sql` in its SQL Editor.
-2. Configure Supabase Auth redirect URLs and optional Google OAuth.
-3. Copy `.env.example` to `.env.local` and add the Supabase values. Keep the
-   secret key server-only.
-4. Add the same variables to the Vercel project.
+## Verification
 
-Public visitors can only submit requests through the server route. The bookings
-table has RLS enabled and grants no direct access to browser roles.
+```bash
+npm run lint
+npm run test:unit
+npm run build
+npm run test:e2e
+```
 
-See `docs/AUTH_SETUP.md` for the exact Google callback URL, staff-role commands,
-and the private staff entry URL.
+`npm run test:e2e` exercises production-rendered desktop Chrome and a Pixel 7
+viewport. `npm run test:all` runs the full sequence.
+
+## Operations and deployment
+
+- Authentication and first-admin setup: `docs/AUTH_SETUP.md`
+- Environment, sandbox validation, Vercel CLI deployment, and rollback:
+  `docs/DEPLOYMENT.md`
+
+Never commit `.env.local`, Supabase secret keys, Stripe secrets, Canada Post
+credentials, Resend keys, or webhook signing secrets.

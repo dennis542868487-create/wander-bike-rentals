@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin, requireBookingAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { requireBookingAdmin } from "@/lib/supabase/auth";
 
 export async function GET(request: Request) {
   try {

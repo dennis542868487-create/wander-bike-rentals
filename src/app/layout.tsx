@@ -5,6 +5,10 @@ import Link from "next/link";
 import SiteHeader from "@/components/site-header";
 import Reveal from "@/components/reveal";
 import ChatbaseWidget from "@/components/chatbase-widget";
+import { CartProvider } from "@/components/commerce/cart-provider";
+import { SandboxBanner } from "@/components/commerce/sandbox-banner";
+import { PublicOnly } from "@/components/public-only";
+import { isSandboxCommerce } from "@/lib/env";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -60,19 +64,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const sandbox = isSandboxCommerce();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#f0fdf9] text-slate-900">
-        <div className="min-h-screen">
-          <Reveal />
-          <SiteHeader />
+        <CartProvider>
+          <div className="min-h-screen">
+            <Reveal />
+            <PublicOnly>
+              <SiteHeader />
+              {sandbox ? <SandboxBanner /> : null}
+            </PublicOnly>
 
-          {children}
+            {children}
 
-          <footer className="border-t border-slate-200/80 bg-slate-950 text-slate-300">
+            <PublicOnly>
+              <footer className="border-t border-slate-200/80 bg-slate-950 text-slate-300">
             <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 text-sm sm:gap-12 lg:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
               <div>
                 <div className="flex items-center gap-3">
@@ -132,9 +143,13 @@ export default function RootLayout({
                 </div>
               </div>
             </div>
-          </footer>
-        </div>
-        <ChatbaseWidget />
+              </footer>
+            </PublicOnly>
+          </div>
+          <PublicOnly>
+            <ChatbaseWidget />
+          </PublicOnly>
+        </CartProvider>
       </body>
     </html>
   );

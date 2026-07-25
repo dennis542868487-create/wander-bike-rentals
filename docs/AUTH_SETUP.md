@@ -1,72 +1,74 @@
 # Wander Bike authentication setup
 
-## What is already implemented
+## Access model
 
-- Public visitors can browse every marketing page without an account.
-- Customers must sign in before submitting a booking.
-- Customers can view, edit, and cancel only their own bookings at `/account/bookings`.
-- Staff use `/booking-admin`. A signed-in account must also have the `staff` or `admin` database role.
-- Email/password registration and sign-in use Supabase Auth.
-- Google sign-in uses the same accounts and role checks as email sign-in.
+- Public visitors can browse rental and shop pages without an account.
+- Guest checkout is supported.
+- Signed-in customers can manage only their own rental requests and view only
+  their own sales orders.
+- `staff` can perform day-to-day order and inventory work.
+- `admin` is required for higher-risk catalog taxonomy and store-setting changes.
+- Every protected page and mutation is checked on the server; knowing an admin
+  URL is not authorization.
 
 ## Supabase URL configuration
 
-Open **Supabase Dashboard → Authentication → URL Configuration**.
+In **Supabase Dashboard → Authentication → URL Configuration**, set the
+production site URL to the chosen canonical domain and allow all callbacks used
+by the project:
 
-- Site URL: `https://wanderbike.ca`
-- Redirect URLs:
-  - `https://wanderbike.ca/auth/callback`
-  - `http://localhost:3000/auth/callback`
+- `https://www.wanderbike.ca/auth/callback`
+- `https://wanderbike.ca/auth/callback`
+- `http://localhost:3000/auth/callback`
 
-Email confirmation is enabled. Supabase sends the confirmation email and returns the customer to the callback URL.
+Add a Vercel preview callback only when a specific preview deployment needs
+authentication. Avoid a broad redirect wildcard.
 
-## Enable Google sign-in
+Choose whether email confirmation is required in the Supabase dashboard. The
+application supports both configurations and completes PKCE sessions at
+`/auth/callback`.
 
-Creating a Google OAuth client does not require a paid Google Cloud API.
+## Optional Google sign-in
 
-1. Open [Google Cloud Console](https://console.cloud.google.com/).
-2. Create or select a project.
-3. Open **APIs & Services → OAuth consent screen** and configure an External app.
-4. Open **APIs & Services → Credentials → Create Credentials → OAuth client ID**.
-5. Choose **Web application**.
-6. Add this exact **Authorized redirect URI**:
+Create a Google OAuth web client and use this authorized redirect URI, replacing
+the placeholder with the new project reference:
 
-   `https://vasdytokidqkoakhbeau.supabase.co/auth/v1/callback`
+```text
+https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+```
 
-7. Copy the Google Client ID and Client secret.
-8. Open **Supabase Dashboard → Authentication → Providers → Google**.
-9. Enable Google, paste the Client ID and Client secret, and save.
+Enable Google under **Supabase Dashboard → Authentication → Providers** and
+store the Google secret there, not in this repository.
 
-The website checks Supabase's provider settings automatically. The Google button becomes active after the provider is enabled; no code change is required.
+## Create the first administrator
 
-## Create customer and staff accounts
+1. Register the owner through `/auth` and sign in once so the profile exists.
+2. Run the following in the Supabase SQL editor, replacing the email:
 
-Customer accounts are created from `/auth`. New accounts receive the `customer` role automatically.
+```sql
+update public.profiles
+set role = 'admin', updated_at = now()
+where lower(email) = lower('owner@example.com');
+```
 
-Staff can use either email/password or Google. First let the employee create/sign in to their account once, then grant access with the Supabase SQL Editor:
+Confirm that exactly one intended row changed. Additional employees normally
+receive `staff`:
 
 ```sql
 update public.profiles
 set role = 'staff', updated_at = now()
-where email = 'employee@example.com';
+where lower(email) = lower('employee@example.com');
 ```
 
-Use `admin` instead of `staff` only for owners who should have the highest application role.
+To revoke access, change the role back to `customer`.
 
-To remove staff access:
+The consolidated merchant console is `/admin`. The legacy rental calendar at
+`/booking-admin` remains role-protected for continuity.
 
-```sql
-update public.profiles
-set role = 'customer', updated_at = now()
-where email = 'employee@example.com';
-```
+## Production email
 
-The staff calendar is intentionally not linked from the public navigation. Enter it directly at:
+Supabase Auth email and commerce transaction email are separate:
 
-`https://wanderbike.ca/booking-admin`
-
-Knowing that URL is not enough to gain access; the server verifies the Supabase session and role on every admin API request.
-
-## Production email delivery
-
-Supabase's built-in email provider is sufficient for initial confirmation testing. Before higher-volume production use, configure a custom SMTP provider under **Authentication → Email** for branded messages and dependable delivery.
+- Configure custom SMTP in Supabase before relying on high-volume Auth email.
+- Configure Resend with `RESEND_API_KEY` and a verified `EMAIL_FROM` domain for
+  order and fulfillment messages.

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { bookingStatuses, parseBookingInput } from "@/lib/booking-types";
-import { getSupabaseAdmin, requireBookingAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { requireBookingAdmin } from "@/lib/supabase/auth";
 
 export async function PATCH(request: Request, context: RouteContext<"/api/booking-admin/bookings/[id]">) {
   try {

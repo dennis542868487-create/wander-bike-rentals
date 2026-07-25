@@ -230,21 +230,34 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="tel:+17789521389"
-                className="btn-brand px-7 py-3.5 text-sm"
-              >
-                Call Now
-              </a>
-              <a
-                href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-secondary px-7 py-3.5 text-sm shadow-sm"
-              >
-                Get Directions
-              </a>
+            <div className="hero-anim hero-d4 space-y-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link href="/booking" className="btn-brand px-7 py-3.5 text-sm">
+                  Rent a Bike
+                </Link>
+                <Link
+                  href="/shop"
+                  className="btn-secondary px-7 py-3.5 text-sm shadow-sm"
+                >
+                  Shop Bikes &amp; Accessories
+                </Link>
+              </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-white">
+                <a
+                  href="tel:+17789521389"
+                  className="underline decoration-white/50 underline-offset-4 transition hover:decoration-white"
+                >
+                  Call (778) 952-1389
+                </a>
+                <a
+                  href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline decoration-white/50 underline-offset-4 transition hover:decoration-white"
+                >
+                  Get Directions
+                </a>
+              </div>
             </div>
 
             <div className="hero-anim hero-d5 grid gap-4 pt-2 sm:grid-cols-3">

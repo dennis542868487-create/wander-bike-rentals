@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useGoogleAuth } from "@/hooks/use-google-auth";
 

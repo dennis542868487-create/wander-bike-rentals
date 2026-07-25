@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { getSupabaseBrowser } from "@/lib/supabase";
+import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import type { Booking, BookingStatus } from "@/lib/booking-types";
 import { useGoogleAuth } from "@/hooks/use-google-auth";
 

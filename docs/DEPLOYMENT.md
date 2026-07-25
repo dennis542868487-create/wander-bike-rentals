@@ -90,6 +90,14 @@ the demo catalog, cart, and the non-provider API checks are connected on this
 host. Stripe checkout, Canada Post labels, and transactional email remain
 fail-closed until valid sandbox credentials are configured.
 
+After the final documentation-only commit is deployed, use the last validated
+CLI Preview as the rollback candidate:
+
+```text
+dpl_6b3kEp8Nodw7Ciao9jkdk9FMEYuv
+https://wander-bike-rentals-nabzclby5-zyz18922182165-4022s-projects.vercel.app
+```
+
 ## 4. Stripe test webhook
 
 Create a test-mode webhook endpoint using the exact deployed host:

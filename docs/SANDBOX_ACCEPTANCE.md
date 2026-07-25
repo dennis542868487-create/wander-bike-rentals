@@ -181,8 +181,9 @@ acceptance run.
       gate, and RLS/grant smoke checks.
 - [ ] Run Stripe, Canada Post, email, complete OAuth, admin, and full hosted
       end-to-end acceptance checks after their external configuration is ready.
-- [ ] Record the final Preview deployment and its immediately previous rollback
-      target after the last application change is deployed.
+- [x] Record the stable protected Preview acceptance host and the last validated
+      CLI Preview (`dpl_6b3kEp8Nodw7Ciao9jkdk9FMEYuv`) as the rollback
+      candidate for the final documentation-only deployment.
 
 ## Required merchant inputs
 

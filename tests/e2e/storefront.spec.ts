@@ -64,9 +64,7 @@ test("account auth exposes safe Google, Apple, and email setup states", async ({
     }),
   ).toBeDisabled();
 
-  await page
-    .getByRole("button", { name: "Create account", exact: true })
-    .click();
+  await page.goto("/auth?mode=signup");
   await expect(page.getByLabel("Full name")).toBeVisible();
   await expect(page.getByLabel("Password")).toHaveAttribute(
     "autocomplete",

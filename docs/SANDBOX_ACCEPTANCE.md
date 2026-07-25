@@ -12,8 +12,9 @@ acceptance run.
 ## Automated local evidence
 
 - [x] `npm run lint`
-- [x] `npm run test:unit` — 54 tests across pricing, fulfillment, validation,
-      Canada Post request/response handling, and Stripe reconciliation
+- [x] `npm run test:unit` — 57 tests across pricing, fulfillment, validation,
+      Canada Post request/response handling, Stripe reconciliation, and signed
+      Stripe webhook routing
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
 - [x] `npm run test:e2e` — desktop Chrome, iPad, and Pixel 7 viewports
@@ -103,7 +104,17 @@ acceptance run.
       signing secret in the protected Vercel Preview branch.
 - [x] Complete a successful test payment and confirm order/payment/inventory.
 - [x] Complete cancellation and provider expiry tests.
-- [ ] Complete a separate asynchronous payment failure test.
+- [x] Route a cryptographically signed `checkout.session.async_payment_failed`
+      fixture through the verified webhook handler, and exercise the hosted
+      atomic failure RPC against a real open Session. The order changed to
+      cancelled/failed, its one reservation was released, the inventory ledger
+      and failure notification each gained one row, and replay returned
+      `duplicate`.
+- [ ] Complete a provider-generated asynchronous payment failure after the
+      Stripe sandbox account is activated and ACSS/PAD becomes available.
+      The current CA/CAD sandbox reports `charges_enabled=false`; ACSS is
+      unavailable, and real Checkout Sessions currently expose only card,
+      Affirm, Klarna, and Link.
 - [x] Replay the same verified webhook and prove no duplicate order, payment, or
       stock movement.
 - [x] Complete a full test refund with inspected-item restock and confirm
@@ -141,7 +152,10 @@ acceptance run.
 - [x] Obtain and save a selected Canada Post quote through the hosted checkout.
 - [x] Create an accessory label through the merchant console.
 - [ ] Create a separate large-item/bicycle label.
-- [ ] Download and print the private PDF through the staff-only endpoint.
+- [x] Download the private PDF through the staff-only endpoint. Unauthenticated
+      access returned `401`, an authenticated customer returned `403`, and an
+      administrator received the expected 55,371-byte `%PDF-` document.
+- [ ] Physically print the downloaded sandbox label.
 - [x] Verify the private bucket contains a 55,371-byte `application/pdf` label
       and saved service, cost, shipment reference, and tracking number.
 - [x] Exercise the account-appropriate sandbox void path and confirm its audit
@@ -170,10 +184,14 @@ acceptance run.
 - [x] Create the first hosted admin, complete Google login, and verify the
       merchant order, refund, return, label, inventory, and rental-calendar
       workflows.
-- [ ] Confirm an ordinary customer receives `403` from every merchant mutation
-      tested.
+- [x] Confirm a real short-lived customer JWT receives `403` from all 15
+      merchant mutation routes, plus the staff-only label read. The temporary
+      identity was deleted after the matrix.
 - [ ] Complete common merchant workflows at desktop, tablet, and mobile widths.
-- [ ] Confirm one customer cannot read another customer's booking or order.
+- [x] Confirm one customer cannot read another customer's booking or order.
+      Order RLS returned zero of four non-owned orders, the profile query
+      returned only the caller, and another user's booking PATCH/DELETE both
+      returned `404`.
 - [x] Confirm guest access works only with the matching order cookie; missing
       and mismatched cookies both receive `404`.
 - [x] Complete Google provider login on the deployed domain and confirm profile
@@ -215,7 +233,7 @@ acceptance run.
 - [ ] Run Resend delivery and final Apple authorization checks after their
       remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_CjhKJN8mhRrRWkm9iAyvmMVT8qiS`) as the rollback
+      CLI Preview (`dpl_ioHqggt1yCGg3TKkXNXSnHayE19s`) as the rollback
       candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs
@@ -226,6 +244,8 @@ acceptance run.
 - Approved tax rules and customer-facing policies
 - Actual sellable-product weights, parcel dimensions, and fulfillment
   eligibility
+- Stripe account activation/business verification before a provider-generated
+  ACSS/PAD asynchronous-failure acceptance run
 - A Supabase Pro plan before enabling leaked-password protection for
   password-based accounts. The security advisor is otherwise clear;
   unused-index notices are expected on this new sandbox project.
@@ -241,6 +261,11 @@ acceptance run.
 - Two simultaneous three-unit checkouts against five available units produced
   exactly one `201` and one `409`; expiring the accepted Session returned the
   inventory to five available units.
+- Test order `WB-260725-001004` exercised the asynchronous-failure state
+  transition against a real open Stripe Session: one reservation was released,
+  inventory returned to five, one failure notification was queued, and replay
+  was idempotent. The provider-generated event remains gated by Stripe account
+  activation.
 - Replaying the signed `checkout.session.completed` event left one order, one
   payment, one sale ledger entry, and one integration-event row.
 - The completed return restored the test helmet inventory from 4 to 5 with zero

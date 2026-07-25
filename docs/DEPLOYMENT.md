@@ -49,29 +49,30 @@ and verify:
 Set these for the intended Vercel environments. Secrets must be entered through
 Vercel CLI or the dashboard, never committed.
 
-| Variable | Sandbox value or purpose |
-|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Exact Preview URL during acceptance; canonical domain only for Production |
-| `NEXT_PUBLIC_SUPABASE_URL` | New project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | New publishable key |
-| `SUPABASE_SECRET_KEY` | Server-only new secret key |
-| `COMMERCE_SANDBOX_MODE` | `true` |
-| `COMMERCE_DEMO_CATALOG` | `true` during sandbox acceptance |
-| `COMMERCE_CHECKOUT_ENABLED` | Start `false`; change to `true` only for test acceptance |
-| `STRIPE_SECRET_KEY` | Stripe `sk_test_…` key |
-| `STRIPE_WEBHOOK_SECRET` | Signing secret for the deployed webhook |
-| `CANADA_POST_USERNAME` | Canada Post sandbox API key/username |
-| `CANADA_POST_PASSWORD` | Canada Post sandbox secret/password |
-| `CANADA_POST_ACCOUNT_TYPE` | `contract` or `non_contract` |
-| `CANADA_POST_CUSTOMER_NUMBER` | Account customer number |
-| `CANADA_POST_MOBO_CUSTOMER_NUMBER` | Optional mailed-on-behalf-of number |
-| `CANADA_POST_CONTRACT_ID` | Required for applicable contract shipments |
-| `CANADA_POST_GROUP_ID` | Required when the account workflow uses a group |
-| `CANADA_POST_API_BASE` | `https://ct.soa-gw.canadapost.ca` |
-| `RESEND_API_KEY` | Resend server key |
-| `EMAIL_FROM` | Verified sender, for example `Wander Bike <orders@domain>` |
-| `ORDER_NOTIFICATION_EMAIL` | Fallback merchant notification address |
-| `CRON_SECRET` | Long random secret for the commerce cron |
+| Variable                               | Sandbox value or purpose                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`                 | Exact Preview URL during acceptance; canonical domain only for Production      |
+| `NEXT_PUBLIC_SUPABASE_URL`             | New project URL                                                                |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | New publishable key                                                            |
+| `SUPABASE_SECRET_KEY`                  | Server-only new secret key                                                     |
+| `COMMERCE_SANDBOX_MODE`                | `true`                                                                         |
+| `COMMERCE_DEMO_CATALOG`                | `true` during sandbox acceptance                                               |
+| `COMMERCE_CHECKOUT_ENABLED`            | Start `false`; change to `true` only for test acceptance                       |
+| `STRIPE_SECRET_KEY`                    | Stripe `sk_test_…` key                                                         |
+| `STRIPE_WEBHOOK_SECRET`                | Signing secret for the deployed webhook                                        |
+| `CANADA_POST_API_KEY`                  | Canada Post Test app API key (OAuth client ID)                                 |
+| `CANADA_POST_API_SECRET`               | Canada Post Test app API secret (OAuth client secret)                          |
+| `CANADA_POST_ENVIRONMENT`              | Must remain `test`; live shipping is code-gated off                            |
+| `CANADA_POST_ACCOUNT_TYPE`             | `contract` or `non_contract`                                                   |
+| `CANADA_POST_CUSTOMER_NUMBER`          | Account customer number                                                        |
+| `CANADA_POST_MOBO_CUSTOMER_NUMBER`     | Optional mailed-on-behalf-of number                                            |
+| `CANADA_POST_CONTRACT_ID`              | Required for applicable contract shipments                                     |
+| `CANADA_POST_GROUP_ID`                 | Required when the account workflow uses a group                                |
+| `CANADA_POST_API_BASE`                 | `https://api.canadapost-postescanada.ca/prod/devportal-portaildesdeveloppeurs` |
+| `RESEND_API_KEY`                       | Resend server key                                                              |
+| `EMAIL_FROM`                           | Verified sender, for example `Wander Bike <orders@domain>`                     |
+| `ORDER_NOTIFICATION_EMAIL`             | Fallback merchant notification address                                         |
+| `CRON_SECRET`                          | Long random secret for the commerce cron                                       |
 
 The database setting `commerce.checkout_enabled` is a second checkout gate.
 Both it and the environment gate must be enabled for test checkout.
@@ -86,9 +87,9 @@ https://wander-bike-rentals-git-co-75a04a-zyz18922182165-4022s-projects.vercel.a
 
 Keep Vercel Standard Protection enabled. Use a short-lived, revocable Vercel
 share link for reviewers rather than weakening project protection. Supabase,
-the demo catalog, cart, and the non-provider API checks are connected on this
-host. Stripe checkout, Canada Post labels, and transactional email remain
-fail-closed until valid sandbox credentials are configured.
+the demo catalog, cart, Stripe test mode, and the Canada Post Test app are
+connected on this host. Transactional email remains fail-closed until Resend is
+configured.
 
 After the final documentation-only commit is deployed, use the last validated
 CLI Preview as the rollback candidate:
@@ -105,6 +106,10 @@ Create a test-mode webhook endpoint using the exact deployed host:
 ```text
 https://YOUR_DEPLOYMENT_HOST/api/stripe/webhook
 ```
+
+For a Vercel-protected Preview, use an Automation Bypass token on the webhook
+URL and keep that token secret. Do not disable Preview protection or document
+the resulting URL.
 
 Subscribe to:
 

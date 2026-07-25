@@ -25,7 +25,7 @@ production shipping labels until the merchant explicitly approves go-live.
 - Next.js 16 App Router and React 19
 - Supabase PostgreSQL, Auth, and Storage
 - Stripe Checkout in test mode
-- Canada Post REST/XML APIs in sandbox
+- Canada Post REST/JSON APIs with OAuth 2.0 through a Test app
 - Resend transactional email
 - Vercel hosting and Cron
 
@@ -73,8 +73,10 @@ All three conditions are required before Stripe Checkout can open:
 
 Keep `COMMERCE_CHECKOUT_ENABLED=false` until Supabase migrations, the Stripe
 test webhook, and sandbox order reconciliation have been verified. Canada Post
-uses its sandbox host by default and independently requires
-`fulfillment.canada_post_enabled=true`.
+independently requires a Developer Portal **Test** app,
+`CANADA_POST_ENVIRONMENT=test`, and
+`fulfillment.canada_post_enabled=true`; the code rejects every other API host
+and shipping mode.
 
 ## Verification
 

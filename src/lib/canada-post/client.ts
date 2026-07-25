@@ -1,19 +1,43 @@
 import "server-only";
 
-import { XMLBuilder, XMLParser } from "fast-xml-parser";
-import { requireServerEnvironment } from "@/lib/env";
-import { CommerceError } from "@/lib/commerce/errors";
 import type { CanadaPostPackage } from "@/lib/commerce/cart-server";
 import {
   canadaPostParcelLimitViolation,
   normalizeCanadaPostParcelDimensions,
 } from "@/lib/commerce/canada-post-limits";
+import { CommerceError } from "@/lib/commerce/errors";
 import { normalizeCanadianPostalCode } from "@/lib/commerce/schemas";
+import { requireServerEnvironment } from "@/lib/env";
 
 type UnknownRecord = Record<string, unknown>;
 
-const canadaPostSandboxOrigin = "https://ct.soa-gw.canadapost.ca";
+const canadaPostApiOrigin = "https://api.canadapost-postescanada.ca";
+const canadaPostApiRootPath = "/prod/devportal-portaildesdeveloppeurs/";
+const canadaPostApiBase = `${canadaPostApiOrigin}${canadaPostApiRootPath.slice(
+  0,
+  -1,
+)}`;
 const maximumCanadaPostLabelBytes = 10 * 1024 * 1024;
+const tokenExpirySafetyWindowMs = 60_000;
+
+type CanadaPostCredentialEnvironment = ReturnType<
+  typeof requireServerEnvironment
+> & {
+  CANADA_POST_API_KEY: string;
+  CANADA_POST_API_SECRET: string;
+};
+
+type CanadaPostTokenCache = {
+  credentialKey: string;
+  accessToken: string;
+  expiresAt: number;
+};
+
+let accessTokenCache: CanadaPostTokenCache | null = null;
+let accessTokenRequest: {
+  credentialKey: string;
+  promise: Promise<string>;
+} | null = null;
 
 export type CanadaPostRate = {
   serviceCode: string;
@@ -79,15 +103,22 @@ export type CanadaPostCancellationResult =
   | { status: "refund_pending"; serviceTicketId: string };
 
 function asRecord(value: unknown): UnknownRecord {
-  return value && typeof value === "object" ? (value as UnknownRecord) : {};
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as UnknownRecord)
+    : {};
 }
 
-function asArray(value: unknown) {
+function asArray(value: unknown): unknown[] {
   return value == null ? [] : Array.isArray(value) ? value : [value];
 }
 
 function textValue(value: unknown) {
   return value == null ? "" : String(value);
+}
+
+function optionalElement(value: string | undefined) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
 }
 
 function dollarsToCents(value: unknown) {
@@ -102,36 +133,60 @@ function dollarsToCents(value: unknown) {
   return Math.round(amount * 100);
 }
 
-function providerMessages(parsed: UnknownRecord) {
-  const root = asRecord(parsed.messages);
-  return asArray(root.message)
-    .map((message) => asRecord(message))
-    .map((message) => textValue(message.description))
-    .filter(Boolean)
-    .join(" ");
+function providerErrors(payload: unknown) {
+  const root = asRecord(payload);
+  return asArray(root.errors).map((value) => asRecord(value));
 }
 
-function providerMessageCodes(parsed: UnknownRecord) {
-  const root = asRecord(parsed.messages);
-  return asArray(root.message)
-    .map((message) => asRecord(message))
-    .map((message) => textValue(message.code))
+function providerMessages(payload: unknown) {
+  const root = asRecord(payload);
+  const errors = providerErrors(payload)
+    .map((error) => textValue(error.message))
+    .filter(Boolean);
+  if (errors.length > 0) return errors.join(" ");
+
+  return (
+    textValue(root.httpMessage) ||
+    textValue(root.detail) ||
+    textValue(root.message)
+  );
+}
+
+function providerMessageCodes(payload: unknown) {
+  return providerErrors(payload)
+    .map((error) => textValue(error.errorCode))
     .filter(Boolean);
 }
 
-function canadaPostAuthorization(username: string, password: string) {
-  return Buffer.from(`${username}:${password}`).toString("base64");
+async function parseJsonResponse(response: Response): Promise<unknown> {
+  const responseText = await response.text();
+  if (!responseText.trim()) return {};
+
+  try {
+    return JSON.parse(responseText) as unknown;
+  } catch {
+    throw new CommerceError(
+      "Canada Post returned an invalid JSON response.",
+      "CANADA_POST_INVALID_RESPONSE",
+      502,
+    );
+  }
 }
 
-function parseCanadaPostResponse(responseText: string) {
-  return asRecord(
-    new XMLParser({
-      ignoreAttributes: false,
-      removeNSPrefix: true,
-      parseTagValue: false,
-      trimValues: true,
-    }).parse(responseText),
-  );
+function assertCanadaPostTestMode(
+  environment: ReturnType<typeof requireServerEnvironment>,
+  action: string,
+) {
+  if (
+    !environment.COMMERCE_SANDBOX_MODE ||
+    environment.CANADA_POST_ENVIRONMENT !== "test"
+  ) {
+    throw new CommerceError(
+      `Production Canada Post ${action} are disabled.`,
+      "LIVE_SHIPPING_DISABLED",
+      503,
+    );
+  }
 }
 
 function canadaPostSandboxApiBase(baseUrl: string) {
@@ -140,27 +195,35 @@ function canadaPostSandboxApiBase(baseUrl: string) {
     base = new URL(baseUrl);
   } catch {
     throw new CommerceError(
-      "Canada Post sandbox configuration is invalid.",
+      "Canada Post test API configuration is invalid.",
       "LIVE_SHIPPING_DISABLED",
       503,
     );
   }
 
+  const normalizedPath = base.pathname.endsWith("/")
+    ? base.pathname
+    : `${base.pathname}/`;
   if (
-    base.origin !== canadaPostSandboxOrigin ||
+    base.origin !== canadaPostApiOrigin ||
     base.username ||
     base.password ||
-    base.pathname !== "/" ||
+    normalizedPath !== canadaPostApiRootPath ||
     base.search ||
     base.hash
   ) {
     throw new CommerceError(
-      "Only the Canada Post sandbox API is enabled.",
+      "Only the Canada Post test application API is enabled.",
       "LIVE_SHIPPING_DISABLED",
       503,
     );
   }
-  return canadaPostSandboxOrigin;
+  return canadaPostApiBase;
+}
+
+function canadaPostEndpoint(baseUrl: string, path: string) {
+  const base = canadaPostSandboxApiBase(baseUrl);
+  return `${base}/${path.replace(/^\/+/, "")}`;
 }
 
 function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
@@ -179,8 +242,10 @@ function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
   if (
     url.protocol !== "https:" ||
     url.origin !== base.origin ||
+    !url.pathname.startsWith(canadaPostApiRootPath) ||
     url.username ||
-    url.password
+    url.password ||
+    url.hash
   ) {
     throw new CommerceError(
       "Canada Post returned an unexpected resource host.",
@@ -192,13 +257,12 @@ function assertSandboxProviderUrl(rawUrl: string, baseUrl: string) {
 }
 
 function responseLinks(root: UnknownRecord, baseUrl: string): CanadaPostLink[] {
-  const links = asRecord(root.links);
-  return asArray(links.link)
+  return asArray(root.links)
     .map((value) => asRecord(value))
     .map((link) => ({
-      rel: textValue(link["@_rel"]),
-      href: textValue(link["@_href"]),
-      mediaType: textValue(link["@_media-type"]),
+      rel: textValue(link.rel),
+      href: textValue(link.href),
+      mediaType: textValue(link.mediaType),
     }))
     .filter((link) => link.rel && link.href && link.mediaType)
     .map((link) => ({
@@ -207,9 +271,131 @@ function responseLinks(root: UnknownRecord, baseUrl: string): CanadaPostLink[] {
     }));
 }
 
-function optionalElement(value: string | undefined) {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
+function credentialCacheKey(environment: CanadaPostCredentialEnvironment) {
+  return [
+    canadaPostSandboxApiBase(environment.CANADA_POST_API_BASE),
+    environment.CANADA_POST_API_KEY,
+    environment.CANADA_POST_API_SECRET,
+  ].join("\u0000");
+}
+
+async function requestCanadaPostAccessToken(
+  environment: CanadaPostCredentialEnvironment,
+  credentialKey: string,
+) {
+  const endpoint = canadaPostEndpoint(
+    environment.CANADA_POST_API_BASE,
+    "cpc-api-native-oauth-provider/oauth2/token",
+  );
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-IBM-Client-Id": environment.CANADA_POST_API_KEY,
+        "X-IBM-Client-Secret": environment.CANADA_POST_API_SECRET,
+        "User-Agent": "WanderBikeCommerce/2.0",
+      },
+      body: new URLSearchParams({
+        grant_type: "client_credentials",
+        scope: "merchant",
+      }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    throw new CommerceError(
+      "Canada Post authentication is temporarily unavailable.",
+      "CANADA_POST_AUTH_UNAVAILABLE",
+      503,
+    );
+  }
+
+  const payload = asRecord(await parseJsonResponse(response));
+  const accessToken = textValue(payload.access_token);
+  const expiresIn = Number(payload.expires_in);
+  if (
+    !response.ok ||
+    !accessToken ||
+    !Number.isFinite(expiresIn) ||
+    expiresIn <= 0
+  ) {
+    throw new CommerceError(
+      providerMessages(payload) ||
+        "Canada Post rejected the test application credentials.",
+      "CANADA_POST_AUTH_REJECTED",
+      503,
+    );
+  }
+
+  accessTokenCache = {
+    credentialKey,
+    accessToken,
+    expiresAt:
+      Date.now() +
+      Math.max(1_000, expiresIn * 1_000 - tokenExpirySafetyWindowMs),
+  };
+  return accessToken;
+}
+
+async function getCanadaPostAccessToken(
+  environment: CanadaPostCredentialEnvironment,
+) {
+  const credentialKey = credentialCacheKey(environment);
+  if (
+    accessTokenCache?.credentialKey === credentialKey &&
+    accessTokenCache.expiresAt > Date.now()
+  ) {
+    return accessTokenCache.accessToken;
+  }
+  if (accessTokenRequest?.credentialKey === credentialKey) {
+    return accessTokenRequest.promise;
+  }
+
+  const promise = requestCanadaPostAccessToken(environment, credentialKey);
+  accessTokenRequest = { credentialKey, promise };
+  try {
+    return await promise;
+  } finally {
+    if (accessTokenRequest?.promise === promise) accessTokenRequest = null;
+  }
+}
+
+function clearCanadaPostAccessToken(
+  environment: CanadaPostCredentialEnvironment,
+) {
+  if (accessTokenCache?.credentialKey === credentialCacheKey(environment)) {
+    accessTokenCache = null;
+  }
+}
+
+async function fetchCanadaPostApi(
+  environment: CanadaPostCredentialEnvironment,
+  endpoint: string,
+  init: RequestInit,
+  timeoutMs: number,
+) {
+  const request = async (accessToken: string) =>
+    fetch(endpoint, {
+      ...init,
+      headers: {
+        "Accept-Language": "en-CA",
+        "User-Agent": "WanderBikeCommerce/2.0",
+        ...init.headers,
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+
+  let response = await request(await getCanadaPostAccessToken(environment));
+  if (response.status === 401) {
+    clearCanadaPostAccessToken(environment);
+    response = await request(await getCanadaPostAccessToken(environment));
+  }
+  return response;
 }
 
 function assertCanadaPostField(
@@ -267,81 +453,73 @@ function shipmentDeliverySpec(input: {
   assertCanadaPostField(input.destination.city, 40, "Recipient city");
 
   const senderAddress: UnknownRecord = {
-    "address-line-1": input.sender.addressLine1,
+    addressLine1: input.sender.addressLine1,
+    city: input.sender.city,
+    provState: input.sender.province,
+    countryCode: input.sender.country,
+    postalZipCode: normalizeCanadianPostalCode(input.sender.postalCode),
   };
   const senderLine2 = optionalElement(input.sender.addressLine2);
-  if (senderLine2) senderAddress["address-line-2"] = senderLine2;
-  senderAddress.city = input.sender.city;
-  senderAddress["prov-state"] = input.sender.province;
-  senderAddress["country-code"] = input.sender.country;
-  senderAddress["postal-zip-code"] = normalizeCanadianPostalCode(
-    input.sender.postalCode,
-  );
+  if (senderLine2) senderAddress.addressLine2 = senderLine2;
 
   const destinationAddress: UnknownRecord = {
-    "address-line-1": input.destination.addressLine1,
+    addressLine1: input.destination.addressLine1,
+    city: input.destination.city,
+    provState: input.destination.province,
+    countryCode: input.destination.country,
+    postalZipCode: normalizeCanadianPostalCode(input.destination.postalCode),
   };
   const destinationLine2 = optionalElement(input.destination.addressLine2);
-  if (destinationLine2) {
-    destinationAddress["address-line-2"] = destinationLine2;
-  }
-  destinationAddress.city = input.destination.city;
-  destinationAddress["prov-state"] = input.destination.province;
-  destinationAddress["country-code"] = input.destination.country;
-  destinationAddress["postal-zip-code"] = normalizeCanadianPostalCode(
-    input.destination.postalCode,
-  );
+  if (destinationLine2) destinationAddress.addressLine2 = destinationLine2;
 
   const destination: UnknownRecord = {
     name: input.destination.name,
+    addressDetails: destinationAddress,
   };
   const destinationCompany = optionalElement(input.destination.company);
   const destinationPhone = optionalElement(input.destination.phone);
   if (destinationCompany) destination.company = destinationCompany;
-  if (destinationPhone) destination["client-voice-number"] = destinationPhone;
-  destination["address-details"] = destinationAddress;
+  if (destinationPhone) destination.clientVoiceNumber = destinationPhone;
 
-  const deliverySpec: UnknownRecord = {
-    "service-code": input.serviceCode,
+  const settlementInfo: UnknownRecord = {
+    paidByCustomer: input.environment.CANADA_POST_CUSTOMER_NUMBER,
+    intendedMethodOfPayment: input.contract ? "Account" : "CreditCard",
+  };
+  if (input.contract) {
+    settlementInfo.contractId = input.environment.CANADA_POST_CONTRACT_ID;
+  }
+
+  return {
+    serviceCode: input.serviceCode,
     sender: {
       name: input.sender.contact,
       company: input.sender.company,
-      "contact-phone": input.sender.phone,
-      "address-details": senderAddress,
+      contactPhone: input.sender.phone,
+      addressDetails: senderAddress,
     },
     destination,
-    "parcel-characteristics": {
-      weight: parcel.weightKg.toFixed(3),
+    parcelCharacteristics: {
+      weight: parcel.weightKg,
       dimensions: {
-        length: parcel.lengthCm.toFixed(1),
-        width: parcel.widthCm.toFixed(1),
-        height: parcel.heightCm.toFixed(1),
+        length: parcel.lengthCm,
+        width: parcel.widthCm,
+        height: parcel.heightCm,
       },
     },
-  };
-
-  if (input.contract) {
-    deliverySpec["print-preferences"] = {
-      "output-format": "8.5x11",
+    printPreferences: {
+      outputFormat: "8.5x11",
       encoding: "PDF",
-    };
-  }
-
-  deliverySpec.preferences = {
-    "show-packing-instructions": false,
+    },
+    preferences: {
+      showPackingInstructions: false,
+      showPostageRate: false,
+      showInsuredValue: false,
+    },
+    references: {
+      customerRef1: input.orderNumber.slice(0, 35),
+    },
+    settlementInfo,
   };
-  deliverySpec.references = {
-    "customer-ref-1": input.orderNumber.slice(0, 35),
-  };
-
-  if (input.contract) {
-    deliverySpec["settlement-info"] = {
-      "contract-id": input.environment.CANADA_POST_CONTRACT_ID,
-      "intended-method-of-payment": "Account",
-    };
-  }
-
-  return deliverySpec;
 }
 
 export async function createCanadaPostShipment(input: {
@@ -354,21 +532,13 @@ export async function createCanadaPostShipment(input: {
   package: CanadaPostParcel;
 }): Promise<CanadaPostShipmentResult> {
   const environment = requireServerEnvironment(
-    "CANADA_POST_USERNAME",
-    "CANADA_POST_PASSWORD",
+    "CANADA_POST_API_KEY",
+    "CANADA_POST_API_SECRET",
     "CANADA_POST_CUSTOMER_NUMBER",
   );
+  assertCanadaPostTestMode(environment, "labels");
+  const apiBase = canadaPostSandboxApiBase(environment.CANADA_POST_API_BASE);
 
-  if (!environment.COMMERCE_SANDBOX_MODE) {
-    throw new CommerceError(
-      "Production Canada Post labels are disabled.",
-      "LIVE_SHIPPING_DISABLED",
-      503,
-    );
-  }
-  const apiBase = canadaPostSandboxApiBase(
-    environment.CANADA_POST_API_BASE,
-  );
   if (!environment.CANADA_POST_ACCOUNT_TYPE) {
     throw new CommerceError(
       "Canada Post account type has not been configured.",
@@ -385,7 +555,10 @@ export async function createCanadaPostShipment(input: {
   }
 
   const contract = environment.CANADA_POST_ACCOUNT_TYPE === "contract";
-  if (contract && (!environment.CANADA_POST_CONTRACT_ID || !environment.CANADA_POST_GROUP_ID)) {
+  if (
+    contract &&
+    (!environment.CANADA_POST_CONTRACT_ID || !environment.CANADA_POST_GROUP_ID)
+  ) {
     throw new CommerceError(
       "Canada Post contract ID and shipment group ID are required.",
       "CANADA_POST_CONTRACT_CONFIGURATION_REQUIRED",
@@ -393,63 +566,50 @@ export async function createCanadaPostShipment(input: {
     );
   }
 
-  const deliverySpec = shipmentDeliverySpec({
-    ...input,
-    contract,
-    environment,
-  });
-  const customerNumber = environment.CANADA_POST_CUSTOMER_NUMBER;
-  const mediaType = contract
-    ? "application/vnd.cpc.shipment-v8+xml"
-    : "application/vnd.cpc.ncshipment-v4+xml";
-  const rootName = contract ? "shipment" : "non-contract-shipment";
-  const root: UnknownRecord = {
-    "@_xmlns": contract
-      ? "http://www.canadapost.ca/ws/shipment-v8"
-      : "http://www.canadapost.ca/ws/ncshipment-v4",
+  const requestBody: UnknownRecord = {
+    customerRequestId: input.customerRequestId.slice(0, 35),
+    requestedShippingPoint: normalizeCanadianPostalCode(
+      input.sender.postalCode,
+    ),
+    deliverySpec: shipmentDeliverySpec({
+      ...input,
+      contract,
+      environment,
+    }),
   };
-
   if (contract) {
-    root["customer-request-id"] = input.customerRequestId.slice(0, 35);
-    root["group-id"] = environment.CANADA_POST_GROUP_ID;
+    requestBody.groupId = environment.CANADA_POST_GROUP_ID;
+  } else {
+    requestBody.transmitShipment = true;
   }
-  root["requested-shipping-point"] =
-    normalizeCanadianPostalCode(input.sender.postalCode);
-  root["delivery-spec"] = deliverySpec;
 
-  const xml = new XMLBuilder({
-    ignoreAttributes: false,
-    format: false,
-    suppressEmptyNode: true,
-  }).build({ [rootName]: root });
+  const customerNumber = environment.CANADA_POST_CUSTOMER_NUMBER;
   const mailedOnBehalfOf =
     environment.CANADA_POST_MOBO_CUSTOMER_NUMBER ?? customerNumber;
-  const endpointPath = contract
-    ? `/rs/${encodeURIComponent(customerNumber)}/${encodeURIComponent(
-        mailedOnBehalfOf,
-      )}/shipment`
-    : `/rs/${encodeURIComponent(customerNumber)}/ncshipment`;
-  const endpoint = new URL(endpointPath, apiBase).toString();
+  const endpoint = canadaPostEndpoint(
+    apiBase,
+    `shipping/v1/${encodeURIComponent(customerNumber)}/${encodeURIComponent(
+      mailedOnBehalfOf,
+    )}/shipments`,
+  );
 
   let response: Response;
   try {
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Accept: mediaType,
-        "Content-Type": mediaType,
-        "Accept-Language": "en-CA",
-        Authorization: `Basic ${canadaPostAuthorization(
-          environment.CANADA_POST_USERNAME,
-          environment.CANADA_POST_PASSWORD,
-        )}`,
-        "User-Agent": "WanderBikeCommerce/1.0",
+    response = await fetchCanadaPostApi(
+      environment,
+      endpoint,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
       },
-      body: xml,
-      cache: "no-store",
-      signal: AbortSignal.timeout(20_000),
-    });
-  } catch {
+      20_000,
+    );
+  } catch (error) {
+    if (error instanceof CommerceError) throw error;
     throw new CommerceError(
       "Canada Post did not confirm whether the label was created. Do not retry with a new request ID.",
       "CANADA_POST_SHIPMENT_UNCERTAIN",
@@ -457,18 +617,13 @@ export async function createCanadaPostShipment(input: {
     );
   }
 
-  const responseText = await response.text();
-  const parsed = parseCanadaPostResponse(responseText);
-  const message = providerMessages(parsed);
-  const responseRoot = asRecord(
-    parsed[contract ? "shipment-info" : "non-contract-shipment-info"],
-  );
-  const shipmentId = textValue(responseRoot["shipment-id"]);
-  const trackingPin = textValue(responseRoot["tracking-pin"]);
-
-  if (!response.ok || message || !shipmentId) {
+  const payload = await parseJsonResponse(response);
+  const responseRoot = asRecord(payload);
+  const shipmentId = textValue(responseRoot.shipmentId);
+  const trackingPin = textValue(responseRoot.trackingPin);
+  if (!response.ok || !shipmentId) {
     throw new CommerceError(
-      message || "Canada Post rejected the shipment request.",
+      providerMessages(payload) || "Canada Post rejected the shipment request.",
       "CANADA_POST_SHIPMENT_REJECTED",
       response.status >= 500 ? 503 : 422,
     );
@@ -483,43 +638,55 @@ export async function createCanadaPostShipment(input: {
       502,
     );
   }
+  const selfLink = links.find((link) => link.rel === "self") ?? null;
+  const explicitRefundLink =
+    links.find((link) => link.rel === "refund") ?? null;
+  const refundLink =
+    explicitRefundLink ??
+    (selfLink
+      ? {
+          rel: "refund",
+          href: assertSandboxProviderUrl(
+            `${selfLink.href.replace(/\/+$/, "")}/refund`,
+            apiBase,
+          ),
+          mediaType: "application/json",
+        }
+      : null);
 
   return {
     shipmentId,
     trackingPin,
     serviceName: input.serviceName,
-    selfLink: links.find((link) => link.rel === "self") ?? null,
+    selfLink,
     labelLink,
-    priceLink:
-      links.find((link) => link.rel === (contract ? "price" : "receipt")) ?? null,
-    refundLink: links.find((link) => link.rel === "refund") ?? null,
-    providerResponse: parsed,
+    priceLink: links.find((link) => link.rel === "price") ?? null,
+    refundLink,
+    providerResponse: responseRoot,
   };
 }
 
 async function fetchCanadaPostResource(link: CanadaPostLink) {
   const environment = requireServerEnvironment(
-    "CANADA_POST_USERNAME",
-    "CANADA_POST_PASSWORD",
+    "CANADA_POST_API_KEY",
+    "CANADA_POST_API_SECRET",
   );
+  assertCanadaPostTestMode(environment, "resources");
   const href = assertSandboxProviderUrl(
     link.href,
     environment.CANADA_POST_API_BASE,
   );
 
-  return fetch(href, {
-    headers: {
-      Accept: link.mediaType,
-      "Accept-Language": "en-CA",
-      Authorization: `Basic ${canadaPostAuthorization(
-        environment.CANADA_POST_USERNAME,
-        environment.CANADA_POST_PASSWORD,
-      )}`,
-      "User-Agent": "WanderBikeCommerce/1.0",
+  return fetchCanadaPostApi(
+    environment,
+    href,
+    {
+      headers: {
+        Accept: link.mediaType,
+      },
     },
-    cache: "no-store",
-    signal: AbortSignal.timeout(15_000),
-  });
+    15_000,
+  );
 }
 
 async function readBoundedLabelBytes(response: Response) {
@@ -534,15 +701,11 @@ async function readBoundedLabelBytes(response: Response) {
       502,
     );
   }
-
-  if (!response.body) {
-    return new Uint8Array();
-  }
+  if (!response.body) return new Uint8Array();
 
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let totalBytes = 0;
-
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -571,7 +734,13 @@ export async function getCanadaPostLabelArtifact(link: CanadaPostLink) {
   let response: Response;
   try {
     response = await fetchCanadaPostResource(link);
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof CommerceError &&
+      error.code === "CANADA_POST_INVALID_RESPONSE"
+    ) {
+      throw error;
+    }
     throw new CommerceError(
       "The Canada Post label exists, but its PDF could not be downloaded.",
       "CANADA_POST_LABEL_DOWNLOAD_FAILED",
@@ -622,8 +791,12 @@ export async function getCanadaPostLabelCost(link: CanadaPostLink | null) {
   try {
     const response = await fetchCanadaPostResource(link);
     if (!response.ok) return null;
-    const parsed = parseCanadaPostResponse(await response.text());
-    const amount = findNumericField(parsed, ["charge-amount", "due"]);
+    const payload = await parseJsonResponse(response);
+    const amount = findNumericField(payload, [
+      "chargeAmount",
+      "dueAmount",
+      "due",
+    ]);
     return amount === null ? null : Math.round(amount * 100);
   } catch {
     return null;
@@ -633,55 +806,34 @@ export async function getCanadaPostLabelCost(link: CanadaPostLink | null) {
 async function requestCanadaPostRefund(input: {
   refundUrl: string;
   email: string;
-  contract: boolean;
 }): Promise<CanadaPostCancellationResult> {
   const environment = requireServerEnvironment(
-    "CANADA_POST_USERNAME",
-    "CANADA_POST_PASSWORD",
+    "CANADA_POST_API_KEY",
+    "CANADA_POST_API_SECRET",
   );
+  assertCanadaPostTestMode(environment, "refunds");
   const endpoint = assertSandboxProviderUrl(
     input.refundUrl,
     environment.CANADA_POST_API_BASE,
   );
-  const mediaType = input.contract
-    ? "application/vnd.cpc.shipment-v8+xml"
-    : "application/vnd.cpc.ncshipment-v4+xml";
-  const rootName = input.contract
-    ? "shipment-refund-request"
-    : "non-contract-shipment-refund-request";
-  const namespace = input.contract
-    ? "http://www.canadapost.ca/ws/shipment-v8"
-    : "http://www.canadapost.ca/ws/ncshipment-v4";
-  const xml = new XMLBuilder({
-    ignoreAttributes: false,
-    format: false,
-    suppressEmptyNode: true,
-  }).build({
-    [rootName]: {
-      "@_xmlns": namespace,
-      email: input.email,
-    },
-  });
 
   let response: Response;
   try {
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Accept: mediaType,
-        "Content-Type": mediaType,
-        "Accept-Language": "en-CA",
-        Authorization: `Basic ${canadaPostAuthorization(
-          environment.CANADA_POST_USERNAME,
-          environment.CANADA_POST_PASSWORD,
-        )}`,
-        "User-Agent": "WanderBikeCommerce/1.0",
+    response = await fetchCanadaPostApi(
+      environment,
+      endpoint,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: input.email }),
       },
-      body: xml,
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
-  } catch {
+      15_000,
+    );
+  } catch (error) {
+    if (error instanceof CommerceError) throw error;
     throw new CommerceError(
       "Canada Post did not confirm whether the refund request was received.",
       "CANADA_POST_REFUND_UNCERTAIN",
@@ -689,25 +841,16 @@ async function requestCanadaPostRefund(input: {
     );
   }
 
-  const responseText = await response.text();
-  const parsed = parseCanadaPostResponse(responseText);
-  const message = providerMessages(parsed);
-  const resultRoot = asRecord(
-    parsed[
-      input.contract
-        ? "shipment-refund-request-info"
-        : "non-contract-shipment-refund-request-info"
-    ],
-  );
-  const serviceTicketId = textValue(resultRoot["service-ticket-id"]);
-  if (!response.ok || message || !serviceTicketId) {
+  const payload = await parseJsonResponse(response);
+  const serviceTicketId = textValue(asRecord(payload).serviceTicketId);
+  if (!response.ok || !serviceTicketId) {
     throw new CommerceError(
-      message || "Canada Post rejected the label refund request.",
+      providerMessages(payload) ||
+        "Canada Post rejected the label refund request.",
       "CANADA_POST_REFUND_REJECTED",
       response.status >= 500 ? 503 : 422,
     );
   }
-
   return { status: "refund_pending", serviceTicketId };
 }
 
@@ -717,69 +860,42 @@ export async function cancelCanadaPostShipment(input: {
   email: string;
 }): Promise<CanadaPostCancellationResult> {
   const environment = requireServerEnvironment(
-    "CANADA_POST_USERNAME",
-    "CANADA_POST_PASSWORD",
+    "CANADA_POST_API_KEY",
+    "CANADA_POST_API_SECRET",
   );
-  if (!environment.COMMERCE_SANDBOX_MODE) {
-    throw new CommerceError(
-      "Production Canada Post cancellation is disabled.",
-      "LIVE_SHIPPING_DISABLED",
-      503,
-    );
-  }
-  if (!environment.CANADA_POST_ACCOUNT_TYPE) {
-    throw new CommerceError(
-      "Canada Post account type has not been configured.",
-      "CANADA_POST_ACCOUNT_TYPE_REQUIRED",
-      503,
-    );
-  }
-
-  const contract = environment.CANADA_POST_ACCOUNT_TYPE === "contract";
-  if (!contract) {
-    if (!input.refundUrl) {
-      throw new CommerceError(
-        "Canada Post did not provide a refund link for this label.",
-        "CANADA_POST_REFUND_UNAVAILABLE",
-        422,
-      );
-    }
-    return requestCanadaPostRefund({
-      refundUrl: input.refundUrl,
-      email: input.email,
-      contract: false,
-    });
-  }
+  assertCanadaPostTestMode(environment, "cancellations");
 
   if (!input.selfUrl) {
+    if (input.refundUrl) {
+      return requestCanadaPostRefund({
+        refundUrl: input.refundUrl,
+        email: input.email,
+      });
+    }
     throw new CommerceError(
-      "Canada Post did not provide a void link for this label.",
+      "Canada Post did not provide a void or refund link for this label.",
       "CANADA_POST_VOID_UNAVAILABLE",
       422,
     );
   }
+
   const endpoint = assertSandboxProviderUrl(
     input.selfUrl,
     environment.CANADA_POST_API_BASE,
   );
-
   let response: Response;
   try {
-    response = await fetch(endpoint, {
-      method: "DELETE",
-      headers: {
-        Accept: "application/vnd.cpc.shipment-v8+xml",
-        "Accept-Language": "en-CA",
-        Authorization: `Basic ${canadaPostAuthorization(
-          environment.CANADA_POST_USERNAME,
-          environment.CANADA_POST_PASSWORD,
-        )}`,
-        "User-Agent": "WanderBikeCommerce/1.0",
+    response = await fetchCanadaPostApi(
+      environment,
+      endpoint,
+      {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
       },
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
-  } catch {
+      15_000,
+    );
+  } catch (error) {
+    if (error instanceof CommerceError) throw error;
     throw new CommerceError(
       "Canada Post did not confirm whether the label was voided.",
       "CANADA_POST_VOID_UNCERTAIN",
@@ -790,17 +906,15 @@ export async function cancelCanadaPostShipment(input: {
   if (response.status === 204) {
     return { status: "voided", serviceTicketId: null };
   }
-  const parsed = parseCanadaPostResponse(await response.text());
-  const message = providerMessages(parsed);
-  if (providerMessageCodes(parsed).includes("8064") && input.refundUrl) {
+  const payload = await parseJsonResponse(response);
+  if (providerMessageCodes(payload).includes("8064") && input.refundUrl) {
     return requestCanadaPostRefund({
       refundUrl: input.refundUrl,
       email: input.email,
-      contract: true,
     });
   }
   throw new CommerceError(
-    message || "Canada Post rejected the label void request.",
+    providerMessages(payload) || "Canada Post rejected the label void request.",
     "CANADA_POST_VOID_REJECTED",
     response.status >= 500 ? 503 : 422,
   );
@@ -812,20 +926,11 @@ export async function getCanadaPostRates(input: {
   package: CanadaPostPackage;
 }): Promise<CanadaPostRateResult> {
   const environment = requireServerEnvironment(
-    "CANADA_POST_USERNAME",
-    "CANADA_POST_PASSWORD",
+    "CANADA_POST_API_KEY",
+    "CANADA_POST_API_SECRET",
   );
-
-  if (!environment.COMMERCE_SANDBOX_MODE) {
-    throw new CommerceError(
-      "Production Canada Post requests are disabled.",
-      "LIVE_SHIPPING_DISABLED",
-      503,
-    );
-  }
-  const apiBase = canadaPostSandboxApiBase(
-    environment.CANADA_POST_API_BASE,
-  );
+  assertCanadaPostTestMode(environment, "requests");
+  const apiBase = canadaPostSandboxApiBase(environment.CANADA_POST_API_BASE);
 
   const packageLimitViolation = canadaPostParcelLimitViolation(input.package);
   if (packageLimitViolation) {
@@ -837,104 +942,91 @@ export async function getCanadaPostRates(input: {
   }
   const parcel = normalizeCanadaPostParcelDimensions(input.package);
   const scenario: UnknownRecord = {
-    "@_xmlns": "http://www.canadapost.ca/ws/ship/rate-v4",
+    parcelCharacteristics: {
+      weight: parcel.weightKg,
+      dimensions: {
+        length: parcel.lengthCm,
+        width: parcel.widthCm,
+        height: parcel.heightCm,
+      },
+    },
+    originPostalCode: normalizeCanadianPostalCode(input.originPostalCode),
+    destination: {
+      domestic: {
+        postalCode: normalizeCanadianPostalCode(input.destinationPostalCode),
+      },
+    },
   };
-
   if (environment.CANADA_POST_CUSTOMER_NUMBER) {
-    scenario["customer-number"] = environment.CANADA_POST_CUSTOMER_NUMBER;
+    scenario.customerNumber = environment.CANADA_POST_CUSTOMER_NUMBER;
+    scenario.quoteType = "commercial";
+  } else {
+    scenario.quoteType = "counter";
   }
   if (environment.CANADA_POST_CONTRACT_ID) {
-    scenario["contract-id"] = environment.CANADA_POST_CONTRACT_ID;
+    scenario.contractId = environment.CANADA_POST_CONTRACT_ID;
   }
 
-  scenario["parcel-characteristics"] = {
-    weight: parcel.weightKg.toFixed(3),
-    dimensions: {
-      length: parcel.lengthCm.toFixed(1),
-      width: parcel.widthCm.toFixed(1),
-      height: parcel.heightCm.toFixed(1),
-    },
-  };
-  scenario["origin-postal-code"] = normalizeCanadianPostalCode(
-    input.originPostalCode,
-  );
-  scenario.destination = {
-    domestic: {
-      "postal-code": normalizeCanadianPostalCode(input.destinationPostalCode),
-    },
-  };
-
-  const xml = new XMLBuilder({
-    ignoreAttributes: false,
-    format: false,
-    suppressEmptyNode: true,
-  }).build({ "mailing-scenario": scenario });
-  const endpoint = new URL(
-    "/rs/ship/price",
-    apiBase,
-  ).toString();
-  const authorization = Buffer.from(
-    `${environment.CANADA_POST_USERNAME}:${environment.CANADA_POST_PASSWORD}`,
-  ).toString("base64");
-
+  const endpoint = canadaPostEndpoint(apiBase, "rating/v1/prices");
   let response: Response;
   try {
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/vnd.cpc.ship.rate-v4+xml",
-        "Content-Type": "application/vnd.cpc.ship.rate-v4+xml",
-        Authorization: `Basic ${authorization}`,
-        "User-Agent": "WanderBikeCommerce/1.0",
+    response = await fetchCanadaPostApi(
+      environment,
+      endpoint,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(scenario),
       },
-      body: xml,
-      cache: "no-store",
-      signal: AbortSignal.timeout(12_000),
-    });
-  } catch {
+      12_000,
+    );
+  } catch (error) {
+    if (error instanceof CommerceError) throw error;
     throw new CommerceError(
-      "Canada Post sandbox did not respond in time.",
+      "Canada Post test API did not respond in time.",
       "CANADA_POST_UNAVAILABLE",
       503,
     );
   }
 
-  const responseText = await response.text();
-  const parsed = asRecord(
-    new XMLParser({
-      ignoreAttributes: false,
-      removeNSPrefix: true,
-      parseTagValue: false,
-      trimValues: true,
-    }).parse(responseText),
-  );
-
+  const payload = await parseJsonResponse(response);
   if (!response.ok) {
     throw new CommerceError(
-      providerMessages(parsed) || "Canada Post rejected the rate request.",
+      providerMessages(payload) || "Canada Post rejected the rate request.",
       "CANADA_POST_REJECTED",
       response.status >= 500 ? 503 : 422,
     );
   }
+  if (!Array.isArray(payload)) {
+    throw new CommerceError(
+      "Canada Post returned an invalid rate response.",
+      "CANADA_POST_INVALID_RESPONSE",
+      502,
+    );
+  }
 
-  const root = asRecord(parsed["price-quotes"]);
-  const quotes = asArray(root["price-quote"]).map((value) => asRecord(value));
+  const quotes = payload.map((value) => asRecord(value));
   const rates = quotes
     .map<CanadaPostRate>((quote) => {
-      const priceDetails = asRecord(quote["price-details"]);
-      const standard = asRecord(quote["service-standard"]);
+      const priceDetails = asRecord(quote.priceDetails);
+      const standard = asRecord(quote.serviceStandard);
       const transit = Number.parseInt(
-        textValue(standard["expected-transit-time"]),
+        textValue(standard.expectedTransitTime),
         10,
       );
+      const expectedDeliveryDate = textValue(standard.expectedDeliveryDate);
 
       return {
-        serviceCode: textValue(quote["service-code"]),
-        serviceName: textValue(quote["service-name"]),
+        serviceCode: textValue(quote.serviceCode),
+        serviceName: textValue(quote.serviceName),
         amountCents: dollarsToCents(priceDetails.due),
         estimatedTransitDays: Number.isFinite(transit) ? transit : null,
-        expectedDeliveryDate:
-          textValue(standard["expected-delivery-date"]) || null,
+        expectedDeliveryDate: expectedDeliveryDate
+          ? expectedDeliveryDate.slice(0, 10)
+          : null,
       };
     })
     .filter((rate) => rate.serviceCode && rate.serviceName)
@@ -948,5 +1040,8 @@ export async function getCanadaPostRates(input: {
     );
   }
 
-  return { rates, providerResponse: parsed };
+  return {
+    rates,
+    providerResponse: { quotes },
+  };
 }

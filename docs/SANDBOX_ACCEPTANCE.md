@@ -13,7 +13,7 @@ acceptance run.
 ## Automated local evidence
 
 - [x] `npm run lint`
-- [x] `npm run test:unit` — 49 tests across pricing, fulfillment, validation,
+- [x] `npm run test:unit` — 53 tests across pricing, fulfillment, validation,
       Canada Post request/response handling, and Stripe reconciliation
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
@@ -36,12 +36,11 @@ acceptance run.
 - [x] Hosted responses include CSP framing/object restrictions,
       `Permissions-Policy`, strict referrer policy, MIME sniffing protection,
       DNS prefetch control, `X-Frame-Options: DENY`, and Vercel HSTS.
-- [x] Browser smoke confirms a two-unit cart totals `$178.00`, checkout fails
-      closed behind the setup gate, Google is enabled, Apple is disabled as
-      setup-needed, and no console warnings or errors are emitted.
-- [x] The Google flow reaches Google's authorization endpoint and fails closed
-      with `redirect_uri_mismatch`; the new Supabase callback still needs to be
-      added in Google Cloud before sign-in can complete.
+- [x] The Supabase public Auth settings endpoint reports Google, Apple, and email
+      enabled after both OAuth callbacks and provider credentials were
+      configured.
+- [ ] Repeat the protected-Preview browser smoke after the provider/environment
+      deployment and complete real Google and Apple sign-ins.
 
 ## Existing rental site and SEO
 
@@ -90,7 +89,8 @@ acceptance run.
 - [x] Cron reconciliation checks Stripe before releasing a stale known Session.
 - [x] A paid event cannot silently fulfill a cancelled order or an order whose
       tracked inventory reservation is missing.
-- [ ] Create the deployed test webhook and save its signing secret in Vercel.
+- [x] Create the deployed test webhook for all required events and save its
+      signing secret in the protected Vercel Preview branch.
 - [ ] Complete a successful test payment and confirm order/payment/inventory.
 - [ ] Complete cancellation, expiry, and asynchronous failure tests.
 - [ ] Replay the same verified webhook and prove no duplicate order, payment, or
@@ -103,6 +103,9 @@ acceptance run.
       server-validated.
 - [x] Rate requests normalize Canadian postal codes and use server-resolved
       package weight and dimensions.
+- [x] The client uses the April 2026 Developer Portal REST/JSON API, OAuth 2.0
+      client credentials, bounded token caching, and a single refresh on `401`;
+      the obsolete XML/Basic Auth client and dependency were removed.
 - [x] The 30 kg, 2 m per-side, and 3 m length-plus-girth limits match Canada
       Post's [domestic parcel restrictions](https://www.canadapost-postescanada.ca/cpc/en/support/articles/parcel-services-shipping-in-canada/size-and-weight-restrictions.page)
       and are enforced in catalog, cart, label, and database validation.
@@ -117,7 +120,11 @@ acceptance run.
 - [x] Shipment creation, cancellation, void, and refund uncertainty preserves
       idempotency state for reconciliation instead of inviting duplicate labels.
 - [x] Multi-parcel numbering and stable package count are database-enforced.
-- [ ] Obtain an actual Canada Post sandbox quote and save the selected quote.
+- [x] Obtain a real Test-app OAuth token and direct rating quote from the current
+      Canada Post API.
+- [x] Create a direct Test-app shipment and receive a sandbox shipment ID,
+      tracking PIN, label, price, and resource links without billing.
+- [ ] Obtain and save a selected Canada Post quote through the hosted checkout.
 - [ ] Create one accessory label and one separate large-item/bicycle label.
 - [ ] Download and print the private PDF through the staff-only endpoint.
 - [ ] Verify saved service, cost, shipment reference, and all tracking numbers.
@@ -128,9 +135,8 @@ acceptance run.
 
 - [x] Google and Apple buttons share the same PKCE callback and fail closed
       unless Supabase reports the provider as enabled.
-- [x] Google is enabled in the new hosted Supabase project without committing
-      its client secret; Apple remains disabled until its developer credentials
-      are supplied.
+- [x] Google and Apple are enabled in the new hosted Supabase project without
+      committing either provider secret.
 - [x] The deployed auth page exposes the expected Google, Apple, and email
       states without client errors.
 - [x] All merchant pages and mutations require a server-verified staff/admin
@@ -172,9 +178,12 @@ acceptance run.
 - [x] Create and migrate the new `ca-central-1` Supabase project, load the
       sandbox catalog, and run the hosted database advisors.
 - [x] Push the completed implementation branch to GitHub.
-- [ ] Configure all sandbox environment variables without exposing values.
+- [ ] Configure the remaining Resend sandbox variables without exposing values.
+- [x] Configure Stripe and Canada Post Test-app branch environment variables
+      without exposing values.
 - [x] Configure Supabase, sandbox feature flags, the stable Preview site URL,
-      Canada Post sandbox base URL, and the cron secret without exposing values.
+      Canada Post Test-app API base, and the cron secret without exposing
+      values.
 - [x] Deploy with Vercel CLI, keep the deployment target as Preview, and inspect
       the terminal deployment result.
 - [x] Run hosted page, API-origin, auth-state, security-header, cart, checkout
@@ -185,15 +194,8 @@ acceptance run.
       CLI Preview (`dpl_6b3kEp8Nodw7Ciao9jkdk9FMEYuv`) as the rollback
       candidate for the final documentation-only deployment.
 
-## Required merchant inputs
+## Remaining merchant inputs
 
-- Valid Stripe test secret and the deployed test-webhook signing secret
-- Add `https://gvuaitmjpenggvosshqm.supabase.co/auth/v1/callback` to the Google
-  OAuth client's authorized redirect URIs
-- Apple Developer Team ID, App ID, Services ID, signing Key ID, and `.p8` key
-- Valid Canada Post sandbox API key/secret, account type, and Customer Number;
-  Contract ID, Group ID, and MOBO Customer Number when applicable
-- Initial admin email
 - Resend API key, verified sender, and merchant notification inbox
 - Business hours, pickup instructions, sales provinces, local-delivery postal
   prefixes and fee

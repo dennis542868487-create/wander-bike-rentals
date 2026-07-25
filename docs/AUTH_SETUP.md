@@ -47,37 +47,29 @@ https://gvuaitmjpenggvosshqm.supabase.co/auth/v1/callback
 Enable Google under **Supabase Dashboard → Authentication → Providers** and
 store the Google secret there, not in this repository.
 
-The supplied Google credential file has the expected web-client fields, but its
-saved redirect URI points at a different Supabase project. Google is enabled in
-the new Supabase project, but the OAuth client in Google Cloud must also include
-the callback above; editing the downloaded JSON file alone does not change
-Google's configuration. The deployed Preview currently reaches Google and then
-fails closed with `redirect_uri_mismatch`, which confirms this Google Cloud
-change is still required.
+The Google Cloud project `wander-bike-booking-auth` now includes that callback
+on the `Wander Bike Supabase Auth` web client, and Google is enabled in the new
+Supabase project. A real hosted sign-in is still part of the acceptance
+checklist.
 
 ### Apple
 
-Sign in with Apple for this website requires an active Apple Developer Program
-membership and:
+The sandbox identity is configured with:
 
-- the 10-character Team ID
-- a primary App ID with the Sign in with Apple capability enabled
-- a Services ID for the website
-- the signing Key ID and its one-time-download `.p8` private key
+- Team ID: `3Y33Y8TYG6`
+- primary App ID: `ca.wanderbike.auth`
+- Services ID / OAuth client ID: `ca.wanderbike.auth.web`
+- signing Key ID: `DF56T8CQLD`
+- website domain: `gvuaitmjpenggvosshqm.supabase.co`
+- return URL:
+  `https://gvuaitmjpenggvosshqm.supabase.co/auth/v1/callback`
 
-Configure the Services ID website domain as the new project's
-`YOUR_PROJECT_REF.supabase.co` hostname and its return URL as:
-
-```text
-https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
-```
-
-The Services ID is the Apple client ID. The Team ID, Key ID, Services ID, and
-`.p8` key are used to generate the client secret stored only in Supabase. Apple
-OAuth client secrets expire after six months, so schedule rotation and retain
-the `.p8` file securely. Register the Wander Bike sending domain with Apple's
-private email relay before sending transactional email to hidden Apple relay
-addresses.
+The generated Apple client secret is stored only in Supabase and expires on
+January 20, 2027. Rotate it before that date and retain the one-time-download
+`.p8` key securely outside the repository. Register the eventual Wander Bike
+sending domain with Apple's private email relay before sending transactional
+email to hidden Apple relay addresses. A real hosted Apple sign-in remains an
+acceptance check.
 
 ## Create the first administrator
 

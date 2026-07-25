@@ -13,16 +13,17 @@ export default async function AdminSettingsPage() {
   const environment = getServerEnvironment();
   const ratesConfigured = Boolean(
     environment.COMMERCE_SANDBOX_MODE &&
-      environment.CANADA_POST_USERNAME &&
-      environment.CANADA_POST_PASSWORD,
+    environment.CANADA_POST_ENVIRONMENT === "test" &&
+    environment.CANADA_POST_API_KEY &&
+    environment.CANADA_POST_API_SECRET,
   );
   const labelsConfigured = Boolean(
     ratesConfigured &&
-      environment.CANADA_POST_ACCOUNT_TYPE &&
-      environment.CANADA_POST_CUSTOMER_NUMBER &&
-      (environment.CANADA_POST_ACCOUNT_TYPE !== "contract" ||
-        (environment.CANADA_POST_CONTRACT_ID &&
-          environment.CANADA_POST_GROUP_ID)),
+    environment.CANADA_POST_ACCOUNT_TYPE &&
+    environment.CANADA_POST_CUSTOMER_NUMBER &&
+    (environment.CANADA_POST_ACCOUNT_TYPE !== "contract" ||
+      (environment.CANADA_POST_CONTRACT_ID &&
+        environment.CANADA_POST_GROUP_ID)),
   );
 
   return (
@@ -36,8 +37,8 @@ export default async function AdminSettingsPage() {
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
           These settings control checkout, pickup, delivery, carrier pricing,
-          taxes, notifications, and customer policies. Secret credentials stay in
-          the deployment environment and are never shown here.
+          taxes, notifications, and customer policies. Secret credentials stay
+          in the deployment environment and are never shown here.
         </p>
       </div>
 
@@ -48,7 +49,7 @@ export default async function AdminSettingsPage() {
           sandboxMode: environment.COMMERCE_SANDBOX_MODE,
           checkoutGateConfigured: Boolean(
             environment.COMMERCE_CHECKOUT_ENABLED &&
-              environment.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
+            environment.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
           ),
           canadaPostRatesConfigured: ratesConfigured,
           canadaPostLabelsConfigured: labelsConfigured,

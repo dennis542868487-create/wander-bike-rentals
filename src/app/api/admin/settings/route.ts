@@ -10,7 +10,10 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+    return NextResponse.json(
+      { error: "Invalid request origin." },
+      { status: 403 },
+    );
   }
 
   const auth = await requireStaff(request);
@@ -45,8 +48,9 @@ export async function POST(request: Request) {
     if (
       settings.canadaPostEnabled &&
       (!environment.COMMERCE_SANDBOX_MODE ||
-        !environment.CANADA_POST_USERNAME ||
-        !environment.CANADA_POST_PASSWORD)
+        environment.CANADA_POST_ENVIRONMENT !== "test" ||
+        !environment.CANADA_POST_API_KEY ||
+        !environment.CANADA_POST_API_SECRET)
     ) {
       return NextResponse.json(
         {

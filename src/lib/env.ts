@@ -5,24 +5,30 @@ import { z } from "zod";
 const emptyToUndefined = (value: unknown) =>
   typeof value === "string" && value.trim() === "" ? undefined : value;
 
-const optionalString = z.preprocess(emptyToUndefined, z.string().trim().min(1).optional());
-const optionalUrl = z.preprocess(emptyToUndefined, z.url().optional());
-const optionalBoolean = z.preprocess(
-  (value) => {
-    if (typeof value !== "string") return value;
-    if (value.toLowerCase() === "true") return true;
-    if (value.toLowerCase() === "false") return false;
-    return value;
-  },
-  z.boolean().optional(),
+const optionalString = z.preprocess(
+  emptyToUndefined,
+  z.string().trim().min(1).optional(),
 );
+const optionalUrl = z.preprocess(emptyToUndefined, z.url().optional());
+const optionalBoolean = z.preprocess((value) => {
+  if (typeof value !== "string") return value;
+  if (value.toLowerCase() === "true") return true;
+  if (value.toLowerCase() === "false") return false;
+  return value;
+}, z.boolean().optional());
 const optionalCanadaPostAccountType = z.preprocess(
   emptyToUndefined,
   z.enum(["contract", "non_contract"]).optional(),
 );
+const optionalCanadaPostEnvironment = z.preprocess(
+  emptyToUndefined,
+  z.literal("test").optional(),
+);
 
 const serverEnvironmentSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   NEXT_PUBLIC_SITE_URL: optionalUrl,
   NEXT_PUBLIC_SUPABASE_URL: optionalUrl,
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: optionalString,
@@ -32,14 +38,17 @@ const serverEnvironmentSchema = z.object({
   COMMERCE_CHECKOUT_ENABLED: optionalBoolean.default(false),
   STRIPE_SECRET_KEY: optionalString,
   STRIPE_WEBHOOK_SECRET: optionalString,
-  CANADA_POST_USERNAME: optionalString,
-  CANADA_POST_PASSWORD: optionalString,
+  CANADA_POST_API_KEY: optionalString,
+  CANADA_POST_API_SECRET: optionalString,
+  CANADA_POST_ENVIRONMENT: optionalCanadaPostEnvironment.default("test"),
   CANADA_POST_ACCOUNT_TYPE: optionalCanadaPostAccountType,
   CANADA_POST_CUSTOMER_NUMBER: optionalString,
   CANADA_POST_MOBO_CUSTOMER_NUMBER: optionalString,
   CANADA_POST_CONTRACT_ID: optionalString,
   CANADA_POST_GROUP_ID: optionalString,
-  CANADA_POST_API_BASE: optionalUrl.default("https://ct.soa-gw.canadapost.ca"),
+  CANADA_POST_API_BASE: optionalUrl.default(
+    "https://api.canadapost-postescanada.ca/prod/devportal-portaildesdeveloppeurs",
+  ),
   RESEND_API_KEY: optionalString,
   EMAIL_FROM: optionalString,
   ORDER_NOTIFICATION_EMAIL: optionalString,
@@ -66,17 +75,20 @@ export function getServerEnvironment(): ServerEnvironment {
   return cachedEnvironment;
 }
 
-export function requireServerEnvironment<
-  Key extends keyof ServerEnvironment,
->(...keys: Key[]): ServerEnvironment & Required<Pick<ServerEnvironment, Key>> {
+export function requireServerEnvironment<Key extends keyof ServerEnvironment>(
+  ...keys: Key[]
+): ServerEnvironment & Required<Pick<ServerEnvironment, Key>> {
   const environment = getServerEnvironment();
   const missing = keys.filter((key) => !environment[key]);
 
   if (missing.length > 0) {
-    throw new Error(`Missing required server configuration: ${missing.join(", ")}`);
+    throw new Error(
+      `Missing required server configuration: ${missing.join(", ")}`,
+    );
   }
 
-  return environment as ServerEnvironment & Required<Pick<ServerEnvironment, Key>>;
+  return environment as ServerEnvironment &
+    Required<Pick<ServerEnvironment, Key>>;
 }
 
 export function isSandboxCommerce() {

@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { CheckoutForm } from "@/components/commerce/checkout-form";
-import {
-  getCommerceStoreSettings,
-} from "@/lib/commerce/settings";
+import { getCommerceStoreSettings } from "@/lib/commerce/settings";
 import { getDefaultCommerceStoreSettings } from "@/lib/commerce/settings-defaults";
 import { getServerEnvironment } from "@/lib/env";
 
@@ -29,12 +27,12 @@ export default async function CheckoutPage({
   }
   const checkoutEnabled = Boolean(
     environment.COMMERCE_SANDBOX_MODE &&
-      storeSettings.sandboxMode &&
-      storeSettings.checkoutEnabled &&
-      environment.COMMERCE_CHECKOUT_ENABLED &&
-      environment.NEXT_PUBLIC_SUPABASE_URL &&
-      environment.SUPABASE_SECRET_KEY &&
-      environment.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
+    storeSettings.sandboxMode &&
+    storeSettings.checkoutEnabled &&
+    environment.COMMERCE_CHECKOUT_ENABLED &&
+    environment.NEXT_PUBLIC_SUPABASE_URL &&
+    environment.SUPABASE_SECRET_KEY &&
+    environment.STRIPE_SECRET_KEY?.startsWith("sk_test_"),
   );
   const checkoutSettings = {
     pickupEnabled: storeSettings.pickupEnabled,
@@ -42,8 +40,9 @@ export default async function CheckoutPage({
     localDelivery: storeSettings.localDelivery,
     canadaPostEnabled: Boolean(
       storeSettings.canadaPostEnabled &&
-        environment.CANADA_POST_USERNAME &&
-        environment.CANADA_POST_PASSWORD,
+      environment.CANADA_POST_ENVIRONMENT === "test" &&
+      environment.CANADA_POST_API_KEY &&
+      environment.CANADA_POST_API_SECRET,
     ),
     profile: storeSettings.profile,
     tax: storeSettings.tax,
@@ -75,7 +74,8 @@ export default async function CheckoutPage({
           </h1>
           <p className="mt-4 text-base leading-7 text-slate-600">
             Every price, rate, and stock level is checked again on the server.
-            This deployment remains in test mode; no real item is sold or shipped.
+            This deployment remains in test mode; no real item is sold or
+            shipped.
           </p>
         </div>
         <CheckoutForm

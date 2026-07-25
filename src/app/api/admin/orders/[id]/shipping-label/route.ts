@@ -9,7 +9,10 @@ import {
 import { shippingLabelRequestSchema } from "@/lib/admin/schemas";
 import { CommerceError, publicCommerceError } from "@/lib/commerce/errors";
 import { scheduleNotificationDelivery } from "@/lib/email/schedule";
-import { addressSchema, normalizeCanadianPostalCode } from "@/lib/commerce/schemas";
+import {
+  addressSchema,
+  normalizeCanadianPostalCode,
+} from "@/lib/commerce/schemas";
 import { getServerEnvironment } from "@/lib/env";
 import { getCommerceStoreSettings } from "@/lib/commerce/settings";
 import { isSameOriginRequest } from "@/lib/http/security";
@@ -38,7 +41,10 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ) {
   if (!isSameOriginRequest(request)) {
-    return NextResponse.json({ error: "Invalid request origin." }, { status: 403 });
+    return NextResponse.json(
+      { error: "Invalid request origin." },
+      { status: 403 },
+    );
   }
 
   const auth = await requireStaff(request);
@@ -58,7 +64,9 @@ export async function POST(
     const parsed = shippingLabelRequestSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid package details." },
+        {
+          error: parsed.error.issues[0]?.message ?? "Invalid package details.",
+        },
         { status: 400 },
       );
     }
@@ -67,8 +75,8 @@ export async function POST(
     if (
       !environment.COMMERCE_SANDBOX_MODE ||
       !environment.CANADA_POST_ACCOUNT_TYPE ||
-      !environment.CANADA_POST_USERNAME ||
-      !environment.CANADA_POST_PASSWORD ||
+      !environment.CANADA_POST_API_KEY ||
+      !environment.CANADA_POST_API_SECRET ||
       !environment.CANADA_POST_CUSTOMER_NUMBER
     ) {
       throw new CommerceError(
@@ -90,7 +98,8 @@ export async function POST(
     const supabase = getSupabaseAdmin();
     const orderResult = await supabase
       .from("orders")
-      .select(`
+      .select(
+        `
         id,
         public_id,
         order_number,
@@ -103,7 +112,8 @@ export async function POST(
         shipping_service_code,
         shipping_total_cents,
         shipping_quotes ( service_name )
-      `)
+      `,
+      )
       .eq("id", orderId)
       .maybeSingle();
 
@@ -133,12 +143,15 @@ export async function POST(
       widthCm: parsed.data.package.widthCm,
       heightCm: parsed.data.package.heightCm,
     };
-    const prepared = await supabase.rpc("commerce_prepare_canada_post_shipment", {
-      p_order_id: orderId,
-      p_idempotency_key: parsed.data.idempotencyKey,
-      p_package_details: packageDetails,
-      p_actor_user_id: auth.user.id,
-    });
+    const prepared = await supabase.rpc(
+      "commerce_prepare_canada_post_shipment",
+      {
+        p_order_id: orderId,
+        p_idempotency_key: parsed.data.idempotencyKey,
+        p_package_details: packageDetails,
+        p_actor_user_id: auth.user.id,
+      },
+    );
     if (prepared.error) {
       const conflict = prepared.error.code === "23505";
       throw new CommerceError(
@@ -161,7 +174,10 @@ export async function POST(
       );
     }
 
-    if (text(shipment.status) === "label_created" && text(shipment.label_storage_path)) {
+    if (
+      text(shipment.status) === "label_created" &&
+      text(shipment.label_storage_path)
+    ) {
       return NextResponse.json(
         { shipment, duplicate: true },
         { headers: { "Cache-Control": "no-store" } },
@@ -170,7 +186,10 @@ export async function POST(
 
     let labelLink: CanadaPostLink;
     let priceLink: CanadaPostLink | null = null;
-    if (text(shipment.provider_shipment_id) && text(shipment.label_artifact_url)) {
+    if (
+      text(shipment.provider_shipment_id) &&
+      text(shipment.label_artifact_url)
+    ) {
       labelLink = {
         rel: "label",
         href: text(shipment.label_artifact_url),
@@ -206,16 +225,19 @@ export async function POST(
         package: packageDetails,
       });
 
-      const recorded = await supabase.rpc("commerce_record_canada_post_shipment", {
-        p_shipment_id: shipmentId,
-        p_provider_shipment_id: providerShipment.shipmentId,
-        p_provider_self_url: providerShipment.selfLink?.href ?? "",
-        p_provider_refund_url: providerShipment.refundLink?.href ?? "",
-        p_label_artifact_url: providerShipment.labelLink.href,
-        p_tracking_pin: providerShipment.trackingPin,
-        p_service_name: providerShipment.serviceName,
-        p_actor_user_id: auth.user.id,
-      });
+      const recorded = await supabase.rpc(
+        "commerce_record_canada_post_shipment",
+        {
+          p_shipment_id: shipmentId,
+          p_provider_shipment_id: providerShipment.shipmentId,
+          p_provider_self_url: providerShipment.selfLink?.href ?? "",
+          p_provider_refund_url: providerShipment.refundLink?.href ?? "",
+          p_label_artifact_url: providerShipment.labelLink.href,
+          p_tracking_pin: providerShipment.trackingPin,
+          p_service_name: providerShipment.serviceName,
+          p_actor_user_id: auth.user.id,
+        },
+      );
       if (recorded.error) {
         throw new CommerceError(
           "Canada Post created a label, but its references could not be saved. Do not create another label.",
@@ -248,12 +270,15 @@ export async function POST(
       );
     }
 
-    const finalized = await supabase.rpc("commerce_finalize_canada_post_shipment", {
-      p_shipment_id: shipmentId,
-      p_label_storage_path: labelStoragePath,
-      p_label_cost_cents: providerCost ?? number(order.shipping_total_cents),
-      p_actor_user_id: auth.user.id,
-    });
+    const finalized = await supabase.rpc(
+      "commerce_finalize_canada_post_shipment",
+      {
+        p_shipment_id: shipmentId,
+        p_label_storage_path: labelStoragePath,
+        p_label_cost_cents: providerCost ?? number(order.shipping_total_cents),
+        p_actor_user_id: auth.user.id,
+      },
+    );
     if (finalized.error) {
       throw new CommerceError(
         "The label PDF was stored but the order could not be finalized.",

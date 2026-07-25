@@ -375,7 +375,9 @@ export function CheckoutForm({
       return;
     }
     if (!checkoutEnabled) {
-      setError("Test checkout is waiting for the new Supabase project and deployment keys.");
+      setError(
+        "Test checkout is waiting for the remaining sandbox payment configuration.",
+      );
       return;
     }
 
@@ -452,8 +454,8 @@ export function CheckoutForm({
         {!checkoutEnabled ? (
           <div className="border border-sky-300 bg-sky-50 p-4 text-sm leading-6 text-sky-950">
             <strong>Setup gate is on.</strong> Browsing and cart testing work now.
-            Stripe test checkout will unlock after the new Supabase project and
-            deployment environment are connected.
+            Stripe test checkout will unlock after the remaining sandbox payment
+            configuration is valid.
           </div>
         ) : null}
 

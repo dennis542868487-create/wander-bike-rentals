@@ -76,6 +76,20 @@ Vercel CLI or the dashboard, never committed.
 The database setting `commerce.checkout_enabled` is a second checkout gate.
 Both it and the environment gate must be enabled for test checkout.
 
+### Current Preview acceptance host
+
+The protected branch alias used for sandbox acceptance is:
+
+```text
+https://wander-bike-rentals-git-co-75a04a-zyz18922182165-4022s-projects.vercel.app
+```
+
+Keep Vercel Standard Protection enabled. Use a short-lived, revocable Vercel
+share link for reviewers rather than weakening project protection. Supabase,
+the demo catalog, cart, and the non-provider API checks are connected on this
+host. Stripe checkout, Canada Post labels, and transactional email remain
+fail-closed until valid sandbox credentials are configured.
+
 ## 4. Stripe test webhook
 
 Create a test-mode webhook endpoint using the exact deployed host:

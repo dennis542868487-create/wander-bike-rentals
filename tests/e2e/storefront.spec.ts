@@ -119,6 +119,11 @@ test("customer can add a product, change quantity, and reach the safe checkout g
   await expect(page).toHaveURL(/\/checkout$/);
   await expect(page.getByText("Setup gate is on.")).toBeVisible();
   await expect(
+    page.getByText(
+      "Stripe test checkout will unlock after the remaining sandbox payment configuration is valid.",
+    ),
+  ).toBeVisible();
+  await expect(
     page.getByRole("button", {
       name: "Continue to Stripe test checkout",
     }),

@@ -2,9 +2,10 @@
 
 This checklist is the evidence record for the commerce upgrade. A checked local
 item proves only what the named command or inspection covers. Provider and
-hosted-database items remain unchecked until they are exercised against the new
-Supabase project, Stripe test mode, Canada Post sandbox, Resend, and the deployed
-Vercel application.
+end-to-end items remain unchecked until they are exercised against Stripe test
+mode, Canada Post sandbox, Resend, and the deployed Vercel application. Hosted
+Supabase, protected-Preview, and browser smoke evidence is recorded separately
+below.
 
 Live Stripe keys and the Canada Post production host are explicitly outside this
 acceptance run.
@@ -20,6 +21,27 @@ acceptance run.
 - [x] `npm audit --omit=dev` — zero production dependency vulnerabilities
 - [x] Repository scan finds no supplied Stripe, Canada Post, Supabase, Resend, or
       webhook secrets in tracked changes
+
+## Hosted Preview and Supabase evidence
+
+- [x] The `ca-central-1` Supabase project is active, migrated, seeded, and linked
+      to the protected Vercel Preview branch alias.
+- [x] All 22 public tables have RLS enabled; client-mutatable table grants are
+      absent, and privileged commerce functions are executable only by
+      `service_role`.
+- [x] Hosted storefront, shop, sandbox product, auth, booking, cart, checkout,
+      robots, and sitemap routes return their expected content.
+- [x] Cross-origin booking and merchant mutations return `403`; unauthenticated
+      booking reads return `401`.
+- [x] Hosted responses include CSP framing/object restrictions,
+      `Permissions-Policy`, strict referrer policy, MIME sniffing protection,
+      DNS prefetch control, `X-Frame-Options: DENY`, and Vercel HSTS.
+- [x] Browser smoke confirms a two-unit cart totals `$178.00`, checkout fails
+      closed behind the setup gate, Google is enabled, Apple is disabled as
+      setup-needed, and no console warnings or errors are emitted.
+- [x] The Google flow reaches Google's authorization endpoint and fails closed
+      with `redirect_uri_mismatch`; the new Supabase callback still needs to be
+      added in Google Cloud before sign-in can complete.
 
 ## Existing rental site and SEO
 
@@ -109,6 +131,8 @@ acceptance run.
 - [x] Google is enabled in the new hosted Supabase project without committing
       its client secret; Apple remains disabled until its developer credentials
       are supplied.
+- [x] The deployed auth page exposes the expected Google, Apple, and email
+      states without client errors.
 - [x] All merchant pages and mutations require a server-verified staff/admin
       profile role.
 - [x] Order details consolidate payment, fulfillment, shipping, refund, return,
@@ -147,17 +171,27 @@ acceptance run.
 - [x] The deployment and forward-only database rollback runbook is documented.
 - [x] Create and migrate the new `ca-central-1` Supabase project, load the
       sandbox catalog, and run the hosted database advisors.
-- [ ] Push the completed branch to GitHub.
+- [x] Push the completed implementation branch to GitHub.
 - [ ] Configure all sandbox environment variables without exposing values.
-- [ ] Deploy with Vercel CLI and inspect the terminal deployment result.
-- [ ] Run hosted smoke, auth, provider, RLS, and end-to-end acceptance checks.
-- [ ] Record the deployment URL and the immediately previous rollback target.
+- [x] Configure Supabase, sandbox feature flags, the stable Preview site URL,
+      Canada Post sandbox base URL, and the cron secret without exposing values.
+- [x] Deploy with Vercel CLI, keep the deployment target as Preview, and inspect
+      the terminal deployment result.
+- [x] Run hosted page, API-origin, auth-state, security-header, cart, checkout
+      gate, and RLS/grant smoke checks.
+- [ ] Run Stripe, Canada Post, email, complete OAuth, admin, and full hosted
+      end-to-end acceptance checks after their external configuration is ready.
+- [ ] Record the final Preview deployment and its immediately previous rollback
+      target after the last application change is deployed.
 
 ## Required merchant inputs
 
+- Valid Stripe test secret and the deployed test-webhook signing secret
+- Add `https://gvuaitmjpenggvosshqm.supabase.co/auth/v1/callback` to the Google
+  OAuth client's authorized redirect URIs
 - Apple Developer Team ID, App ID, Services ID, signing Key ID, and `.p8` key
-- Canada Post account type and Customer Number; Contract ID, Group ID, and MOBO
-  Customer Number when applicable
+- Valid Canada Post sandbox API key/secret, account type, and Customer Number;
+  Contract ID, Group ID, and MOBO Customer Number when applicable
 - Initial admin email
 - Resend API key, verified sender, and merchant notification inbox
 - Business hours, pickup instructions, sales provinces, local-delivery postal

@@ -19,9 +19,11 @@ by the project:
 
 - `https://www.wanderbike.ca/auth/callback`
 - `https://wanderbike.ca/auth/callback`
+- `https://wander-bike-rentals-git-co-75a04a-zyz18922182165-4022s-projects.vercel.app/auth/callback`
 - `http://localhost:3000/auth/callback`
 
-Add a Vercel preview callback only when a specific preview deployment needs
+The exact protected branch alias above is the sandbox-acceptance callback. Add
+other Vercel preview callbacks only when a specific deployment needs
 authentication. Avoid a broad redirect wildcard.
 
 Choose whether email confirmation is required in the Supabase dashboard. The
@@ -49,7 +51,9 @@ The supplied Google credential file has the expected web-client fields, but its
 saved redirect URI points at a different Supabase project. Google is enabled in
 the new Supabase project, but the OAuth client in Google Cloud must also include
 the callback above; editing the downloaded JSON file alone does not change
-Google's configuration.
+Google's configuration. The deployed Preview currently reaches Google and then
+fails closed with `redirect_uri_mismatch`, which confirms this Google Cloud
+change is still required.
 
 ### Apple
 

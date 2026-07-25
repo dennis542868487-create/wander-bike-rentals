@@ -33,6 +33,7 @@ CLI equivalent:
 ```bash
 npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push --include-all --include-seed
+npx supabase config push --project-ref YOUR_PROJECT_REF
 ```
 
 Configure the Auth URLs in `docs/AUTH_SETUP.md`, create the first administrator,

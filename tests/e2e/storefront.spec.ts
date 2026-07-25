@@ -4,7 +4,17 @@ test("core public pages render without client exceptions", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
-  await page.goto("/");
+  const homeResponse = await page.goto("/");
+  expect(homeResponse).not.toBeNull();
+  expect(homeResponse?.headers()).toMatchObject({
+    "content-security-policy":
+      "base-uri 'self'; frame-ancestors 'none'; object-src 'none'",
+    "permissions-policy":
+      "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+  });
   await expect(
     page.getByRole("heading", {
       level: 1,

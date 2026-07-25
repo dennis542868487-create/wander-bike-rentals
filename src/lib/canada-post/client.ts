@@ -19,6 +19,8 @@ const canadaPostApiBase = `${canadaPostApiOrigin}${canadaPostApiRootPath.slice(
 )}`;
 const maximumCanadaPostLabelBytes = 10 * 1024 * 1024;
 const tokenExpirySafetyWindowMs = 60_000;
+const tokenRequestAttempts = 2;
+const tokenRequestTimeoutMs = 15_000;
 
 type CanadaPostCredentialEnvironment = ReturnType<
   typeof requireServerEnvironment
@@ -287,41 +289,60 @@ async function requestCanadaPostAccessToken(
     environment.CANADA_POST_API_BASE,
     "cpc-api-native-oauth-provider/oauth2/token",
   );
-  let response: Response;
-  try {
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-IBM-Client-Id": environment.CANADA_POST_API_KEY,
-        "X-IBM-Client-Secret": environment.CANADA_POST_API_SECRET,
-        "User-Agent": "WanderBikeCommerce/2.0",
-      },
-      body: new URLSearchParams({
-        grant_type: "client_credentials",
-        scope: "merchant",
-      }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
-    });
-  } catch {
-    throw new CommerceError(
-      "Canada Post authentication is temporarily unavailable.",
-      "CANADA_POST_AUTH_UNAVAILABLE",
-      503,
-    );
-  }
+  for (let attempt = 1; attempt <= tokenRequestAttempts; attempt += 1) {
+    let response: Response;
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-IBM-Client-Id": environment.CANADA_POST_API_KEY,
+          "X-IBM-Client-Secret": environment.CANADA_POST_API_SECRET,
+          "User-Agent": "WanderBikeCommerce/2.0",
+        },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          scope: "merchant",
+        }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(tokenRequestTimeoutMs),
+      });
+    } catch {
+      if (attempt < tokenRequestAttempts) continue;
+      throw new CommerceError(
+        "Canada Post authentication is temporarily unavailable.",
+        "CANADA_POST_AUTH_UNAVAILABLE",
+        503,
+      );
+    }
 
-  const payload = asRecord(await parseJsonResponse(response));
-  const accessToken = textValue(payload.access_token);
-  const expiresIn = Number(payload.expires_in);
-  if (
-    !response.ok ||
-    !accessToken ||
-    !Number.isFinite(expiresIn) ||
-    expiresIn <= 0
-  ) {
+    const payload = asRecord(await parseJsonResponse(response));
+    const accessToken = textValue(payload.access_token);
+    const expiresIn = Number(payload.expires_in);
+    if (
+      response.ok &&
+      accessToken &&
+      Number.isFinite(expiresIn) &&
+      expiresIn > 0
+    ) {
+      accessTokenCache = {
+        credentialKey,
+        accessToken,
+        expiresAt:
+          Date.now() +
+          Math.max(1_000, expiresIn * 1_000 - tokenExpirySafetyWindowMs),
+      };
+      return accessToken;
+    }
+
+    if (
+      attempt < tokenRequestAttempts &&
+      (response.status === 429 || response.status >= 500)
+    ) {
+      continue;
+    }
+
     throw new CommerceError(
       providerMessages(payload) ||
         "Canada Post rejected the test application credentials.",
@@ -330,14 +351,11 @@ async function requestCanadaPostAccessToken(
     );
   }
 
-  accessTokenCache = {
-    credentialKey,
-    accessToken,
-    expiresAt:
-      Date.now() +
-      Math.max(1_000, expiresIn * 1_000 - tokenExpirySafetyWindowMs),
-  };
-  return accessToken;
+  throw new CommerceError(
+    "Canada Post authentication is temporarily unavailable.",
+    "CANADA_POST_AUTH_UNAVAILABLE",
+    503,
+  );
 }
 
 async function getCanadaPostAccessToken(

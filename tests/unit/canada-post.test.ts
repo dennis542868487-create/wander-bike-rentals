@@ -246,6 +246,36 @@ describe("Canada Post test-app client", () => {
     expect(fetchMock.mock.calls[2]?.[0]).toBe(`${apiBase}/rating/v1/prices`);
   });
 
+  it("retries one transient OAuth network failure before calling the API", async () => {
+    fetchMock
+      .mockRejectedValueOnce(new Error("temporary network failure"))
+      .mockResolvedValueOnce(tokenResponse())
+      .mockResolvedValueOnce(jsonResponse(ratePayload()));
+
+    await expect(
+      getCanadaPostRates({
+        originPostalCode: "V7E 3M1",
+        destinationPostalCode: "V6B 1A1",
+        package: {
+          weightKg: 1.25,
+          lengthCm: 30,
+          widthCm: 20,
+          heightCm: 10,
+          packagingAllowanceGrams: 250,
+        },
+      }),
+    ).resolves.toMatchObject({ rates: expect.any(Array) });
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      `${apiBase}/cpc-api-native-oauth-provider/oauth2/token`,
+    );
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      `${apiBase}/cpc-api-native-oauth-provider/oauth2/token`,
+    );
+    expect(fetchMock.mock.calls[2]?.[0]).toBe(`${apiBase}/rating/v1/prices`);
+  });
+
   it("refreshes the token once after an authenticated request returns 401", async () => {
     fetchMock
       .mockResolvedValueOnce(tokenResponse("expired-token"))

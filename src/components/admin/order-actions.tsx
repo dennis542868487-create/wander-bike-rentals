@@ -120,7 +120,8 @@ export function OrderActions({
     event.preventDefault();
     resetMessages();
     setBusy("tracking");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     try {
       await adminRequest(`/api/admin/orders/${order.id}/tracking`, {
         method: "POST",
@@ -134,7 +135,7 @@ export function OrderActions({
       });
       setSuccess("Tracking saved and shipment notification queued.");
       setTrackingKey(crypto.randomUUID());
-      event.currentTarget.reset();
+      formElement.reset();
       router.refresh();
     } catch (actionError) {
       setError(

@@ -49,8 +49,8 @@ store the Google secret there, not in this repository.
 
 The Google Cloud project `wander-bike-booking-auth` now includes that callback
 on the `Wander Bike Supabase Auth` web client, and Google is enabled in the new
-Supabase project. A real hosted sign-in is still part of the acceptance
-checklist.
+Supabase project. A real hosted sign-in completed on the protected Preview,
+created the expected profile, and returned through `/auth/callback`.
 
 ### Apple
 
@@ -68,8 +68,9 @@ The generated Apple client secret is stored only in Supabase and expires on
 January 20, 2027. Rotate it before that date and retain the one-time-download
 `.p8` key securely outside the repository. Register the eventual Wander Bike
 sending domain with Apple's private email relay before sending transactional
-email to hidden Apple relay addresses. A real hosted Apple sign-in remains an
-acceptance check.
+email to hidden Apple relay addresses. The real hosted flow reaches Apple's
+authorization page with the expected Services ID and callback; completing the
+password or Passkey prompt remains a manual acceptance step.
 
 ## Create the first administrator
 
@@ -92,6 +93,10 @@ where lower(email) = lower('employee@example.com');
 ```
 
 To revoke access, change the role back to `customer`.
+
+The first protected-Preview administrator is
+`zyz18922182165@gmail.com`. Its Google-created profile was promoted to `admin`
+and the consolidated merchant console was verified.
 
 The consolidated merchant console is `/admin`. The legacy rental calendar at
 `/booking-admin` remains role-protected for continuity.

@@ -23,6 +23,18 @@ export const runtime = "nodejs";
 
 type UnknownRecord = Record<string, unknown>;
 
+const safeCanadaPostFailureCodes = new Set([
+  "CANADA_POST_ACCOUNT_TYPE_REQUIRED",
+  "CANADA_POST_ADDRESS_INVALID",
+  "CANADA_POST_AUTH_REJECTED",
+  "CANADA_POST_AUTH_UNAVAILABLE",
+  "CANADA_POST_CONTRACT_CONFIGURATION_REQUIRED",
+  "CANADA_POST_DOMESTIC_ONLY",
+  "CANADA_POST_PACKAGE_INVALID",
+  "CANADA_POST_SHIPMENT_REJECTED",
+  "LIVE_SHIPPING_DISABLED",
+]);
+
 function record(value: unknown): UnknownRecord {
   return value && typeof value === "object" ? (value as UnknownRecord) : {};
 }
@@ -297,7 +309,7 @@ export async function POST(
     if (
       shipmentId &&
       error instanceof CommerceError &&
-      error.code === "CANADA_POST_SHIPMENT_REJECTED"
+      safeCanadaPostFailureCodes.has(error.code)
     ) {
       await getSupabaseAdmin().rpc("commerce_fail_canada_post_shipment", {
         p_shipment_id: shipmentId,

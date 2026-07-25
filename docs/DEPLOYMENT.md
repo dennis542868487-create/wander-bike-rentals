@@ -91,12 +91,12 @@ the demo catalog, cart, Stripe test mode, and the Canada Post Test app are
 connected on this host. Transactional email remains fail-closed until Resend is
 configured.
 
-After the final documentation-only commit is deployed, use the last validated
-CLI Preview as the rollback candidate:
+After the final acceptance commit is deployed, use the last validated CLI
+Preview as the rollback candidate:
 
 ```text
-dpl_6b3kEp8Nodw7Ciao9jkdk9FMEYuv
-https://wander-bike-rentals-nabzclby5-zyz18922182165-4022s-projects.vercel.app
+dpl_6qDyhMdGEvtDzHLEg7kMAGKbmd9h
+https://wander-bike-rentals-5n72ogkwl-zyz18922182165-4022s-projects.vercel.app
 ```
 
 ## 4. Stripe test webhook

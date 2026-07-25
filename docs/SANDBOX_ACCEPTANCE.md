@@ -1,11 +1,10 @@
 # Wander Bike sandbox acceptance record
 
 This checklist is the evidence record for the commerce upgrade. A checked local
-item proves only what the named command or inspection covers. Provider and
-end-to-end items remain unchecked until they are exercised against Stripe test
-mode, Canada Post sandbox, Resend, and the deployed Vercel application. Hosted
-Supabase, protected-Preview, and browser smoke evidence is recorded separately
-below.
+item proves only what the named command or inspection covers. Hosted Supabase,
+protected-Preview, Stripe test, Canada Post Test-app, and browser evidence is
+recorded separately below. Resend and the final manual Apple authorization
+remain intentionally incomplete.
 
 Live Stripe keys and the Canada Post production host are explicitly outside this
 acceptance run.
@@ -13,7 +12,7 @@ acceptance run.
 ## Automated local evidence
 
 - [x] `npm run lint`
-- [x] `npm run test:unit` — 53 tests across pricing, fulfillment, validation,
+- [x] `npm run test:unit` — 54 tests across pricing, fulfillment, validation,
       Canada Post request/response handling, and Stripe reconciliation
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
@@ -39,8 +38,11 @@ acceptance run.
 - [x] The Supabase public Auth settings endpoint reports Google, Apple, and email
       enabled after both OAuth callbacks and provider credentials were
       configured.
-- [ ] Repeat the protected-Preview browser smoke after the provider/environment
-      deployment and complete real Google and Apple sign-ins.
+- [x] Repeat the protected-Preview browser smoke after the provider/environment
+      deployment and complete a real Google sign-in.
+- [ ] Complete the final Apple password or Passkey authorization step. The
+      hosted flow already reaches Apple's page with the expected Services ID
+      and Supabase callback.
 
 ## Existing rental site and SEO
 
@@ -50,9 +52,10 @@ acceptance run.
 - [x] Rental and commerce mutations reject cross-origin requests before auth.
 - [x] The sitemap includes permanent commerce and repair pages while excluding
       sandbox product URLs.
-- [ ] Create, update, and cancel a rental booking against the new Supabase
+- [x] Create, update, and cancel a rental booking against the new Supabase
       project as a customer.
-- [ ] Confirm the legacy staff rental calendar against the new hosted database.
+- [x] Confirm and edit the same booking in the legacy staff rental calendar
+      against the new hosted database.
 - [ ] Crawl the deployed canonical domain and compare its important status codes,
       canonicals, robots directives, and sitemap with the pre-deploy site.
 
@@ -75,7 +78,7 @@ acceptance run.
       only one reservation succeeds.
 - [ ] Verify abandoned, expired, cancelled, and failed test checkouts release
       inventory.
-- [ ] Verify successful payment converts the reservation exactly once.
+- [x] Verify successful payment converts the reservation exactly once.
 
 ## Stripe test mode
 
@@ -91,11 +94,13 @@ acceptance run.
       tracked inventory reservation is missing.
 - [x] Create the deployed test webhook for all required events and save its
       signing secret in the protected Vercel Preview branch.
-- [ ] Complete a successful test payment and confirm order/payment/inventory.
+- [x] Complete a successful test payment and confirm order/payment/inventory.
 - [ ] Complete cancellation, expiry, and asynchronous failure tests.
-- [ ] Replay the same verified webhook and prove no duplicate order, payment, or
+- [x] Replay the same verified webhook and prove no duplicate order, payment, or
       stock movement.
-- [ ] Complete partial and full test refunds, including optional restock.
+- [x] Complete a full test refund with inspected-item restock and confirm
+      `refund.created` and `refund.updated` webhook reconciliation.
+- [ ] Complete a separate partial test refund.
 
 ## Fulfillment and Canada Post sandbox
 
@@ -124,11 +129,14 @@ acceptance run.
       Canada Post API.
 - [x] Create a direct Test-app shipment and receive a sandbox shipment ID,
       tracking PIN, label, price, and resource links without billing.
-- [ ] Obtain and save a selected Canada Post quote through the hosted checkout.
-- [ ] Create one accessory label and one separate large-item/bicycle label.
+- [x] Obtain and save a selected Canada Post quote through the hosted checkout.
+- [x] Create an accessory label through the merchant console.
+- [ ] Create a separate large-item/bicycle label.
 - [ ] Download and print the private PDF through the staff-only endpoint.
-- [ ] Verify saved service, cost, shipment reference, and all tracking numbers.
-- [ ] Exercise the account-appropriate void or refund path.
+- [x] Verify the private bucket contains a 55,371-byte `application/pdf` label
+      and saved service, cost, shipment reference, and tracking number.
+- [x] Exercise the account-appropriate sandbox void path and confirm its audit
+      event.
 - [ ] Confirm pickup/local-delivery fallback when the sandbox returns no rate.
 
 ## Merchant console and customer access
@@ -150,13 +158,17 @@ acceptance run.
 - [x] Data API column grants keep product cost, internal order notes, guest-token
       hashes, Stripe references, and provider artifact links out of customer
       queries.
-- [ ] Create the first hosted admin and confirm an ordinary customer receives
-      `403` from every merchant mutation tested.
+- [x] Create the first hosted admin, complete Google login, and verify the
+      merchant order, refund, return, label, inventory, and rental-calendar
+      workflows.
+- [ ] Confirm an ordinary customer receives `403` from every merchant mutation
+      tested.
 - [ ] Complete common merchant workflows at desktop, tablet, and mobile widths.
 - [ ] Confirm one customer cannot read another customer's booking or order.
 - [ ] Confirm guest access works only with the matching order cookie.
-- [ ] Complete Google and Apple provider logins on the deployed domain and
-      confirm profile creation, callback routing, sign-out, and repeat sign-in.
+- [x] Complete Google provider login on the deployed domain and confirm profile
+      creation, callback routing, and merchant authorization.
+- [ ] Complete Apple authorization, sign-out, and repeat-sign-in checks.
 
 ## Notifications
 
@@ -188,11 +200,13 @@ acceptance run.
       the terminal deployment result.
 - [x] Run hosted page, API-origin, auth-state, security-header, cart, checkout
       gate, and RLS/grant smoke checks.
-- [ ] Run Stripe, Canada Post, email, complete OAuth, admin, and full hosted
-      end-to-end acceptance checks after their external configuration is ready.
+- [x] Run Stripe payment/refund, Canada Post quote/label/void, Google OAuth,
+      admin, return, inventory, and rental hosted end-to-end acceptance checks.
+- [ ] Run Resend delivery and final Apple authorization checks after their
+      remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_6b3kEp8Nodw7Ciao9jkdk9FMEYuv`) as the rollback
-      candidate for the final documentation-only deployment.
+      CLI Preview (`dpl_6qDyhMdGEvtDzHLEg7kMAGKbmd9h`) as the rollback
+      candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs
 
@@ -202,3 +216,18 @@ acceptance run.
 - Approved tax rules and customer-facing policies
 - Actual sellable-product weights, parcel dimensions, and fulfillment
   eligibility
+- A Supabase Pro plan before enabling leaked-password protection for
+  password-based accounts. The security advisor is otherwise clear;
+  unused-index notices are expected on this new sandbox project.
+
+## Hosted transaction evidence
+
+- Test order `WB-260725-001000` captured and then refunded CAD 124.70.
+- Replaying the signed `checkout.session.completed` event left one order, one
+  payment, one sale ledger entry, and one integration-event row.
+- The completed return restored the test helmet inventory from 4 to 5 with zero
+  reserved units.
+- Canada Post quote `DOM.RP` was saved, one sandbox label was stored privately,
+  and the unused label was voided.
+- Rental booking creation, customer edit, admin confirmation, and customer
+  cancellation all completed against the hosted `ca-central-1` project.

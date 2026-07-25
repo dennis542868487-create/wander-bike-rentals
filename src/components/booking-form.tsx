@@ -39,7 +39,8 @@ export default function BookingForm() {
     setStatus("sending");
     setMessage("");
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const date = String(form.get("date"));
     const pickupTime = String(form.get("pickup_time"));
     const returnTime = String(form.get("return_time"));
@@ -70,7 +71,7 @@ export default function BookingForm() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || "Could not send your request.");
 
-      event.currentTarget.reset();
+      formElement.reset();
       setQuantities({ adult_bikes: 1, kids_bikes: 0, trailers: 0 });
       setStatus("success");
       setMessage("Thanks! Your booking request has been received. We’ll contact you to confirm availability.");

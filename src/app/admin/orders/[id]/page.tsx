@@ -350,6 +350,9 @@ export default async function AdminOrderPage({
         <aside>
           <div className="space-y-5">
             <OrderActions
+              key={`${orderId}:${text(order.payment_status)}:${text(
+                order.fulfillment_status,
+              )}:${number(order.refunded_total_cents)}`}
               role={staff.role}
               items={items}
               order={{

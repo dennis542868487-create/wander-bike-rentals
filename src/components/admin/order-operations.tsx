@@ -23,9 +23,36 @@ async function jsonRequest(url: string, init: RequestInit) {
     code?: string;
     shipment?: Record<string, unknown>;
   };
-  if (!response.ok) throw new Error(body.error ?? "The operation failed.");
+  if (!response.ok) {
+    throw new JsonRequestError(
+      body.error ?? "The operation failed.",
+      body.code ?? "",
+    );
+  }
   return body;
 }
+
+class JsonRequestError extends Error {
+  constructor(
+    message: string,
+    readonly code: string,
+  ) {
+    super(message);
+    this.name = "JsonRequestError";
+  }
+}
+
+const safelyRetryableLabelCodes = new Set([
+  "CANADA_POST_ACCOUNT_TYPE_REQUIRED",
+  "CANADA_POST_ADDRESS_INVALID",
+  "CANADA_POST_AUTH_REJECTED",
+  "CANADA_POST_AUTH_UNAVAILABLE",
+  "CANADA_POST_CONTRACT_CONFIGURATION_REQUIRED",
+  "CANADA_POST_DOMESTIC_ONLY",
+  "CANADA_POST_PACKAGE_INVALID",
+  "CANADA_POST_SHIPMENT_REJECTED",
+  "LIVE_SHIPPING_DISABLED",
+]);
 
 function Message({ value, error }: { value: string; error?: boolean }) {
   if (!value) return null;
@@ -136,6 +163,18 @@ export function CanadaPostLabelAction({
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Label creation failed.");
+      if (
+        caught instanceof JsonRequestError &&
+        safelyRetryableLabelCodes.has(caught.code)
+      ) {
+        setPackages((current) =>
+          current.map((parcel) => ({
+            ...parcel,
+            idempotencyKey: crypto.randomUUID(),
+          })),
+        );
+      }
+      router.refresh();
     } finally {
       setBusy("");
     }

@@ -52,6 +52,11 @@ type LocalDeliveryQuote = {
   reason: string | null;
 };
 
+type ShippingFallback = {
+  requestKey: string;
+  reason: string;
+};
+
 type ContactState = {
   email: string;
   firstName: string;
@@ -171,6 +176,8 @@ export function CheckoutForm({
   const [rateRequestKey, setRateRequestKey] = useState("");
   const [selectedRateId, setSelectedRateId] = useState("");
   const [rateLoading, setRateLoading] = useState(false);
+  const [shippingFallback, setShippingFallback] =
+    useState<ShippingFallback | null>(null);
   const [localDeliveryQuote, setLocalDeliveryQuote] =
     useState<LocalDeliveryQuote | null>(null);
   const [localDeliveryRequestKey, setLocalDeliveryRequestKey] = useState("");
@@ -199,6 +206,8 @@ export function CheckoutForm({
   const activeSelectedRate = activeRates.find(
     (rate) => rate.id === selectedRateId,
   );
+  const activeShippingFallback =
+    shippingFallback?.requestKey === currentRateKey ? shippingFallback : null;
   const productFulfillment = getCartFulfillmentAvailability(lines);
   const pickupUnavailable =
     !checkoutSettings.pickupEnabled || !productFulfillment.pickup.available;
@@ -234,6 +243,7 @@ export function CheckoutForm({
 
   async function requestRates() {
     setError("");
+    setShippingFallback(null);
     const requestBody = {
       postalCode: address.postalCode,
       province: address.province,
@@ -254,11 +264,17 @@ export function CheckoutForm({
         body: JSON.stringify(parsed.data),
       });
       const data = (await response.json()) as {
+        code?: string;
         error?: string;
         rates?: ShippingRate[];
       };
       if (!response.ok || !data.rates) {
         throw new Error(data.error ?? "Shipping rates are unavailable.");
+      }
+      if (data.rates.length === 0) {
+        throw new Error(
+          "Canada Post did not return a service for this package and postal code.",
+        );
       }
 
       setRates(data.rates);
@@ -267,11 +283,14 @@ export function CheckoutForm({
     } catch (rateError) {
       setRates([]);
       setSelectedRateId("");
-      setError(
-        rateError instanceof Error
-          ? rateError.message
-          : "Shipping rates are unavailable.",
-      );
+      setRateRequestKey(requestedKey);
+      setShippingFallback({
+        requestKey: requestedKey,
+        reason:
+          rateError instanceof Error
+            ? rateError.message
+            : "Shipping rates are unavailable.",
+      });
     } finally {
       setRateLoading(false);
     }
@@ -769,6 +788,54 @@ export function CheckoutForm({
                         ))}
                       </div>
                     </fieldset>
+                  ) : null}
+
+                  {activeShippingFallback ? (
+                    <div
+                      role="alert"
+                      className="mt-5 border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
+                    >
+                      <p className="font-bold">
+                        Canada Post could not return a safe rate.
+                      </p>
+                      <p className="mt-2 leading-6">
+                        {activeShippingFallback.reason} No Canada Post charge has
+                        been added. Choose another available fulfillment method
+                        or contact Wander Bike for a manual shipping quote.
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {!pickupUnavailable ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFulfillmentMethod("pickup");
+                              setError("");
+                            }}
+                            className="rounded-full bg-slate-950 px-4 py-2 text-xs font-bold text-white"
+                          >
+                            Switch to free pickup
+                          </button>
+                        ) : null}
+                        {!localDeliveryUnavailable ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFulfillmentMethod("local_delivery");
+                              setError("");
+                            }}
+                            className="rounded-full border border-amber-500 bg-white px-4 py-2 text-xs font-bold text-amber-950"
+                          >
+                            Check local delivery
+                          </button>
+                        ) : null}
+                        <Link
+                          href="/location"
+                          className="rounded-full border border-amber-500 bg-white px-4 py-2 text-xs font-bold text-amber-950"
+                        >
+                          Contact Wander Bike
+                        </Link>
+                      </div>
+                    </div>
                   ) : null}
                 </>
               ) : (

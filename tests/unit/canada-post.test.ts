@@ -221,6 +221,29 @@ describe("Canada Post test-app client", () => {
     });
   });
 
+  it("fails closed when Canada Post returns no usable service", async () => {
+    fetchMock
+      .mockResolvedValueOnce(tokenResponse())
+      .mockResolvedValueOnce(jsonResponse([]));
+
+    await expect(
+      getCanadaPostRates({
+        originPostalCode: "V7E 3M1",
+        destinationPostalCode: "V6B 1A1",
+        package: {
+          weightKg: 1.25,
+          lengthCm: 30,
+          widthCm: 20,
+          heightCm: 10,
+          packagingAllowanceGrams: 250,
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: "CANADA_POST_NO_RATES",
+      status: 422,
+    });
+  });
+
   it("reuses an unexpired OAuth token across sequential requests", async () => {
     fetchMock
       .mockResolvedValueOnce(tokenResponse())

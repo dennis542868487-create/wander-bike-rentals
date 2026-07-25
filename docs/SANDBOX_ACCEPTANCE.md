@@ -12,9 +12,10 @@ acceptance run.
 ## Automated local evidence
 
 - [x] `npm run lint`
-- [x] `npm run test:unit` — 57 tests across pricing, fulfillment, validation,
-      Canada Post request/response handling, Stripe reconciliation, and signed
-      Stripe webhook routing
+- [x] `npm run test:unit` — 81 tests across pricing, fulfillment, validation,
+      Canada Post request/response handling, Stripe reconciliation, signed
+      Stripe webhook routing, notification templates/outbox, and commerce Cron
+      authorization
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
 - [x] `npm run test:e2e` — desktop Chrome, iPad, and Pixel 7 viewports
@@ -205,9 +206,18 @@ acceptance run.
       delivery, refunds, and return updates.
 - [x] Notification payloads are escaped before HTML rendering.
 - [x] Merchant copies and manual resend actions are supported.
+- [x] Render all 13 notification templates in HTML and plain text, reject an
+      unknown template, restrict tracking links to HTTPS, preserve a stable
+      provider idempotency key, and return simulated provider failures to the
+      durable queue.
 - [ ] Configure Resend, a verified sender, and the merchant inbox.
 - [ ] Deliver every template to test recipients and verify retry behavior.
-- [ ] Verify the Vercel Cron authorization and one scheduled invocation.
+- [x] Verify missing and incorrect Cron bearer credentials are rejected before
+      Stripe, database, or notification side effects; verify the authorized
+      maintenance path invokes all three services.
+- [ ] Observe one automatic Vercel Cron invocation after a Production
+      deployment is explicitly approved. [Vercel does not schedule Cron Jobs
+      for Preview deployments](https://vercel.com/docs/cron-jobs/quickstart).
 
 ## Deployment and rollback
 
@@ -233,7 +243,7 @@ acceptance run.
 - [ ] Run Resend delivery and final Apple authorization checks after their
       remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_ioHqggt1yCGg3TKkXNXSnHayE19s`) as the rollback
+      CLI Preview (`dpl_EnuSD478A3yJbA6v3xVLYnQfDBbk`) as the rollback
       candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs

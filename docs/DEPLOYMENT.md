@@ -95,8 +95,8 @@ After the final acceptance commit is deployed, use the last validated CLI
 Preview as the rollback candidate:
 
 ```text
-dpl_ioHqggt1yCGg3TKkXNXSnHayE19s
-https://wander-bike-rentals-6qybg97q0-zyz18922182165-4022s-projects.vercel.app
+dpl_EnuSD478A3yJbA6v3xVLYnQfDBbk
+https://wander-bike-rentals-h24lq3dik-zyz18922182165-4022s-projects.vercel.app
 ```
 
 ## 4. Stripe test webhook

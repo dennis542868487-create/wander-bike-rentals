@@ -44,7 +44,9 @@ export function AdminShell({
               type="button"
               aria-controls="admin-sidebar"
               aria-expanded={menuOpen}
+              aria-hidden={menuOpen}
               aria-label={menuOpen ? "Close admin navigation" : "Open admin navigation"}
+              tabIndex={menuOpen ? -1 : 0}
               onClick={() => setMenuOpen((current) => !current)}
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 lg:hidden"
             >
@@ -115,6 +117,17 @@ export function AdminShell({
             menuOpen ? "visible translate-x-0" : "invisible -translate-x-full"
           }`}
         >
+          <div className="absolute inset-x-0 top-0 flex h-16 items-center justify-between border-b border-slate-200 px-3 lg:hidden">
+            <span className="text-sm font-bold text-slate-900">Navigation</span>
+            <button
+              type="button"
+              aria-label="Close admin navigation"
+              onClick={() => setMenuOpen(false)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2"
+            >
+              <X aria-hidden="true" className="h-5 w-5" />
+            </button>
+          </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
             <AdminNav onNavigate={() => setMenuOpen(false)} />
           </div>

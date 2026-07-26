@@ -28,14 +28,11 @@ export default async function AdminSettingsPage() {
 
   return (
     <div>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
-          Store operations
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+      <div className="border-b border-slate-200 pb-5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
           Settings
         </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+        <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-500">
           These settings control checkout, pickup, delivery, carrier pricing,
           taxes, notifications, and customer policies. Secret credentials stay
           in the deployment environment and are never shown here.

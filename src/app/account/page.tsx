@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { CalendarDays, PackageCheck } from "lucide-react";
+import { redirect } from "next/navigation";
 import { AccountSignOut } from "@/components/account-sign-out";
-import { getCurrentUser } from "@/lib/supabase/auth";
+import { getCurrentStaff, getCurrentUser } from "@/lib/supabase/auth";
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
+  if (user) {
+    const staff = await getCurrentStaff();
+    if (staff) redirect("/admin");
+  }
 
   return (
     <main className="min-h-[70vh] bg-[radial-gradient(circle_at_8%_5%,rgba(20,184,166,.18),transparent_34%),#f0fdf9] px-6 py-12 sm:py-16">

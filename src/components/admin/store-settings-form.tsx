@@ -4,10 +4,11 @@ import {
   AlertCircle,
   CheckCircle2,
   LoaderCircle,
+  RotateCcw,
   Save,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   canadianProvinceCodes,
   type CanadianProvinceCode,
@@ -51,16 +52,21 @@ const dayNames: Record<StoreDayKey, string> = {
 };
 
 function Section({
+  id,
   title,
   description,
   children,
 }: {
+  id: string;
   title: string;
   description: string;
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section
+      id={id}
+      className="scroll-mt-32 rounded-xl border border-slate-200 bg-white p-5 sm:p-6"
+    >
       <h2 className="text-lg font-bold text-slate-950">{title}</h2>
       <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>
       <div className="mt-5">{children}</div>
@@ -139,9 +145,15 @@ export function StoreSettingsForm({
   const router = useRouter();
   const [settings, setSettings] =
     useState<CommerceStoreSettings>(initialSettings);
+  const [savedSettings, setSavedSettings] =
+    useState<CommerceStoreSettings>(initialSettings);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const isDirty = useMemo(
+    () => JSON.stringify(settings) !== JSON.stringify(savedSettings),
+    [savedSettings, settings],
+  );
 
   function toggleSalesProvince(province: CanadianProvinceCode) {
     setSettings((current) => {
@@ -200,6 +212,7 @@ export function StoreSettingsForm({
       if (!response.ok) {
         throw new Error(data.error ?? "Settings could not be saved.");
       }
+      setSavedSettings(settings);
       setMessage("Store settings saved and recorded in the audit log.");
       router.refresh();
     } catch (caught) {
@@ -212,8 +225,31 @@ export function StoreSettingsForm({
   }
 
   return (
-    <div className="mt-7 grid gap-6">
-      <section className="grid gap-3 rounded-2xl bg-slate-950 p-5 text-white sm:grid-cols-2 xl:grid-cols-4">
+    <div className="mt-5 grid gap-5">
+      <nav
+        aria-label="Settings sections"
+        className="sticky top-[4.75rem] z-20 -mx-1 flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white/95 p-1.5 shadow-sm backdrop-blur"
+      >
+        {[
+          ["profile", "Profile"],
+          ["hours", "Hours"],
+          ["fulfillment", "Fulfillment"],
+          ["delivery", "Delivery"],
+          ["origin", "Shipping origin"],
+          ["taxes", "Taxes"],
+          ["notifications", "Notifications"],
+        ].map(([href, label]) => (
+          <a
+            key={href}
+            href={`#${href}`}
+            className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
+
+      <section className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
         <Status
           ok={environmentStatus.sandboxMode}
           label={
@@ -258,6 +294,7 @@ export function StoreSettingsForm({
       ) : null}
 
       <Section
+        id="profile"
         title="Store profile"
         description="Customer-facing identity, contact details, and main store address."
       >
@@ -388,6 +425,7 @@ export function StoreSettingsForm({
       </Section>
 
       <Section
+        id="hours"
         title="Business hours"
         description="Weekly hours use the America/Vancouver time zone."
       >
@@ -482,6 +520,7 @@ export function StoreSettingsForm({
       </Section>
 
       <Section
+        id="fulfillment"
         title="Checkout and fulfillment"
         description="Database switches are combined with deployment safety gates. Enabling a switch here never bypasses sandbox credentials."
       >
@@ -589,6 +628,7 @@ export function StoreSettingsForm({
       </Section>
 
       <Section
+        id="delivery"
         title="Local delivery and shipping prices"
         description="Local delivery is matched by the first three characters of a Canadian postal code. Shipping promotions are recalculated on the server."
       >
@@ -707,6 +747,7 @@ export function StoreSettingsForm({
       </Section>
 
       <Section
+        id="origin"
         title="Shipping origin"
         description="Used for Canada Post rates and label sender details. It can differ from the public pickup address."
       >
@@ -777,6 +818,7 @@ export function StoreSettingsForm({
       </Section>
 
       <Section
+        id="taxes"
         title="Manual tax rules"
         description="Tax is disabled until the merchant confirms registration and rates. Configure each applicable province; the server calculates and stores the final tax."
       >
@@ -801,110 +843,123 @@ export function StoreSettingsForm({
             className="h-5 w-5 accent-teal-700"
           />
         </label>
-        <div className="mt-4">
-          <Field label="Tax registration number">
-            <input
-              value={settings.tax.registrationNumber}
-              onChange={(event) =>
-                setSettings((current) => ({
-                  ...current,
-                  tax: {
-                    ...current.tax,
-                    registrationNumber: event.target.value,
-                  },
-                }))
-              }
-              className="booking-input"
-            />
-          </Field>
-        </div>
-        <div className="mt-5 overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="text-xs uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="pb-3">Use</th>
-                <th className="pb-3">Province</th>
-                <th className="pb-3">Label</th>
-                <th className="pb-3">Combined rate</th>
-                <th className="pb-3">Tax shipping</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {canadianProvinceCodes.map((province) => {
-                const rate = settings.tax.rates.find(
-                  (candidate) => candidate.province === province,
-                );
-                return (
-                  <tr key={province}>
-                    <td className="py-3">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(rate)}
-                        onChange={(event) =>
-                          updateTaxRate(
-                            province,
-                            event.target.checked ? {} : null,
-                          )
-                        }
-                        className="accent-teal-700"
-                      />
-                    </td>
-                    <td className="py-3 font-semibold">{province}</td>
-                    <td className="py-3 pr-3">
-                      <input
-                        disabled={!rate}
-                        value={rate?.label ?? ""}
-                        onChange={(event) =>
-                          updateTaxRate(province, { label: event.target.value })
-                        }
-                        className="booking-input disabled:bg-slate-100"
-                      />
-                    </td>
-                    <td className="py-3 pr-3">
-                      <div className="relative">
-                        <input
-                          disabled={!rate}
-                          type="number"
-                          min="0"
-                          max="50"
-                          step="0.01"
-                          value={rate ? (rate.rateBps / 100).toFixed(2) : ""}
-                          onChange={(event) =>
-                            updateTaxRate(province, {
-                              rateBps: Math.round(
-                                Math.max(0, Number(event.target.value) || 0) * 100,
-                              ),
-                            })
-                          }
-                          className="booking-input pr-8 disabled:bg-slate-100"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                          %
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3">
-                      <input
-                        disabled={!rate}
-                        type="checkbox"
-                        checked={rate?.appliesToShipping ?? false}
-                        onChange={(event) =>
-                          updateTaxRate(province, {
-                            appliesToShipping: event.target.checked,
-                          })
-                        }
-                        className="accent-teal-700 disabled:opacity-40"
-                      />
-                    </td>
+        {settings.tax.enabled ? (
+          <>
+            <div className="mt-4">
+              <Field label="Tax registration number">
+                <input
+                  value={settings.tax.registrationNumber}
+                  onChange={(event) =>
+                    setSettings((current) => ({
+                      ...current,
+                      tax: {
+                        ...current.tax,
+                        registrationNumber: event.target.value,
+                      },
+                    }))
+                  }
+                  className="booking-input"
+                />
+              </Field>
+            </div>
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead className="text-xs uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="pb-3">Use</th>
+                    <th className="pb-3">Province</th>
+                    <th className="pb-3">Label</th>
+                    <th className="pb-3">Combined rate</th>
+                    <th className="pb-3">Tax shipping</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {canadianProvinceCodes.map((province) => {
+                    const rate = settings.tax.rates.find(
+                      (candidate) => candidate.province === province,
+                    );
+                    return (
+                      <tr key={province}>
+                        <td className="py-3">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(rate)}
+                            onChange={(event) =>
+                              updateTaxRate(
+                                province,
+                                event.target.checked ? {} : null,
+                              )
+                            }
+                            className="accent-teal-700"
+                          />
+                        </td>
+                        <td className="py-3 font-semibold">{province}</td>
+                        <td className="py-3 pr-3">
+                          <input
+                            disabled={!rate}
+                            value={rate?.label ?? ""}
+                            onChange={(event) =>
+                              updateTaxRate(province, {
+                                label: event.target.value,
+                              })
+                            }
+                            className="booking-input disabled:bg-slate-100"
+                          />
+                        </td>
+                        <td className="py-3 pr-3">
+                          <div className="relative">
+                            <input
+                              disabled={!rate}
+                              type="number"
+                              min="0"
+                              max="50"
+                              step="0.01"
+                              value={rate ? (rate.rateBps / 100).toFixed(2) : ""}
+                              onChange={(event) =>
+                                updateTaxRate(province, {
+                                  rateBps: Math.round(
+                                    Math.max(0, Number(event.target.value) || 0) *
+                                      100,
+                                  ),
+                                })
+                              }
+                              className="booking-input pr-8 disabled:bg-slate-100"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                              %
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3">
+                          <input
+                            disabled={!rate}
+                            type="checkbox"
+                            checked={rate?.appliesToShipping ?? false}
+                            onChange={(event) =>
+                              updateTaxRate(province, {
+                                appliesToShipping: event.target.checked,
+                              })
+                            }
+                            className="accent-teal-700 disabled:opacity-40"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <p className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
+            Manual tax is off. Province rates stay hidden until this setting is
+            enabled.
+          </p>
+        )}
       </Section>
 
       <Section
+        id="notifications"
         title="Notifications and policies"
         description="The notification inbox receives order copies and customer replies. Policies are stored for customer-facing checkout and order communications."
       >
@@ -966,21 +1021,39 @@ export function StoreSettingsForm({
         </div>
       ) : null}
 
-      <div className="sticky bottom-4 flex justify-end rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-xl backdrop-blur">
-        <button
-          type="button"
-          disabled={!canEdit || saving}
-          onClick={save}
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {saving ? (
-            <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save aria-hidden="true" className="h-4 w-4" />
-          )}
-          {saving ? "Saving settings" : "Save settings"}
-        </button>
-      </div>
+      {isDirty ? (
+        <div className="sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-300 bg-slate-950 px-4 py-3 text-white shadow-xl">
+          <p className="text-sm font-semibold">Unsaved settings changes</p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => {
+                setSettings(savedSettings);
+                setError("");
+                setMessage("");
+              }}
+              className="inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+            >
+              <RotateCcw aria-hidden="true" className="h-4 w-4" />
+              Discard
+            </button>
+            <button
+              type="button"
+              disabled={!canEdit || saving}
+              onClick={save}
+              className="inline-flex h-10 min-w-36 items-center justify-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {saving ? (
+                <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save aria-hidden="true" className="h-4 w-4" />
+              )}
+              {saving ? "Saving settings" : "Save settings"}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

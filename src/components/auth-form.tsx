@@ -10,7 +10,7 @@ import { SocialAuthButtons } from "@/components/social-auth-buttons";
 import type { SocialAuthProvider } from "@/lib/supabase/oauth-providers";
 
 function safeNext(value: string | null) {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/account/bookings";
+  return value?.startsWith("/") && !value.startsWith("//") ? value : "/account";
 }
 
 export default function AuthForm() {

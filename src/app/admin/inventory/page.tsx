@@ -34,19 +34,16 @@ export default async function AdminInventoryPage({
 
   return (
     <div>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
-          Stock control
-        </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+      <div className="border-b border-slate-200 pb-5">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
           Inventory
         </h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-1.5 text-sm text-slate-500">
           On-hand changes are atomic and recorded in the immutable inventory ledger.
         </p>
       </div>
 
-      <form className="mt-7 flex gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <form className="mt-5 flex gap-3 rounded-xl border border-slate-200 bg-white p-3">
         <label className="relative flex-1">
           <span className="sr-only">Search inventory</span>
           <Search
@@ -65,7 +62,7 @@ export default async function AdminInventoryPage({
         </button>
       </form>
 
-      <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <section className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1050px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
@@ -136,7 +133,7 @@ export default async function AdminInventoryPage({
         </div>
       </section>
 
-      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <section className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-4">
           <h2 className="font-semibold text-slate-950">
             Recent inventory movements

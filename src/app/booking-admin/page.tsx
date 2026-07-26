@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import BookingAdmin from "@/components/booking-admin";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Booking Calendar",
@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function BookingAdminPage() {
-  return (
-    <div className="fixed inset-0 z-[2147483647] overflow-y-auto bg-slate-100">
-      <BookingAdmin />
-    </div>
-  );
+  redirect("/admin/rentals");
 }

@@ -10,6 +10,10 @@
 - `admin` is required for higher-risk catalog taxonomy and store-setting changes.
 - Every protected page and mutation is checked on the server; knowing an admin
   URL is not authorization.
+- The public `/auth` page is the single sign-in entry. With no explicit return
+  path, it sends the session to `/account`; that server route sends
+  `staff`/`admin` profiles to `/admin` and leaves customers in their account.
+  Client metadata and email addresses are never used to decide staff access.
 
 ## Supabase URL configuration
 
@@ -69,8 +73,9 @@ January 20, 2027. Rotate it before that date and retain the one-time-download
 `.p8` key securely outside the repository. Register the eventual Wander Bike
 sending domain with Apple's private email relay before sending transactional
 email to hidden Apple relay addresses. The real hosted flow reaches Apple's
-authorization page with the expected Services ID and callback; completing the
-password or Passkey prompt remains a manual acceptance step.
+authorization page with the expected Services ID and callback. The merchant
+confirmed a successful hosted Apple sign-in on July 25, 2026; a separate
+sign-out and repeat-sign-in check remains on the sandbox checklist.
 
 ## Create the first administrator
 
@@ -98,8 +103,9 @@ The first protected-Preview administrator is
 `zyz18922182165@gmail.com`. Its Google-created profile was promoted to `admin`
 and the consolidated merchant console was verified.
 
-The consolidated merchant console is `/admin`. The legacy rental calendar at
-`/booking-admin` remains role-protected for continuity.
+The consolidated merchant console is `/admin`, and its rental calendar is
+`/admin/rentals`. The old `/booking-admin` URL redirects to that protected
+admin route for continuity.
 
 ## Production email
 
@@ -108,3 +114,5 @@ Supabase Auth email and commerce transaction email are separate:
 - Configure custom SMTP in Supabase before relying on high-volume Auth email.
 - Configure Resend with `RESEND_API_KEY` and a verified `EMAIL_FROM` domain for
   order and fulfillment messages.
+- Follow `docs/RESEND_SETUP.md` for the Preview-first rollout. Resend does not
+  require a Supabase schema change.

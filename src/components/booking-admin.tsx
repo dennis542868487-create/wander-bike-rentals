@@ -1,12 +1,17 @@
 "use client";
 
+import Link from "next/link";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  RefreshCw,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import type { Booking, BookingStatus } from "@/lib/booking-types";
-import { useSocialAuth } from "@/hooks/use-social-auth";
-import { SocialAuthButtons } from "@/components/social-auth-buttons";
-import type { SocialAuthProvider } from "@/lib/supabase/oauth-providers";
 
 const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const statusStyles: Record<BookingStatus, string> = {
@@ -57,72 +62,6 @@ async function api(session: Session, url: string, init?: RequestInit) {
     throw error;
   }
   return result;
-}
-
-function Login({ onLogin }: { onLogin: (session: Session) => void }) {
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const socialAuth = useSocialAuth();
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
-    const form = new FormData(event.currentTarget);
-    try {
-      const { data, error: authError } = await getSupabaseBrowser().auth.signInWithPassword({
-        email: String(form.get("email")),
-        password: String(form.get("password")),
-      });
-      if (authError || !data.session) throw authError || new Error("Could not sign in.");
-      onLogin(data.session);
-    } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : "Could not sign in.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function socialLogin(provider: SocialAuthProvider) {
-    setLoading(true);
-    setError("");
-    const { error: authError } = await getSupabaseBrowser().auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/booking-admin` },
-    });
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,.22),transparent_38%),#020617] p-5">
-      <form onSubmit={submit} className="hero-anim w-full max-w-sm rounded-[1.8rem] border border-white/10 bg-white p-7 shadow-2xl">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-600 text-2xl text-white">🚲</div>
-        <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-950">Booking calendar</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-500">Private staff access for Wander Bike Rentals.</p>
-        <SocialAuthButtons
-          availability={socialAuth}
-          busy={loading}
-          onSelect={socialLogin}
-          className="mt-6"
-        />
-        <div className="my-5 flex items-center gap-3"><span className="h-px flex-1 bg-slate-200"/><span className="text-xs font-semibold uppercase tracking-wider text-slate-400">or email</span><span className="h-px flex-1 bg-slate-200"/></div>
-        <label className="block text-sm font-semibold text-slate-700">Email
-          <input name="email" type="email" autoComplete="email" required className="booking-input" />
-        </label>
-        <label className="mt-4 block text-sm font-semibold text-slate-700">Password
-          <input name="password" type="password" autoComplete="current-password" required className="booking-input" />
-        </label>
-        {error && <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
-        <button disabled={loading} className="mt-6 w-full rounded-full bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60">
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
-        <p className="mt-4 text-center text-xs leading-5 text-slate-500">Only accounts granted the staff role can open the calendar.</p>
-      </form>
-    </div>
-  );
 }
 
 function BookingEditor({ booking, session, onClose, onSaved }: {
@@ -198,12 +137,21 @@ export default function BookingAdmin() {
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [view, setView] = useState<"month" | "agenda">("month");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selected, setSelected] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [access, setAccess] = useState<"checking" | "granted" | "denied">("checking");
   const days = useMemo(() => monthGrid(month), [month]);
+  const agendaBookings = useMemo(
+    () =>
+      [...bookings].sort(
+        (left, right) =>
+          new Date(left.starts_at).getTime() - new Date(right.starts_at).getTime(),
+      ),
+    [bookings],
+  );
 
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | undefined;
@@ -246,9 +194,54 @@ export default function BookingAdmin() {
     return () => window.clearTimeout(timeout);
   }, [loadBookings]);
 
-  if (!authReady) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">Loading…</div>;
-  if (!session) return <Login onLogin={(nextSession) => { setAccess("checking"); setSession(nextSession); }} />;
-  if (access === "denied") return <div className="flex min-h-screen items-center justify-center bg-slate-950 p-5"><div className="w-full max-w-md rounded-[1.8rem] bg-white p-8 text-center shadow-2xl"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-2xl">🔒</div><h1 className="mt-5 text-2xl font-bold text-slate-950">Staff access required</h1><p className="mt-3 text-sm leading-6 text-slate-600">You are signed in as {session.user.email}, but this account has not been granted a staff role.</p><button onClick={async () => { await getSupabaseBrowser().auth.signOut(); setSession(null); setAccess("checking"); }} className="mt-6 rounded-full bg-slate-950 px-6 py-3 font-semibold text-white">Sign out</button></div></div>;
+  if (!authReady) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+        <RefreshCw
+          aria-hidden="true"
+          className="mx-auto h-5 w-5 animate-spin text-teal-700"
+        />
+        <p className="mt-3 text-sm font-medium text-slate-600">
+          Loading rental calendar…
+        </p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
+        <h1 className="text-xl font-bold text-slate-950">Your session has expired</h1>
+        <p className="mt-2 text-sm text-slate-600">
+          Sign in again to reopen the private rental calendar.
+        </p>
+        <Link
+          href="/auth?next=/admin/rentals"
+          className="mt-5 inline-flex h-10 items-center rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
+
+  if (access === "denied") {
+    return (
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-6">
+        <h1 className="text-xl font-bold text-slate-950">Staff access required</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          This session no longer has permission to load rental bookings.
+        </p>
+        <Link
+          href="/admin"
+          className="mt-5 inline-flex h-10 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700"
+        >
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          Back to admin
+        </Link>
+      </div>
+    );
+  }
 
   const byDay = new Map<string, Booking[]>();
   bookings.forEach((booking) => {
@@ -259,54 +252,255 @@ export default function BookingAdmin() {
   const changeMonth = (amount: number) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4">
-          <div><p className="font-bold text-slate-950">Wander Bike</p><p className="text-xs text-slate-500">Private booking calendar</p></div>
-          <button onClick={async () => { await getSupabaseBrowser().auth.signOut(); setSession(null); }} className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Sign out</button>
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-5">
+        <div>
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-800 transition hover:text-teal-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2"
+          >
+            <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+            Back to admin
+          </Link>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+            Rentals
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">Booking calendar</p>
         </div>
-      </header>
-      <main className="mx-auto max-w-[1500px] p-3 sm:p-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button onClick={() => changeMonth(-1)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">←</button>
-            <button onClick={() => setMonth(new Date(new Date().getFullYear(), new Date().getMonth(), 1))} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold shadow-sm">Today</button>
-            <button onClick={() => changeMonth(1)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">→</button>
-          </div>
-          <h1 className="text-xl font-bold sm:text-2xl">{new Intl.DateTimeFormat("en-CA", { month: "long", year: "numeric" }).format(month)}</h1>
-          <button onClick={() => void loadBookings()} className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white">{loading ? "Loading…" : "Refresh"}</button>
+        <div className="flex rounded-lg border border-slate-200 bg-white p-1">
+          {(["month", "agenda"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={view === option}
+              onClick={() => setView(option)}
+              className={`h-8 rounded-md px-3 text-sm font-semibold capitalize transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 ${
+                view === option
+                  ? "bg-teal-50 text-teal-900"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
         </div>
-        {error && <p className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
+      </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="min-w-[900px]">
-            <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
-              {weekdays.map((day) => <div key={day} className="p-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500">{day}</div>)}
-            </div>
-            <div className="grid grid-cols-7">
-              {days.map((date) => {
-                const items = byDay.get(dayKey(date)) ?? [];
-                const outside = date.getMonth() !== month.getMonth();
-                const today = dayKey(date) === dayKey(new Date());
-                return (
-                  <div key={date.toISOString()} className={`min-h-32 border-b border-r border-slate-200 p-2 ${outside ? "bg-slate-50/70" : "bg-white"}`}>
-                    <div className={`mb-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${today ? "bg-teal-700 text-white" : outside ? "text-slate-400" : "text-slate-700"}`}>{date.getDate()}</div>
-                    <div className="space-y-1.5">
-                      {items.map((booking) => (
-                        <button key={booking.id} onClick={() => setSelected(booking)} className={`block w-full rounded-lg border px-2 py-1.5 text-left text-xs leading-4 transition hover:-translate-y-0.5 hover:shadow-sm ${statusStyles[booking.status]}`}>
-                          <span className="block font-bold">{formatTime(booking.starts_at)} · {booking.customer_name}</span>
-                          <span className="block opacity-80">{booking.adult_bikes}A · {booking.kids_bikes}K · {booking.trailers}T</span>
-                        </button>
-                      ))}
-                    </div>
+      <div className="mt-5">
+        <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Previous month"
+              onClick={() => changeMonth(-1)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+            >
+              <ChevronLeft aria-hidden="true" className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setMonth(
+                  new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                )
+              }
+              className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              aria-label="Next month"
+              onClick={() => changeMonth(1)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+            >
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </button>
+          </div>
+          <h2 className="text-xl font-bold text-slate-950 sm:text-center sm:text-2xl">
+            {new Intl.DateTimeFormat("en-CA", {
+              month: "long",
+              year: "numeric",
+            }).format(month)}
+          </h2>
+          <button
+            type="button"
+            onClick={() => void loadBookings()}
+            disabled={loading}
+            className="inline-flex h-10 min-w-28 items-center justify-center gap-2 justify-self-start rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 disabled:cursor-wait disabled:opacity-70 sm:justify-self-end"
+          >
+            <RefreshCw
+              aria-hidden="true"
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </button>
+        </div>
+        {error ? (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"
+          >
+            {error}
+          </p>
+        ) : null}
+
+        {view === "month" ? (
+          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <div className="min-w-[880px]">
+              <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/80">
+                {weekdays.map((day) => (
+                  <div
+                    key={day}
+                    className="p-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500"
+                  >
+                    {day}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+              <div className="grid grid-cols-7">
+                {days.map((date) => {
+                  const items = byDay.get(dayKey(date)) ?? [];
+                  const outside = date.getMonth() !== month.getMonth();
+                  const today = dayKey(date) === dayKey(new Date());
+                  return (
+                    <div
+                      key={date.toISOString()}
+                      className={`min-h-32 border-b border-r border-slate-200 p-2 ${
+                        outside ? "bg-slate-50/70" : "bg-white"
+                      }`}
+                    >
+                      <div
+                        className={`mb-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                          today
+                            ? "bg-teal-700 text-white"
+                            : outside
+                              ? "text-slate-400"
+                              : "text-slate-700"
+                        }`}
+                      >
+                        {date.getDate()}
+                      </div>
+                      <div className="space-y-1.5">
+                        {items.map((booking) => (
+                          <button
+                            key={booking.id}
+                            type="button"
+                            onClick={() => setSelected(booking)}
+                            className={`block w-full rounded-md border px-2 py-1.5 text-left text-xs leading-4 transition hover:border-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 ${statusStyles[booking.status]}`}
+                          >
+                            <span className="block truncate font-bold">
+                              {formatTime(booking.starts_at)} ·{" "}
+                              {booking.customer_name}
+                            </span>
+                            <span className="block opacity-80">
+                              {booking.adult_bikes}A · {booking.kids_bikes}K ·{" "}
+                              {booking.trailers}T
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
+                {(Object.keys(statusStyles) as BookingStatus[]).map((status) => (
+                  <span key={status} className="inline-flex items-center gap-2 capitalize">
+                    <span
+                      aria-hidden="true"
+                      className={`h-2 w-2 rounded-full ${
+                        status === "pending"
+                          ? "bg-amber-500"
+                          : status === "confirmed"
+                            ? "bg-teal-600"
+                            : status === "completed"
+                              ? "bg-slate-500"
+                              : "bg-rose-500"
+                      }`}
+                    />
+                    {status}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </main>
-      {selected && <BookingEditor booking={selected} session={session} onClose={() => setSelected(null)} onSaved={(updated) => { setBookings((current) => current.map((item) => item.id === updated.id ? updated : item)); setSelected(null); }} />}
+        ) : (
+          <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-200 px-4 py-3">
+              <h3 className="font-semibold text-slate-950">Bookings in this view</h3>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {agendaBookings.length}{" "}
+                {agendaBookings.length === 1 ? "booking" : "bookings"}
+              </p>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {agendaBookings.map((booking) => (
+                <button
+                  key={booking.id}
+                  type="button"
+                  onClick={() => setSelected(booking)}
+                  className="grid w-full gap-3 px-4 py-4 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-600 sm:grid-cols-[11rem_1fr_auto] sm:items-center"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {new Intl.DateTimeFormat("en-CA", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }).format(new Date(booking.starts_at))}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {formatTime(booking.starts_at)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {booking.customer_name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {booking.adult_bikes} adult · {booking.kids_bikes} kids ·{" "}
+                      {booking.trailers} trailer
+                    </p>
+                  </div>
+                  <span
+                    className={`w-fit rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${statusStyles[booking.status]}`}
+                  >
+                    {booking.status}
+                  </span>
+                </button>
+              ))}
+              {agendaBookings.length === 0 ? (
+                <div className="px-5 py-14 text-center">
+                  <CalendarDays
+                    aria-hidden="true"
+                    className="mx-auto h-7 w-7 text-slate-400"
+                  />
+                  <p className="mt-3 text-sm font-semibold text-slate-700">
+                    No bookings in this calendar range
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Change month or refresh to check again.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </section>
+        )}
+      </div>
+      {selected ? (
+        <BookingEditor
+          booking={selected}
+          session={session}
+          onClose={() => setSelected(null)}
+          onSaved={(updated) => {
+            setBookings((current) =>
+              current.map((item) => (item.id === updated.id ? updated : item)),
+            );
+            setSelected(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

@@ -3,8 +3,7 @@
 This checklist is the evidence record for the commerce upgrade. A checked local
 item proves only what the named command or inspection covers. Hosted Supabase,
 protected-Preview, Stripe test, Canada Post Test-app, and browser evidence is
-recorded separately below. Resend and the final manual Apple authorization
-remain intentionally incomplete.
+recorded separately below. Resend remains intentionally incomplete.
 
 Live Stripe keys and the Canada Post production host are explicitly outside this
 acceptance run.
@@ -43,9 +42,8 @@ acceptance run.
       configured.
 - [x] Repeat the protected-Preview browser smoke after the provider/environment
       deployment and complete a real Google sign-in.
-- [ ] Complete the final Apple password or Passkey authorization step. The
-      hosted flow already reaches Apple's page with the expected Services ID
-      and Supabase callback.
+- [x] Complete the final Apple password or Passkey authorization step. The
+      merchant confirmed a successful hosted Apple sign-in on July 25, 2026.
 
 ## Existing rental site and SEO
 
@@ -211,7 +209,8 @@ acceptance run.
       and mismatched cookies both receive `404`.
 - [x] Complete Google provider login on the deployed domain and confirm profile
       creation, callback routing, and merchant authorization.
-- [ ] Complete Apple authorization, sign-out, and repeat-sign-in checks.
+- [x] Complete Apple authorization on the hosted Preview.
+- [ ] Complete a separate Apple sign-out and repeat-sign-in check.
 
 ## Notifications
 
@@ -257,8 +256,8 @@ acceptance run.
       gate, and RLS/grant smoke checks.
 - [x] Run Stripe payment/refund, Canada Post quote/label/void, Google OAuth,
       admin, return, inventory, and rental hosted end-to-end acceptance checks.
-- [ ] Run Resend delivery and final Apple authorization checks after their
-      remaining external inputs are ready.
+- [ ] Run Resend delivery and the remaining Apple repeat-sign-in check after
+      their external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
       CLI Preview (`dpl_2iAK5fzvUMi1ijEw1Qw6B6uAKnVA`) as the rollback
       candidate for the final acceptance deployment.
@@ -276,6 +275,9 @@ acceptance run.
 - A Supabase Pro plan before enabling leaked-password protection for
   password-based accounts. The security advisor is otherwise clear;
   unused-index notices are expected on this new sandbox project.
+- Final cleanup of the explicitly identified sandbox orders and rental
+  bookings after the admin UI regression run. Preview transaction rows must be
+  reviewed before deletion so no real customer record is included.
 
 ## Hosted transaction evidence
 

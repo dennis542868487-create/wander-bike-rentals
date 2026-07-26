@@ -28,15 +28,12 @@ export default async function AdminProductsPage({
 
   return (
     <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
-            Catalog
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
             Products
           </h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-1.5 text-sm text-slate-500">
             Manage products, variants, prices, shipping dimensions, and publishing.
           </p>
         </div>
@@ -60,7 +57,7 @@ export default async function AdminProductsPage({
         ) : null}
       </div>
 
-      <form className="mt-7 flex gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+      <form className="mt-5 flex gap-3 rounded-xl border border-slate-200 bg-white p-3">
         <label className="relative flex-1">
           <span className="sr-only">Search products</span>
           <Search
@@ -79,7 +76,7 @@ export default async function AdminProductsPage({
         </button>
       </form>
 
-      <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      <section className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[850px] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">

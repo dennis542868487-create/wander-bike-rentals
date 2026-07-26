@@ -5,6 +5,18 @@ export const metadata: Metadata = {
   title: "Bike Trailer Rental Guide",
   description:
     "A practical guide for families deciding whether a bike trailer is the right fit for their Richmond or Steveston ride.",
+  alternates: {
+    canonical: "/guides/bike-trailer-rental-richmond-guide",
+  },
+  openGraph: {
+    title: "Bike Trailer Rental Guide",
+    description:
+      "A practical guide for families deciding whether a bike trailer is the right fit for their Richmond or Steveston ride.",
+    url: "https://www.wanderbike.ca/guides/bike-trailer-rental-richmond-guide",
+    siteName: "Wander Bike Rentals",
+    locale: "en_CA",
+    type: "article",
+  },
 };
 
 const guidePoints = [

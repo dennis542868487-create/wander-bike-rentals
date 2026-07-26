@@ -6,6 +6,18 @@ export const metadata: Metadata = {
   title: "Best Places to Bike in Steveston",
   description:
     "A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.",
+  alternates: {
+    canonical: "/guides/best-places-to-bike-in-steveston",
+  },
+  openGraph: {
+    title: "Best Places to Bike in Steveston",
+    description:
+      "A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.",
+    url: "https://www.wanderbike.ca/guides/best-places-to-bike-in-steveston",
+    siteName: "Wander Bike Rentals",
+    locale: "en_CA",
+    type: "article",
+  },
 };
 
 const guidePoints = [

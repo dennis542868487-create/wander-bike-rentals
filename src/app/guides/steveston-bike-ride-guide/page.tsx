@@ -6,6 +6,18 @@ export const metadata: Metadata = {
   title: "Steveston Bike Ride Guide",
   description:
     "Plan an easy Steveston bike ride from Steveston Village to Garry Point Park, Fisherman’s Wharf, Britannia Shipyards, and the South Dyke Trail.",
+  alternates: {
+    canonical: "/guides/steveston-bike-ride-guide",
+  },
+  openGraph: {
+    title: "Steveston Bike Ride Guide",
+    description:
+      "Plan an easy Steveston bike ride from Steveston Village to Garry Point Park, Fisherman’s Wharf, Britannia Shipyards, and the South Dyke Trail.",
+    url: "https://www.wanderbike.ca/guides/steveston-bike-ride-guide",
+    siteName: "Wander Bike Rentals",
+    locale: "en_CA",
+    type: "article",
+  },
 };
 
 const guidePoints = [

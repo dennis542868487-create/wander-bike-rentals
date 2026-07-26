@@ -162,3 +162,27 @@ test("sitemap includes commerce but excludes sandbox products", async ({
   );
   expect(xml).not.toContain("test-family-ride-helmet");
 });
+
+test("guide pages publish self-referential canonical and Open Graph URLs", async ({
+  page,
+}) => {
+  const guideRoutes = [
+    "/guides/best-places-to-bike-in-steveston",
+    "/guides/bike-trailer-rental-richmond-guide",
+    "/guides/family-bike-rental-richmond",
+    "/guides/steveston-bike-ride-guide",
+  ];
+
+  for (const route of guideRoutes) {
+    await page.goto(route);
+    const expectedUrl = `https://www.wanderbike.ca${route}`;
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      expectedUrl,
+    );
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      "content",
+      expectedUrl,
+    );
+  }
+});

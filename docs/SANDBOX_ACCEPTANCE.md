@@ -18,7 +18,8 @@ acceptance run.
       authorization
 - [x] All migrations and `supabase/seed.sql` parse with `pgsql-parser`
 - [x] `npm run build` — Next.js production build and TypeScript validation
-- [x] `npm run test:e2e` — desktop Chrome, iPad, and Pixel 7 viewports
+- [x] `npm run test:e2e` — 21 checks across desktop Chrome, iPad, and Pixel 7
+      viewports, including self-referential canonical and Open Graph URLs
 - [x] `npm audit --omit=dev` — zero production dependency vulnerabilities
 - [x] Repository scan finds no supplied Stripe, Canada Post, Supabase, Resend, or
       webhook secrets in tracked changes
@@ -58,8 +59,12 @@ acceptance run.
       project as a customer.
 - [x] Confirm and edit the same booking in the legacy staff rental calendar
       against the new hosted database.
-- [ ] Crawl the deployed canonical domain and compare its important status codes,
-      canonicals, robots directives, and sitemap with the pre-deploy site.
+- [x] Crawl 15 important routes on the deployed canonical domain and protected
+      Preview: all return `200`. The Preview normalizes canonicals, robots host,
+      sitemap host, and Open Graph URLs to the final redirect target
+      `https://www.wanderbike.ca`; all four guide pages now self-canonicalize.
+      The sitemap preserves the 14 existing URLs and adds only `/shop` and
+      `/quick-bike-repair-richmond`.
 
 ## Catalog, cart, checkout, and inventory
 
@@ -161,7 +166,12 @@ acceptance run.
       and saved service, cost, shipment reference, and tracking number.
 - [x] Exercise the account-appropriate sandbox void path and confirm its audit
       event.
-- [ ] Confirm pickup/local-delivery fallback when the sandbox returns no rate.
+- [x] Confirm carrier failures add no shipping charge and expose only safe
+      alternatives. An empty provider result returns
+      `CANADA_POST_NO_RATES`; the hosted out-of-region check stayed disabled for
+      payment, offered contact, and switched successfully to free pickup. The
+      local-delivery action appears only when the merchant enables an eligible
+      delivery area.
 
 ## Merchant console and customer access
 
@@ -188,7 +198,11 @@ acceptance run.
 - [x] Confirm a real short-lived customer JWT receives `403` from all 15
       merchant mutation routes, plus the staff-only label read. The temporary
       identity was deleted after the matrix.
-- [ ] Complete common merchant workflows at desktop, tablet, and mobile widths.
+- [x] Complete the merchant overview and sales-order workflow at desktop,
+      tablet, and mobile widths in authenticated Chrome. Navigation remains
+      usable, the order filters stack at narrow widths, the wide table scrolls
+      inside its own container, a mobile order-number filter returned exactly
+      one row, and the console remained clear.
 - [x] Confirm one customer cannot read another customer's booking or order.
       Order RLS returned zero of four non-owned orders, the profile query
       returned only the caller, and another user's booking PATCH/DELETE both
@@ -214,7 +228,10 @@ acceptance run.
 - [ ] Deliver every template to test recipients and verify retry behavior.
 - [x] Verify missing and incorrect Cron bearer credentials are rejected before
       Stripe, database, or notification side effects; verify the authorized
-      maintenance path invokes all three services.
+      maintenance path invokes all three services. The hosted Preview returned
+      `401` for missing/incorrect credentials; after rotating the branch secret,
+      the correct credential entered maintenance and then returned `500`
+      because Resend is intentionally not configured.
 - [ ] Observe one automatic Vercel Cron invocation after a Production
       deployment is explicitly approved. [Vercel does not schedule Cron Jobs
       for Preview deployments](https://vercel.com/docs/cron-jobs/quickstart).
@@ -243,7 +260,7 @@ acceptance run.
 - [ ] Run Resend delivery and final Apple authorization checks after their
       remaining external inputs are ready.
 - [x] Record the stable protected Preview acceptance host and the last validated
-      CLI Preview (`dpl_EnuSD478A3yJbA6v3xVLYnQfDBbk`) as the rollback
+      CLI Preview (`dpl_2iAK5fzvUMi1ijEw1Qw6B6uAKnVA`) as the rollback
       candidate for the final acceptance deployment.
 
 ## Remaining merchant inputs

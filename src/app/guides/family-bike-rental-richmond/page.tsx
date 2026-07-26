@@ -6,6 +6,18 @@ export const metadata: Metadata = {
   title: "Family Bike Rentals in Richmond, BC",
   description:
     "Plan an easy family bike ride in Richmond, BC. Rent kids bikes or bike trailers near Steveston and explore Garry Point Park, waterfront paths, and flat dyke trails.",
+  alternates: {
+    canonical: "/guides/family-bike-rental-richmond",
+  },
+  openGraph: {
+    title: "Family Bike Rentals in Richmond, BC",
+    description:
+      "Plan an easy family bike ride in Richmond, BC. Rent kids bikes or bike trailers near Steveston and explore Garry Point Park, waterfront paths, and flat dyke trails.",
+    url: "https://www.wanderbike.ca/guides/family-bike-rental-richmond",
+    siteName: "Wander Bike Rentals",
+    locale: "en_CA",
+    type: "article",
+  },
 };
 
 const guidePoints = [

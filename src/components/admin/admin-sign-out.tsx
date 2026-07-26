@@ -10,6 +10,7 @@ export function AdminSignOut() {
   return (
     <button
       type="button"
+      aria-label={loading ? "Signing out" : "Sign out"}
       disabled={loading}
       onClick={async () => {
         setLoading(true);

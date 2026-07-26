@@ -101,6 +101,8 @@ export function AdminShell({
         <button
           type="button"
           aria-label="Close admin navigation"
+          aria-hidden={!menuOpen}
+          tabIndex={menuOpen ? 0 : -1}
           onClick={() => setMenuOpen(false)}
           className={`fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px] transition-opacity duration-200 lg:hidden ${
             menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
@@ -109,8 +111,8 @@ export function AdminShell({
 
         <aside
           id="admin-sidebar"
-          className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white pt-16 transition-transform duration-200 ease-out lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:pt-0 ${
-            menuOpen ? "translate-x-0" : "-translate-x-full"
+          className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white pt-16 transition-[transform,visibility] duration-200 ease-out lg:visible lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:pt-0 ${
+            menuOpen ? "visible translate-x-0" : "invisible -translate-x-full"
           }`}
         >
           <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">

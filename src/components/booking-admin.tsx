@@ -170,6 +170,15 @@ export default function BookingAdmin() {
     return () => subscription?.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      if (window.matchMedia("(max-width: 639px)").matches) {
+        setView("agenda");
+      }
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
   const loadBookings = useCallback(async () => {
     if (!session) return;
     setLoading(true);
@@ -346,85 +355,93 @@ export default function BookingAdmin() {
         ) : null}
 
         {view === "month" ? (
-          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-            <div className="min-w-[880px]">
-              <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/80">
-                {weekdays.map((day) => (
-                  <div
-                    key={day}
-                    className="p-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7">
-                {days.map((date) => {
-                  const items = byDay.get(dayKey(date)) ?? [];
-                  const outside = date.getMonth() !== month.getMonth();
-                  const today = dayKey(date) === dayKey(new Date());
-                  return (
+          <>
+            <p className="mb-2 text-xs text-slate-500 sm:hidden">
+              Swipe horizontally to see the full week.
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <div className="min-w-[880px]">
+                <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50/80">
+                  {weekdays.map((day) => (
                     <div
-                      key={date.toISOString()}
-                      className={`min-h-32 border-b border-r border-slate-200 p-2 ${
-                        outside ? "bg-slate-50/70" : "bg-white"
-                      }`}
+                      key={day}
+                      className="p-3 text-center text-xs font-bold uppercase tracking-wider text-slate-500"
                     >
+                      {day}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7">
+                  {days.map((date) => {
+                    const items = byDay.get(dayKey(date)) ?? [];
+                    const outside = date.getMonth() !== month.getMonth();
+                    const today = dayKey(date) === dayKey(new Date());
+                    return (
                       <div
-                        className={`mb-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                          today
-                            ? "bg-teal-700 text-white"
-                            : outside
-                              ? "text-slate-400"
-                              : "text-slate-700"
+                        key={date.toISOString()}
+                        className={`min-h-32 border-b border-r border-slate-200 p-2 ${
+                          outside ? "bg-slate-50/70" : "bg-white"
                         }`}
                       >
-                        {date.getDate()}
+                        <div
+                          className={`mb-2 flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                            today
+                              ? "bg-teal-700 text-white"
+                              : outside
+                                ? "text-slate-400"
+                                : "text-slate-700"
+                          }`}
+                        >
+                          {date.getDate()}
+                        </div>
+                        <div className="space-y-1.5">
+                          {items.map((booking) => (
+                            <button
+                              key={booking.id}
+                              type="button"
+                              onClick={() => setSelected(booking)}
+                              className={`block w-full rounded-md border px-2 py-1.5 text-left text-xs leading-4 transition hover:border-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 ${statusStyles[booking.status]}`}
+                            >
+                              <span className="block truncate font-bold">
+                                {formatTime(booking.starts_at)} ·{" "}
+                                {booking.customer_name}
+                              </span>
+                              <span className="block opacity-80">
+                                {booking.adult_bikes}A · {booking.kids_bikes}K ·{" "}
+                                {booking.trailers}T
+                              </span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="space-y-1.5">
-                        {items.map((booking) => (
-                          <button
-                            key={booking.id}
-                            type="button"
-                            onClick={() => setSelected(booking)}
-                            className={`block w-full rounded-md border px-2 py-1.5 text-left text-xs leading-4 transition hover:border-current focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 ${statusStyles[booking.status]}`}
-                          >
-                            <span className="block truncate font-bold">
-                              {formatTime(booking.starts_at)} ·{" "}
-                              {booking.customer_name}
-                            </span>
-                            <span className="block opacity-80">
-                              {booking.adult_bikes}A · {booking.kids_bikes}K ·{" "}
-                              {booking.trailers}T
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
-                {(Object.keys(statusStyles) as BookingStatus[]).map((status) => (
-                  <span key={status} className="inline-flex items-center gap-2 capitalize">
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
+                  {(Object.keys(statusStyles) as BookingStatus[]).map((status) => (
                     <span
-                      aria-hidden="true"
-                      className={`h-2 w-2 rounded-full ${
-                        status === "pending"
-                          ? "bg-amber-500"
-                          : status === "confirmed"
-                            ? "bg-teal-600"
-                            : status === "completed"
-                              ? "bg-slate-500"
-                              : "bg-rose-500"
-                      }`}
-                    />
-                    {status}
-                  </span>
-                ))}
+                      key={status}
+                      className="inline-flex items-center gap-2 capitalize"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={`h-2 w-2 rounded-full ${
+                          status === "pending"
+                            ? "bg-amber-500"
+                            : status === "confirmed"
+                              ? "bg-teal-600"
+                              : status === "completed"
+                                ? "bg-slate-500"
+                                : "bg-rose-500"
+                        }`}
+                      />
+                      {status}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          </>
         ) : (
           <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="border-b border-slate-200 px-4 py-3">

@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { DateField } from "@/components/forms/date-field";
 import { FieldError } from "@/components/forms/field-error";
+import { FieldHint } from "@/components/forms/field-hint";
 import { useBlockedSubmitMessage } from "@/components/forms/use-blocked-submit";
 import { useFieldErrors } from "@/components/forms/use-field-errors";
+import { useFieldLengths } from "@/components/forms/use-field-lengths";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { bikeTypeLabel } from "@/lib/marketplace/format";
 import { scanBikePhotos } from "@/lib/marketplace/image-safety-client";
@@ -35,6 +37,47 @@ const imageExtensions: Record<string, string> = {
   "image/webp": "webp",
   "image/avif": "avif",
 };
+
+/**
+ * Schema field → the input that carries it, so a rejected save highlights the
+ * field the server complained about instead of only filling the banner.
+ */
+const inputNameBySchemaField: Record<string, string> = {
+  title: "title",
+  shortDescription: "short_description",
+  description: "description",
+  bikeType: "bike_type",
+  brand: "brand",
+  model: "model",
+  frameSize: "frame_size",
+  condition: "condition",
+  offerMode: "offer_mode",
+  rentalHourlyCents: "rental_hourly",
+  rentalDailyCents: "rental_daily",
+  salePriceCents: "sale_price",
+  minimumRentalHours: "minimum_rental_hours",
+  pickupArea: "pickup_area",
+  pickupAddress: "pickup_address",
+  postalCode: "postal_code",
+  pickupInstructions: "pickup_instructions",
+  city: "city",
+  province: "province",
+  availableFrom: "available_from",
+  availableUntil: "available_until",
+  availabilitySummary: "availability_summary",
+  rentalRules: "rental_rules",
+  includedItems: "included_items",
+};
+
+function toInputErrors(fieldErrors: Record<string, string> | undefined) {
+  if (!fieldErrors) return {};
+  const mapped: Record<string, string> = {};
+  for (const [schemaField, message] of Object.entries(fieldErrors)) {
+    const inputName = inputNameBySchemaField[schemaField];
+    if (inputName) mapped[inputName] = message;
+  }
+  return mapped;
+}
 
 export function ListingForm({
   userId,
@@ -67,11 +110,39 @@ export function ListingForm({
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [photoNames, setPhotoNames] = useState<string[]>([]);
-  const [descriptionLength, setDescriptionLength] = useState(
-    listing?.description?.length ?? 0,
-  );
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
-  const fieldErrors = useFieldErrors(formRef);
+  const liveErrors = useFieldErrors(formRef);
+  const lengths = useFieldLengths(formRef);
+  /*
+   * A live browser message wins when there is one, but an empty live entry must
+   * not clear a server message: `useFieldErrors` records "" for every field the
+   * browser considers valid, and the fields the server rejects are exactly the
+   * ones the browser let through. Server messages are dropped per field in
+   * `clearServerError` once that field is edited.
+   */
+  const fieldErrors: Record<string, string> = { ...serverErrors };
+  for (const [name, message] of Object.entries(liveErrors)) {
+    if (message) fieldErrors[name] = message;
+  }
+
+  function clearServerError(event: FormEvent<HTMLFormElement>) {
+    const target = event.target;
+    if (
+      !(target instanceof HTMLInputElement) &&
+      !(target instanceof HTMLSelectElement) &&
+      !(target instanceof HTMLTextAreaElement)
+    ) {
+      return;
+    }
+    const key = target.dataset.fieldName || target.name;
+    setServerErrors((current) => {
+      if (!key || !(key in current)) return current;
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  }
 
   useBlockedSubmitMessage(formRef, (message) => {
     setSaved(false);
@@ -164,6 +235,7 @@ export function ListingForm({
     setBusy(true);
     setError("");
     setSaved(false);
+    setServerErrors({});
     const form = new FormData(event.currentTarget);
     const files = form
       .getAll("photos")
@@ -228,9 +300,20 @@ export function ListingForm({
       );
       const result = (await response.json()) as {
         error?: string;
+        fieldErrors?: Record<string, string>;
         listing?: { id: string };
       };
       if (!response.ok || !result.listing) {
+        const mapped = toInputErrors(result.fieldErrors);
+        setServerErrors(mapped);
+        const [firstName] = Object.keys(mapped);
+        if (firstName) {
+          const field = formRef.current?.querySelector<HTMLElement>(
+            `[name="${firstName}"], [data-field-name="${firstName}"]`,
+          );
+          field?.scrollIntoView({ block: "center", behavior: "smooth" });
+          field?.focus({ preventScroll: true });
+        }
         throw new Error(result.error ?? "Could not save this listing.");
       }
       setSaved(true);
@@ -264,7 +347,13 @@ export function ListingForm({
   const canSell = offerMode === "sale" || offerMode === "rent_sale";
 
   return (
-    <form ref={formRef} onSubmit={submit} className="space-y-6">
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      onInput={clearServerError}
+      onChange={clearServerError}
+      className="space-y-6"
+    >
       <section className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-8">
         <div className="flex items-center gap-3">
           <BikeIcon />
@@ -301,12 +390,14 @@ export function ListingForm({
             <input
               name="title"
               required
+              minLength={3}
               maxLength={120}
               defaultValue={listing?.title ?? ""}
               className="market-input"
               placeholder="e.g. Medium hybrid bike with rear rack"
             />
-                      <FieldError message={fieldErrors.title} />
+            <FieldHint length={lengths.title} min={3} max={120} />
+            <FieldError message={fieldErrors.title} />
           </label>
           <label className="field-label">
             Bike type
@@ -339,35 +430,56 @@ export function ListingForm({
           </label>
           <label className="field-label">
             Brand <span className="font-normal text-slate-400">(optional)</span>
-            <input name="brand" defaultValue={listing?.brand ?? ""} className="market-input" />
+            <input
+              name="brand"
+              maxLength={80}
+              defaultValue={listing?.brand ?? ""}
+              className="market-input"
+            />
+            <FieldHint length={lengths.brand} max={80} optional />
+            <FieldError message={fieldErrors.brand} />
           </label>
           <label className="field-label">
             Model <span className="font-normal text-slate-400">(optional)</span>
-            <input name="model" defaultValue={listing?.model ?? ""} className="market-input" />
+            <input
+              name="model"
+              maxLength={100}
+              defaultValue={listing?.model ?? ""}
+              className="market-input"
+            />
+            <FieldHint length={lengths.model} max={100} optional />
+            <FieldError message={fieldErrors.model} />
           </label>
           <label className="field-label">
-            Frame size / rider fit
+            Frame size / rider fit{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="frame_size"
+              maxLength={60}
               defaultValue={listing?.frameSize ?? ""}
               className="market-input"
               placeholder="e.g. Medium · 5′5″–5′10″"
             />
+            <FieldHint length={lengths.frame_size} max={60} optional />
+            <FieldError message={fieldErrors.frame_size} />
           </label>
           <label className="field-label">
-            Included items
+            Included items{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="included_items"
               defaultValue={listing?.includedItems.join(", ") ?? ""}
               className="market-input"
               placeholder="Helmet, lock, basket"
             />
-            <span className="mt-1.5 block text-xs font-normal text-slate-500">
-              Separate items with commas.
-            </span>
+            <FieldHint optional>
+              Separate items with commas · up to 20 items, 80 characters each
+            </FieldHint>
+            <FieldError message={fieldErrors.included_items} />
           </label>
           <label className="field-label sm:col-span-2">
-            Short summary
+            Short summary{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="short_description"
               maxLength={240}
@@ -375,7 +487,8 @@ export function ListingForm({
               className="market-input"
               placeholder="One sentence shown in browse results"
             />
-                      <FieldError message={fieldErrors.short_description} />
+            <FieldHint length={lengths.short_description} max={240} optional />
+            <FieldError message={fieldErrors.short_description} />
           </label>
           <label className="field-label sm:col-span-2">
             Full description
@@ -385,19 +498,11 @@ export function ListingForm({
               minLength={20}
               maxLength={5000}
               defaultValue={listing?.description ?? ""}
-              onChange={(event) => setDescriptionLength(event.target.value.length)}
               className="market-textarea"
               placeholder="Describe fit, maintenance, ride feel, and anything a rider should know."
             />
-            <span
-              className={`mt-1.5 block text-xs font-normal ${
-                descriptionLength >= 20 ? "text-slate-500" : "text-amber-700"
-              }`}
-            >
-              {descriptionLength >= 20
-                ? `${descriptionLength} characters`
-                : `At least 20 characters needed to publish · ${descriptionLength} so far`}
-            </span>
+            <FieldHint length={lengths.description} min={20} max={5000} />
+            <FieldError message={fieldErrors.description} />
           </label>
         </div>
       </section>
@@ -449,12 +554,14 @@ export function ListingForm({
                   name="rental_hourly"
                   type="number"
                   min="0.01"
+                  max="1000000"
                   step="0.01"
                   defaultValue={dollars(listing?.rentalHourlyCents ?? null)}
                   className="market-input"
                   placeholder="12"
                 />
-                              <FieldError message={fieldErrors.rental_hourly} />
+                <FieldHint>$0.01–$1,000,000 · fill in this or the daily price</FieldHint>
+                <FieldError message={fieldErrors.rental_hourly} />
               </label>
               <label className="field-label">
                 Daily price (CAD)
@@ -462,12 +569,14 @@ export function ListingForm({
                   name="rental_daily"
                   type="number"
                   min="0.01"
+                  max="1000000"
                   step="0.01"
                   defaultValue={dollars(listing?.rentalDailyCents ?? null)}
                   className="market-input"
                   placeholder="45"
                 />
-                              <FieldError message={fieldErrors.rental_daily} />
+                <FieldHint>$0.01–$1,000,000 · fill in this or the hourly price</FieldHint>
+                <FieldError message={fieldErrors.rental_daily} />
               </label>
               <label className="field-label">
                 Minimum rental (hours)
@@ -476,11 +585,13 @@ export function ListingForm({
                   type="number"
                   min="1"
                   max="168"
+                  step="1"
                   required
                   defaultValue={listing?.minimumRentalHours ?? 1}
                   className="market-input"
                 />
-                              <FieldError message={fieldErrors.minimum_rental_hours} />
+                <FieldHint>Whole hours, 1–168 (one week)</FieldHint>
+                <FieldError message={fieldErrors.minimum_rental_hours} />
               </label>
             </>
           ) : (
@@ -493,13 +604,15 @@ export function ListingForm({
                 name="sale_price"
                 type="number"
                 min="0.01"
+                max="1000000"
                 step="0.01"
                 required
                 defaultValue={dollars(listing?.salePriceCents ?? null)}
                 className="market-input"
                 placeholder="450"
               />
-                          <FieldError message={fieldErrors.sale_price} />
+              <FieldHint>Required to sell · $0.01–$1,000,000</FieldHint>
+              <FieldError message={fieldErrors.sale_price} />
             </label>
           ) : null}
         </div>
@@ -527,51 +640,67 @@ export function ListingForm({
             <input
               name="pickup_area"
               required
+              minLength={2}
+              maxLength={120}
               defaultValue={listing?.pickupArea ?? ""}
               className="market-input"
               placeholder="e.g. Steveston Village"
             />
-                      <FieldError message={fieldErrors.pickup_area} />
+            <FieldHint length={lengths.pickup_area} min={2} max={120} />
+            <FieldError message={fieldErrors.pickup_area} />
           </label>
           <label className="field-label">
             City
             <input
               name="city"
               required
+              minLength={2}
+              maxLength={100}
               defaultValue={listing?.city ?? "Richmond"}
               className="market-input"
             />
-                      <FieldError message={fieldErrors.city} />
+            <FieldHint length={lengths.city} min={2} max={100} />
+            <FieldError message={fieldErrors.city} />
           </label>
           <label className="field-label">
             Province
             <input
               name="province"
               required
+              minLength={2}
+              maxLength={80}
               defaultValue={listing?.province ?? "BC"}
               className="market-input"
             />
-                      <FieldError message={fieldErrors.province} />
+            <FieldHint length={lengths.province} min={2} max={80} />
+            <FieldError message={fieldErrors.province} />
           </label>
           <label className="field-label">
             Postal code <span className="font-normal text-slate-400">(private)</span>
             <input
               name="postal_code"
+              maxLength={20}
               defaultValue={initial?.privateDetails?.postalCode ?? ""}
               className="market-input"
               autoComplete="postal-code"
             />
+            <FieldHint length={lengths.postal_code} max={20} optional />
+            <FieldError message={fieldErrors.postal_code} />
           </label>
           <label className="field-label sm:col-span-2">
             Exact pickup address <span className="font-normal text-teal-700">(kept private until accepted)</span>
             <input
               name="pickup_address"
               required
+              minLength={5}
+              maxLength={240}
               defaultValue={initial?.privateDetails?.pickupAddress ?? ""}
               className="market-input"
               autoComplete="street-address"
+              placeholder="e.g. 12040 4th Ave, Richmond BC"
             />
-                      <FieldError message={fieldErrors.pickup_address} />
+            <FieldHint length={lengths.pickup_address} min={5} max={240} />
+            <FieldError message={fieldErrors.pickup_address} />
           </label>
           <label className="field-label">
             Available from <span className="font-normal text-slate-400">(optional)</span>
@@ -579,6 +708,7 @@ export function ListingForm({
               name="available_from"
               defaultValue={listing?.availableFrom ?? ""}
             />
+            <FieldHint optional>Format YYYY-MM-DD</FieldHint>
             <FieldError message={fieldErrors.available_from} />
           </label>
           <label className="field-label">
@@ -587,34 +717,47 @@ export function ListingForm({
               name="available_until"
               defaultValue={listing?.availableUntil ?? ""}
             />
+            <FieldHint optional>Must be on or after the available-from date</FieldHint>
             <FieldError message={fieldErrors.available_until} />
           </label>
           <label className="field-label sm:col-span-2">
-            Public availability summary
+            Public availability summary{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="availability_summary"
+              maxLength={240}
               defaultValue={listing?.availabilitySummary ?? ""}
               className="market-input"
               placeholder="e.g. Weekdays after 4 PM · flexible weekends"
             />
+            <FieldHint length={lengths.availability_summary} max={240} optional />
+            <FieldError message={fieldErrors.availability_summary} />
           </label>
           <label className="field-label sm:col-span-2">
-            Private pickup instructions
+            Private pickup instructions{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <textarea
               name="pickup_instructions"
+              maxLength={1000}
               defaultValue={initial?.privateDetails?.pickupInstructions ?? ""}
               className="market-textarea min-h-24"
               placeholder="Meeting point, buzzer, or contact instructions shown only after acceptance."
             />
+            <FieldHint length={lengths.pickup_instructions} max={1000} optional />
+            <FieldError message={fieldErrors.pickup_instructions} />
           </label>
           <label className="field-label sm:col-span-2">
-            Rules and owner notes
+            Rules and owner notes{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <textarea
               name="rental_rules"
+              maxLength={2000}
               defaultValue={listing?.rentalRules ?? ""}
               className="market-textarea min-h-24"
               placeholder="ID requirements, permitted use, or anything the rider should know."
             />
+            <FieldHint length={lengths.rental_rules} max={2000} optional />
+            <FieldError message={fieldErrors.rental_rules} />
           </label>
           <input
             type="hidden"

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FieldHint } from "@/components/forms/field-hint";
 import type { MarketplaceAccessStatus } from "@/lib/marketplace/types";
 
 export function UserAccessActions({
@@ -83,10 +84,19 @@ export function UserAccessActions({
           Suspension reason
           <textarea
             value={reason}
+            maxLength={1000}
             onChange={(event) => setReason(event.target.value)}
             className="market-textarea min-h-20"
             placeholder="Explain the account restriction for the audit record."
           />
+          {/*
+            The server refuses a suspension without a reason, and the Suspend
+            button below stays disabled until there is one. Say so, rather than
+            leaving a greyed-out button with no explanation.
+          */}
+          <FieldHint length={reason.trim().length} min={1} max={1000}>
+            Required before suspending
+          </FieldHint>
         </label>
       ) : null}
       <div className="flex flex-wrap gap-2">

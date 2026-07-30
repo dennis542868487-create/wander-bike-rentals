@@ -4,6 +4,7 @@ import { CalendarClock, CheckCircle2, HandCoins, LockKeyhole } from "lucide-reac
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { DateField } from "@/components/forms/date-field";
+import { FieldHint } from "@/components/forms/field-hint";
 import { formatCad } from "@/lib/marketplace/format";
 import type { BikeListing, RequestIntent } from "@/lib/marketplace/types";
 
@@ -198,23 +199,29 @@ export function RequestPanel({
           <input
             name="renter_name"
             required
+            minLength={2}
+            maxLength={120}
             autoComplete="name"
             className="market-input"
           />
+          <FieldHint min={2} max={120} />
         </label>
         <label className="field-label mt-4">
           Phone <span className="font-normal text-slate-400">(optional)</span>
           <input
             name="renter_phone"
             type="tel"
+            maxLength={40}
             autoComplete="tel"
             className="market-input"
           />
+          <FieldHint max={40} optional />
         </label>
         <label className="field-label mt-4">
           Message <span className="font-normal text-slate-400">(optional)</span>
           <textarea
             name="message"
+            maxLength={1000}
             className="market-textarea min-h-24"
             placeholder={
               intent === "rent"
@@ -222,6 +229,7 @@ export function RequestPanel({
                 : "Ask a question or suggest a time to see the bike."
             }
           />
+          <FieldHint max={1000} optional />
         </label>
         <label className="sr-only" aria-hidden="true">
           Website

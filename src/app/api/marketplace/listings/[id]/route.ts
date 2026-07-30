@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { getListingManagerAccess } from "@/lib/marketplace/access-server";
 import { listingInputSchema } from "@/lib/marketplace/schemas";
@@ -49,10 +50,7 @@ export async function PATCH(
     if ("response" in access) return access.response;
     const parsed = listingInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Check the listing details." },
-        { status: 400 },
-      );
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const rents =
       parsed.data.offerMode === "rent" ||

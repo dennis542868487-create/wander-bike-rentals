@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { sensitiveTermInputSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -15,10 +16,7 @@ export async function POST(request: Request) {
     }
     const parsed = sensitiveTermInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Invalid sensitive term." },
-        { status: 400 },
-      );
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { data, error } = await getSupabaseAdmin()
       .from("marketplace_sensitive_terms")

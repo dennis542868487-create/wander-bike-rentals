@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { manageListing } from "@/lib/marketplace/listing-management-server";
 import { listingManagementSchema } from "@/lib/marketplace/schemas";
@@ -18,7 +19,7 @@ export async function PATCH(
     }
     const parsed = listingManagementSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid listing update." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { id } = await context.params;
     const result = await manageListing({

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
 import { requestStatusInputSchema } from "@/lib/marketplace/schemas";
@@ -24,7 +25,7 @@ export async function PATCH(
     }
     const parsed = requestStatusInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid request status." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { id } = await context.params;
     const supabase = getSupabaseAdmin();

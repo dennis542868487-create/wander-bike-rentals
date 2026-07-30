@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { roleInputSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -25,7 +26,7 @@ export async function PATCH(
     }
     const parsed = roleInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid account role." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const supabase = getSupabaseAdmin();
     const { data: current } = await supabase

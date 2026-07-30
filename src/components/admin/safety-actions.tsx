@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { FieldHint } from "@/components/forms/field-hint";
 import type {
   ListingStatus,
   SafetyFlagStatus,
@@ -170,15 +171,18 @@ export function SensitiveTermManager({
         <label className="sr-only" htmlFor="new-sensitive-term">
           New sensitive term
         </label>
-        <input
-          id="new-sensitive-term"
-          name="term"
-          required
-          minLength={2}
-          maxLength={80}
-          className="market-input mt-0 bg-white"
-          placeholder="Add a word or phrase"
-        />
+        <div>
+          <input
+            id="new-sensitive-term"
+            name="term"
+            required
+            minLength={2}
+            maxLength={80}
+            className="market-input mt-0 bg-white"
+            placeholder="Add a word or phrase"
+          />
+          <FieldHint min={2} max={80} />
+        </div>
         <select
           name="category"
           className="market-select mt-0 bg-white"

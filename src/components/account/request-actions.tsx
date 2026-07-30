@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FieldHint } from "@/components/forms/field-hint";
 import type { RequestStatus } from "@/lib/marketplace/types";
 
 export function RequestActions({
@@ -75,10 +76,12 @@ export function RequestActions({
             Note to the rider
             <textarea
               value={note}
+              maxLength={1000}
               onChange={(event) => setNote(event.target.value)}
               className="market-textarea min-h-20"
               placeholder="Optional context about availability"
             />
+            <FieldHint length={note.trim().length} max={1000} optional />
           </label>
         ) : null}
         <div className="flex flex-wrap gap-2">

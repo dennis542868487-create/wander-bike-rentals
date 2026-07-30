@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { listingInputSchema } from "@/lib/marketplace/schemas";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
@@ -19,10 +20,7 @@ export async function POST(request: Request) {
     }
     const parsed = listingInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Check the listing details." },
-        { status: 400 },
-      );
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
 
     const supabase = getSupabaseAdmin();

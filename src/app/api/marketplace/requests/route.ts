@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
 import { requestInputSchema } from "@/lib/marketplace/schemas";
@@ -16,10 +17,7 @@ export async function POST(request: Request) {
     }
     const parsed = requestInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Check the request details." },
-        { status: 400 },
-      );
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     if (parsed.data.website) {
       return NextResponse.json({ ok: true }, { status: 201 });

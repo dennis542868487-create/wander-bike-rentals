@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { profileInputSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -15,10 +16,7 @@ export async function PATCH(request: Request) {
     }
     const parsed = profileInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? "Check your profile." },
-        { status: 400 },
-      );
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { data, error } = await getSupabaseAdmin()
       .from("profiles")

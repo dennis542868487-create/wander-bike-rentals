@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { z } from "zod";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { getListingManagerAccess } from "@/lib/marketplace/access-server";
@@ -35,7 +36,7 @@ export async function POST(
     const { id } = await context.params;
     const parsed = imageInputSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid image details." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const access = await getListingManagerAccess(auth.user.id, id);
     if (!access) {

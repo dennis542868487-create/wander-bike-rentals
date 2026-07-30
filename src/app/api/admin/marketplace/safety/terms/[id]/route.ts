@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { sensitiveTermStatusSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -18,7 +19,7 @@ export async function PATCH(
     }
     const parsed = sensitiveTermStatusSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid term update." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { id } = await context.params;
     const termId = Number(id);

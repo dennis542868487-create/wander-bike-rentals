@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fieldErrorPayload } from "@/lib/marketplace/field-errors";
 import { z } from "zod";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { getListingManagerAccess } from "@/lib/marketplace/access-server";
@@ -32,7 +33,7 @@ export async function POST(
     }
     const parsed = predictionSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid image scan result." }, { status: 400 });
+      return NextResponse.json(fieldErrorPayload(parsed.error), { status: 400 });
     }
     const { id, imageId } = await context.params;
     const access = await getListingManagerAccess(auth.user.id, id);

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FieldHint } from "@/components/forms/field-hint";
 import type { ListingStatus } from "@/lib/marketplace/types";
 
 export function ListingManagementActions({
@@ -63,10 +64,14 @@ export function ListingManagementActions({
           Reason shown to the owner
           <textarea
             value={note}
+            maxLength={1000}
             onChange={(event) => setNote(event.target.value)}
             className="market-textarea min-h-20"
             placeholder="Explain why this listing is being paused."
           />
+          <FieldHint length={note.trim().length} min={1} max={1000}>
+            Required before pausing
+          </FieldHint>
         </label>
       ) : null}
       <div className="flex flex-wrap gap-2">

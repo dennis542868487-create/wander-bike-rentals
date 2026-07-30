@@ -329,11 +329,15 @@ export default function SiteHeader() {
 
         <div
           id="mobile-primary-navigation"
+          inert={!menuOpen}
           className={[
-            "overscroll-contain overflow-y-auto border-t border-slate-200 transition-all duration-300 xl:hidden",
+            "absolute inset-x-0 top-full origin-top overscroll-contain overflow-y-auto",
+            "max-h-[calc(100dvh-4.5rem)] sm:max-h-[calc(100dvh-6rem)]",
+            "border-t border-slate-200 bg-white/95 shadow-[0_18px_40px_rgba(15,23,42,0.12)] backdrop-blur-2xl",
+            "transition-[translate,opacity] duration-[220ms] ease-[var(--ease-ui)] xl:hidden",
             menuOpen
-              ? "max-h-[calc(100dvh-4.5rem)] py-3 opacity-100 sm:max-h-[calc(100dvh-6rem)] sm:py-4"
-              : "max-h-0 py-0 opacity-0",
+              ? "translate-y-0 py-3 opacity-100 sm:py-4"
+              : "pointer-events-none -translate-y-2 py-3 opacity-0 sm:py-4",
           ].join(" ")}
         >
           <nav aria-label="Mobile primary" className="space-y-2 pb-2">
@@ -368,20 +372,30 @@ export default function SiteHeader() {
                       aria-hidden="true"
                     />
                   </button>
-                  {expanded ? (
-                    <div className="mt-1 space-y-1 border-t border-slate-100 pt-2">
-                      {group.links.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          onClick={closeMenu}
-                          className="block rounded-xl px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
+                  <div
+                    className={[
+                      "grid transition-[grid-template-rows,opacity] duration-200 ease-[var(--ease-ui)]",
+                      expanded
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0",
+                    ].join(" ")}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="mt-1 space-y-1 border-t border-slate-100 pt-2">
+                        {group.links.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={closeMenu}
+                            tabIndex={expanded ? undefined : -1}
+                            className="block rounded-xl px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  ) : null}
+                  </div>
                 </div>
               );
             })}

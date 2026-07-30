@@ -15,7 +15,7 @@ export default function Reveal() {
     const targets = new Set<Element>();
     document.querySelectorAll("main > section:not(.hero)").forEach((section) => {
       section.setAttribute("data-reveal", "");
-      section.querySelectorAll(".grid").forEach((grid) => {
+      section.querySelectorAll(".grid:not([data-reveal-skip])").forEach((grid) => {
         if (grid.children.length > 1) {
           grid.setAttribute("data-reveal-cascade", "");
         }

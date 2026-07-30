@@ -113,7 +113,7 @@ export function RequestPanel({
 
   if (complete) {
     return (
-      <aside className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+      <aside className="request-complete-panel rounded-[1.5rem] border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
         <CheckCircle2 className="h-7 w-7 text-emerald-700" aria-hidden="true" />
         <h2 className="mt-4 text-xl font-bold text-slate-950">Request sent</h2>
         <p className="mt-2 text-sm leading-6 text-slate-700">

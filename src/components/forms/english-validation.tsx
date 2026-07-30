@@ -47,6 +47,10 @@ export function englishValidationMessage(element: ValidatableElement) {
   const validity = element.validity;
   const label = fieldName(element);
 
+  if (validity.customError && element.validationMessage) {
+    return element.validationMessage;
+  }
+
   if (validity.valueMissing) return missingMessage(element);
 
   if (validity.typeMismatch && element instanceof HTMLInputElement) {
@@ -109,10 +113,9 @@ export function EnglishValidationMessages() {
     function handleInvalid(event: Event) {
       const element = event.target;
       if (!isValidatable(element)) return;
-      // A stale custom message would keep the field invalid forever, so clear
-      // it first and only re-apply when the field is still failing natively.
-      element.setCustomValidity("");
-      if (element.validity.valid) return;
+      // A component that set its own message (DateField, for one) already wrote
+      // something more specific than anything derivable here.
+      if (element.validity.customError) return;
       element.setCustomValidity(englishValidationMessage(element));
     }
 

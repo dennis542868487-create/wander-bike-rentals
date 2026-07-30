@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { PageTransition } from "@/components/page-transition";
 import { AccountSignOut } from "@/components/account-sign-out";
 import type { MarketplaceAccessStatus } from "@/lib/marketplace/types";
 import {
@@ -243,7 +244,7 @@ export function AccountShell({
               ) : null}
             </div>
           ) : null}
-          {children}
+          <PageTransition>{children}</PageTransition>
         </div>
       </main>
     </div>

@@ -16,6 +16,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AdminSignOut } from "@/components/admin/admin-sign-out";
+import { PageTransition } from "@/components/page-transition";
 import {
   COMMUNITY_DASHBOARD_LABEL,
   PLATFORM_DASHBOARD_LABEL,
@@ -212,7 +213,9 @@ export function AdminShell({
       ) : null}
 
       <main className="px-4 py-6 sm:px-6 sm:py-8 lg:ml-[17rem] lg:px-8">
-        <div className="mx-auto max-w-[88rem]">{children}</div>
+        <div className="mx-auto max-w-[88rem]">
+          <PageTransition>{children}</PageTransition>
+        </div>
       </main>
     </div>
   );

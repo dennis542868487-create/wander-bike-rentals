@@ -228,11 +228,10 @@ a {
 }
 
 /*
- * Date and datetime fields are painted by the browser in its own UI language,
- * so a Chinese Chrome paints Chinese date placeholders inside an English-only
- * form. While the field is idle the native text is hidden and
- * .date-field__display shows the English value instead; focusing the field
- * restores the native editor.
+ * Native date inputs are painted by the browser in its own UI language, down to
+ * the calendar popup, and the page cannot override that. DateField replaces
+ * them with a plain text input plus the calendar styled below, so the control
+ * reads the same English for every visitor.
  */
 .date-field {
   position: relative;
@@ -242,36 +241,217 @@ a {
 
 .date-field > .market-input {
   margin-top: 0;
+  padding-right: 2.75rem;
 }
 
-.date-field__display {
-  display: none;
+.date-field__trigger {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  display: flex;
+  width: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0.55rem 0.55rem 0;
+  color: #64748b;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
 }
 
-@supports selector(::-webkit-datetime-edit) {
-  .date-field[data-idle="true"] > .market-input::-webkit-datetime-edit {
+.date-field__trigger:hover {
+  background: #f1f5f9;
+  color: var(--teal);
+}
+
+.date-popover {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 40;
+  width: 17.5rem;
+  max-width: calc(100vw - 2rem);
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 0.75rem;
+  box-shadow: 0 18px 40px rgba(15, 34, 56, 0.16);
+}
+
+.date-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.date-popover__title {
+  font-size: 0.9rem;
+  font-weight: 680;
+  color: var(--navy);
+}
+
+.date-popover__nav {
+  display: flex;
+  height: 1.85rem;
+  width: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: #475569;
+}
+
+.date-popover__nav:hover {
+  background: #f1f5f9;
+  color: var(--teal);
+}
+
+.date-popover__weekdays,
+.date-popover__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15rem;
+}
+
+.date-popover__weekdays {
+  margin-top: 0.6rem;
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.date-popover__grid {
+  margin-top: 0.25rem;
+}
+
+.date-popover__day {
+  display: flex;
+  height: 2.05rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: var(--navy);
+  font-size: 0.83rem;
+  font-weight: 600;
+  transition:
+    background-color 130ms ease,
+    color 130ms ease;
+}
+
+.date-popover__day:hover {
+  background: var(--teal-soft);
+}
+
+.date-popover__day[data-today="true"] {
+  box-shadow: inset 0 0 0 1px var(--teal);
+}
+
+.date-popover__day[data-selected="true"] {
+  background: var(--teal);
+  color: #fff;
+}
+
+.date-popover__time {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+}
+
+.date-popover__time-label {
+  margin-right: auto;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 680;
+}
+
+.date-popover__select {
+  min-height: 2rem;
+  border: 1px solid #c8d2d9;
+  border-radius: 0.45rem;
+  background: #fff;
+  padding: 0.15rem 0.3rem;
+  color: var(--navy);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.date-popover__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+}
+
+.date-popover__action {
+  border-radius: 0.45rem;
+  padding: 0.3rem 0.55rem;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 680;
+}
+
+.date-popover__action:hover {
+  background: #f1f5f9;
+}
+
+.date-popover__action--strong {
+  color: var(--teal);
+}
+
+/* Dashboard route changes fade and rise instead of snapping into place. */
+.page-transition {
+  animation: page-enter 280ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes page-enter {
+  from {
     opacity: 0;
+    transform: translateY(10px);
   }
 
-  .date-field__display {
-    position: absolute;
-    inset: 1px 2.5rem 1px 1px;
-    display: flex;
-    align-items: center;
-    padding: 0 0.8rem;
-    border-radius: 0.55rem;
-    color: var(--navy);
-    font: inherit;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    pointer-events: none;
+  to {
+    opacity: 1;
+    transform: none;
   }
+}
 
-  .date-field__display--empty {
-    color: #8a98a8;
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
   }
+}
+
+.field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  color: #b42318;
+  font-size: 0.78rem;
+  font-weight: 620;
+  line-height: 1.35;
+}
+
+.market-input[aria-invalid="true"],
+.market-select[aria-invalid="true"],
+.market-textarea[aria-invalid="true"] {
+  border-color: #f04438;
+}
+
+.market-input[aria-invalid="true"]:focus,
+.market-select[aria-invalid="true"]:focus,
+.market-textarea[aria-invalid="true"]:focus {
+  border-color: #f04438;
+  box-shadow: 0 0 0 3px rgba(240, 68, 56, 0.14);
 }
 
 .surface {

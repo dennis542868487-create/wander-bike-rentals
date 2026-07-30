@@ -18,6 +18,8 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { DateField } from "@/components/forms/date-field";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import {
   buildRentalAgreementClauses,
   rentalAgreementFilename,
@@ -183,6 +185,7 @@ export function RentalAgreementForm({
   defaultPreparedBy: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
   const [providerName, setProviderName] = useState(defaultProviderName);
   const [signatureDataUrl, setSignatureDataUrl] = useState("");
   const [signatureKey, setSignatureKey] = useState(0);
@@ -390,6 +393,7 @@ export function RentalAgreementForm({
                 className="market-input text-base read-only:bg-slate-50 read-only:text-slate-600"
                 autoComplete="name"
               />
+              <FieldError message={fieldErrors.provider_name} />
             </label>
             <label className="field-label">
               Provider contact
@@ -401,6 +405,7 @@ export function RentalAgreementForm({
                 className="market-input text-base"
                 placeholder="Email or phone number"
               />
+              <FieldError message={fieldErrors.provider_contact} />
             </label>
             <label className="field-label">
               Prepared by
@@ -412,6 +417,7 @@ export function RentalAgreementForm({
                 className="market-input text-base"
                 placeholder="Owner or staff name"
               />
+              <FieldError message={fieldErrors.prepared_by} />
             </label>
           </div>
 
@@ -427,6 +433,7 @@ export function RentalAgreementForm({
                   className="market-input text-base"
                   autoComplete="given-name"
                 />
+                <FieldError message={fieldErrors.renter_first_name} />
               </label>
               <label className="field-label">
                 Last name
@@ -437,6 +444,7 @@ export function RentalAgreementForm({
                   className="market-input text-base"
                   autoComplete="family-name"
                 />
+                <FieldError message={fieldErrors.renter_last_name} />
               </label>
               <label className="field-label">
                 Phone number
@@ -449,6 +457,7 @@ export function RentalAgreementForm({
                   autoComplete="tel"
                   placeholder="Include country code if not Canadian"
                 />
+                <FieldError message={fieldErrors.renter_phone} />
               </label>
               <label className="field-label">
                 Email
@@ -460,6 +469,7 @@ export function RentalAgreementForm({
                   className="market-input text-base"
                   autoComplete="email"
                 />
+                <FieldError message={fieldErrors.renter_email} />
               </label>
               <label className="field-label">
                 Photo ID type
@@ -478,6 +488,7 @@ export function RentalAgreementForm({
                     </option>
                   ))}
                 </select>
+                <FieldError message={fieldErrors.photo_id_type} />
               </label>
               <label className="field-label">
                 Photo ID number
@@ -488,6 +499,7 @@ export function RentalAgreementForm({
                   className="market-input text-base"
                   autoComplete="off"
                 />
+                <FieldError message={fieldErrors.photo_id_number} />
               </label>
             </div>
             <p className="mt-4 flex gap-2 text-xs leading-5 text-slate-500">
@@ -517,6 +529,7 @@ export function RentalAgreementForm({
                 required
                 className="market-input text-base"
               />
+              <FieldError message={fieldErrors.rental_start} />
             </label>
             <label className="field-label">
               Expected return
@@ -526,6 +539,7 @@ export function RentalAgreementForm({
                 required
                 className="market-input text-base"
               />
+              <FieldError message={fieldErrors.expected_return} />
             </label>
             <label className="field-label sm:col-span-2">
               Bike / listing description
@@ -536,6 +550,7 @@ export function RentalAgreementForm({
                 className="market-input text-base"
                 placeholder="e.g. Blue Trek hybrid, listing name, frame size, lock"
               />
+              <FieldError message={fieldErrors.bike_description} />
             </label>
             <fieldset className="sm:col-span-2">
               <legend className="field-label">Equipment quantities</legend>
@@ -551,6 +566,7 @@ export function RentalAgreementForm({
                     defaultValue="1"
                     className="market-input text-base"
                   />
+                  <FieldError message={fieldErrors.adult_bike_quantity} />
                 </label>
                 <label className="field-label">
                   Kids bikes
@@ -563,6 +579,7 @@ export function RentalAgreementForm({
                     defaultValue="0"
                     className="market-input text-base"
                   />
+                  <FieldError message={fieldErrors.kid_bike_quantity} />
                 </label>
                 <label className="field-label">
                   Trailers
@@ -575,6 +592,7 @@ export function RentalAgreementForm({
                     defaultValue="0"
                     className="market-input text-base"
                   />
+                  <FieldError message={fieldErrors.trailer_quantity} />
                 </label>
               </div>
             </fieldset>
@@ -587,6 +605,7 @@ export function RentalAgreementForm({
                 className="market-textarea min-h-28 text-base"
                 placeholder="Existing scratches, included accessories, or other handoff details"
               />
+              <FieldError message={fieldErrors.notes} />
             </label>
           </div>
         </section>
@@ -624,6 +643,7 @@ export function RentalAgreementForm({
                 autoComplete="name"
                 placeholder="Must match the signer's photo ID"
               />
+              <FieldError message={fieldErrors.signer_legal_name} />
             </label>
             <label className="field-label">
               Signing as
@@ -639,6 +659,7 @@ export function RentalAgreementForm({
                   Authorized group representative
                 </option>
               </select>
+              <FieldError message={fieldErrors.signing_capacity} />
             </label>
           </div>
 
@@ -660,6 +681,7 @@ export function RentalAgreementForm({
               className="mt-1 h-5 w-5 shrink-0 accent-teal-700"
             />
             I have read and agree to the complete rental agreement above.
+            <FieldError message={fieldErrors.agreement_confirmed} />
           </label>
 
           <div id="rental-signature" className="mt-6 scroll-mt-24">

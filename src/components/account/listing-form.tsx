@@ -4,7 +4,9 @@ import { Camera, CheckCircle2, DollarSign, MapPin, ShieldCheck } from "lucide-re
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { DateField } from "@/components/forms/date-field";
+import { FieldError } from "@/components/forms/field-error";
 import { useBlockedSubmitMessage } from "@/components/forms/use-blocked-submit";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { bikeTypeLabel } from "@/lib/marketplace/format";
 import { scanBikePhotos } from "@/lib/marketplace/image-safety-client";
@@ -69,6 +71,7 @@ export function ListingForm({
     listing?.description?.length ?? 0,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   useBlockedSubmitMessage(formRef, (message) => {
     setSaved(false);
@@ -303,6 +306,7 @@ export function ListingForm({
               className="market-input"
               placeholder="e.g. Medium hybrid bike with rear rack"
             />
+                      <FieldError message={fieldErrors.title} />
           </label>
           <label className="field-label">
             Bike type
@@ -318,6 +322,7 @@ export function ListingForm({
                 </option>
               ))}
             </select>
+                      <FieldError message={fieldErrors.bike_type} />
           </label>
           <label className="field-label">
             Condition
@@ -370,6 +375,7 @@ export function ListingForm({
               className="market-input"
               placeholder="One sentence shown in browse results"
             />
+                      <FieldError message={fieldErrors.short_description} />
           </label>
           <label className="field-label sm:col-span-2">
             Full description
@@ -448,6 +454,7 @@ export function ListingForm({
                   className="market-input"
                   placeholder="12"
                 />
+                              <FieldError message={fieldErrors.rental_hourly} />
               </label>
               <label className="field-label">
                 Daily price (CAD)
@@ -460,6 +467,7 @@ export function ListingForm({
                   className="market-input"
                   placeholder="45"
                 />
+                              <FieldError message={fieldErrors.rental_daily} />
               </label>
               <label className="field-label">
                 Minimum rental (hours)
@@ -472,6 +480,7 @@ export function ListingForm({
                   defaultValue={listing?.minimumRentalHours ?? 1}
                   className="market-input"
                 />
+                              <FieldError message={fieldErrors.minimum_rental_hours} />
               </label>
             </>
           ) : (
@@ -490,6 +499,7 @@ export function ListingForm({
                 className="market-input"
                 placeholder="450"
               />
+                          <FieldError message={fieldErrors.sale_price} />
             </label>
           ) : null}
         </div>
@@ -521,6 +531,7 @@ export function ListingForm({
               className="market-input"
               placeholder="e.g. Steveston Village"
             />
+                      <FieldError message={fieldErrors.pickup_area} />
           </label>
           <label className="field-label">
             City
@@ -530,6 +541,7 @@ export function ListingForm({
               defaultValue={listing?.city ?? "Richmond"}
               className="market-input"
             />
+                      <FieldError message={fieldErrors.city} />
           </label>
           <label className="field-label">
             Province
@@ -539,6 +551,7 @@ export function ListingForm({
               defaultValue={listing?.province ?? "BC"}
               className="market-input"
             />
+                      <FieldError message={fieldErrors.province} />
           </label>
           <label className="field-label">
             Postal code <span className="font-normal text-slate-400">(private)</span>
@@ -558,6 +571,7 @@ export function ListingForm({
               className="market-input"
               autoComplete="street-address"
             />
+                      <FieldError message={fieldErrors.pickup_address} />
           </label>
           <label className="field-label">
             Available from <span className="font-normal text-slate-400">(optional)</span>
@@ -565,6 +579,7 @@ export function ListingForm({
               name="available_from"
               defaultValue={listing?.availableFrom ?? ""}
             />
+            <FieldError message={fieldErrors.available_from} />
           </label>
           <label className="field-label">
             Available until <span className="font-normal text-slate-400">(optional)</span>
@@ -572,6 +587,7 @@ export function ListingForm({
               name="available_until"
               defaultValue={listing?.availableUntil ?? ""}
             />
+            <FieldError message={fieldErrors.available_until} />
           </label>
           <label className="field-label sm:col-span-2">
             Public availability summary

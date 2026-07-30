@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GuideByline } from "@/components/guide-byline";
+import {
+  breadcrumbSchema,
+  guideArticleSchema,
+  jsonLd,
+} from "@/lib/seo/structured-data";
+
+const PUBLISHED = "2026-06-15";
+const PATH = "/guides/bike-trailer-rental-richmond-guide";
 
 export const metadata: Metadata = {
   title: "Bike Trailer Rental Guide",
@@ -49,6 +58,27 @@ const guidePoints = [
 export default function BikeTrailerRentalRichmondGuidePage() {
   return (
     <main className="pb-20 text-slate-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          guideArticleSchema({
+            headline: "Bike Trailer Rental Guide",
+            description:
+              "A practical guide for families deciding whether a bike trailer is the right fit for their Richmond or Steveston ride.",
+            path: PATH,
+            /* This guide has a CSS-gradient hero, not a photo. */
+            images: [],
+            datePublished: PUBLISHED,
+            dateModified: PUBLISHED,
+          }),
+        )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([{ name: "Bike Trailer Rental Guide", path: PATH }]),
+        )}
+      />
       <section className="hero relative isolate overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_16%_14%,rgba(20,184,166,0.34),transparent_44%),radial-gradient(circle_at_84%_80%,rgba(14,165,233,0.22),transparent_48%),linear-gradient(135deg,#0f172a_0%,#052e2b_52%,#0b3b39_100%)]" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:46px_46px] [mask-image:radial-gradient(circle_at_50%_40%,#000,transparent_75%)]" />
@@ -65,9 +95,12 @@ export default function BikeTrailerRentalRichmondGuidePage() {
                 A practical guide for parents deciding whether a trailer will make the ride smoother and more comfortable for the whole group.
               </p>
             </div>
-            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
-              Riding with younger children? This guide helps you decide whether a trailer is the better choice before you visit.
-            </p>
+            <div className="hero-anim hero-d3 space-y-3">
+              <p className="max-w-2xl text-base leading-8 text-slate-200/85">
+                Riding with younger children? This guide helps you decide whether a trailer is the better choice before you visit.
+              </p>
+              <GuideByline published={PUBLISHED} />
+            </div>
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/bike-trailer-rental-richmond"
@@ -90,20 +123,48 @@ export default function BikeTrailerRentalRichmondGuidePage() {
             </div>
           </div>
 
-          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)]">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/90 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Choose the setup that makes the family ride easier</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">When should you rent a bike trailer instead of a kids bike?</h2>
+            <div className="mt-5 text-sm leading-7 text-slate-600">
               <p>
-                A trailer can be the better fit when the ride needs to stay comfortable, flexible, and easier for younger children who are not ready for the full route.
-              </p>
-              <p>
-                The easiest plan is usually a simple Steveston or waterfront ride where the route stays flat and the family can stop whenever it helps.
+                <strong className="font-semibold text-slate-900">
+                  A bike trailer is the better rental when a child is too young to
+                  ride the full route alone but the family still wants a relaxed
+                  outing.
+                </strong>{" "}
+                Wander Bike Rentals in Steveston rents trailers alongside
+                adult bikes and kids bikes, and they suit the flat waterfront
+                routes nearby — Steveston Village, Garry Point Park, and the dyke
+                trails — where the pace stays slow enough for photo stops, snacks,
+                and breaks. Choose a trailer over a kids bike when comfort matters
+                more than distance, and when one tired child turning back early
+                would end the outing for everyone. A kids bike is the better
+                choice once a child is comfortable riding the full route on their
+                own. If the ride depends on having a trailer, call (778) 952-1389
+                to confirm before making the trip.
+                The shop is at 12071 First Ave #101 in Steveston, open 9:00 AM to
+                10:00 PM daily.
               </p>
             </div>
-            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
-              If the outing depends on having a trailer, calling ahead is still the best way to confirm the details before you come by.
-            </div>
+            <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-6 text-teal-950 shadow-sm">
+              <div>
+                <dt className="font-semibold">Best for</dt>
+                <dd className="text-teal-900/85">Younger children</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Best routes</dt>
+                <dd className="text-teal-900/85">Flat waterfront</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Before you go</dt>
+                <dd className="text-teal-900/85">Call (778) 952-1389</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Rentals</dt>
+                <dd className="text-teal-900/85">9:00 AM – 10:00 PM daily</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </section>
@@ -112,7 +173,7 @@ export default function BikeTrailerRentalRichmondGuidePage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">When a trailer makes sense</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple trailer tips for easier family rides</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">When does a bike trailer make sense?</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
             Use this page if you want to decide whether a trailer suits the ride, the child, and the kind of family outing you are planning.
@@ -134,7 +195,7 @@ export default function BikeTrailerRentalRichmondGuidePage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the guide first, then confirm the trailer details you need</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">How do you confirm a trailer before you visit?</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
                 If a trailer matters for the ride, use this page to plan the outing first, then contact the shop to confirm the setup.
               </p>

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "How It Works",
   description:
     "Learn how local bike rentals and purchase inquiries work on Wander Bike.",
+  alternates: { canonical: "/how-it-works" },
 };
 
 const steps = [
@@ -52,7 +53,7 @@ export default function HowItWorksPage() {
               Request first, meet locally
             </p>
             <h1 className="display-heading mt-4 text-[2.65rem] leading-[0.98] sm:text-6xl lg:text-7xl">
-              A local marketplace,
+              A local marketplace,{" "}
               <span className="block text-[var(--teal)]">without checkout.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8">

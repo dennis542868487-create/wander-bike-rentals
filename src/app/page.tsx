@@ -15,7 +15,12 @@ import { getFeaturedListings } from "@/lib/marketplace/data";
 import { wanderWebsiteSchema } from "@/lib/seo/wander-business";
 
 export const metadata: Metadata = {
-  title: "Bike Rentals in Steveston & Local Bike Marketplace",
+  /*
+   * Spelled out with the brand because title.template only applies to child
+   * segments — app/page.tsx sits in the same segment as app/layout.tsx, so the
+   * "%s | Wander Bike Rentals" suffix every other page gets never reaches it.
+   */
+  title: "Bike Rentals in Steveston | Wander Bike Rentals",
   description:
     "Wander Bike Rentals is a physical bike rental, sale, and quick repair shop in Steveston, Richmond, plus a local marketplace for owner-listed bikes.",
   alternates: { canonical: "/" },
@@ -59,7 +64,7 @@ export default async function HomePage() {
               Wander Bike Rentals • Steveston, Richmond
             </div>
             <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.02] tracking-[-0.05em] text-white sm:mt-7 sm:text-6xl lg:text-[4.4rem]">
-              Easy local bike rentals,
+              Easy local bike rentals,{" "}
               <span className="block text-teal-200">
                 now with a community marketplace.
               </span>

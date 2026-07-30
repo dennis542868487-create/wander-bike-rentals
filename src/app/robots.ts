@@ -15,7 +15,11 @@ export default function robots(): MetadataRoute.Robots {
         "/auth",
       ],
     },
+    /*
+     * No `host` directive: it is a non-standard Yandex-only extension that
+     * Google ignores. Canonicalisation is handled by the canonical tags and the
+     * apex-to-www redirect.
+     */
     sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
   };
 }

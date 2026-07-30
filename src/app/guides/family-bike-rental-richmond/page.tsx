@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { GuideByline } from "@/components/guide-byline";
+import {
+  breadcrumbSchema,
+  guideArticleSchema,
+  jsonLd,
+} from "@/lib/seo/structured-data";
+
+const PUBLISHED = "2026-06-15";
+const PATH = "/guides/family-bike-rental-richmond";
 
 export const metadata: Metadata = {
   title: "Family Bike Rentals in Richmond, BC",
@@ -50,6 +59,28 @@ const guidePoints = [
 export default function FamilyBikeRentalRichmondPage() {
   return (
     <main className="pb-20 text-slate-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          guideArticleSchema({
+            headline: "Family Bike Rentals in Richmond, BC",
+            description:
+              "Plan an easy family bike ride in Richmond, BC. Rent kids bikes or bike trailers near Steveston and explore Garry Point Park, waterfront paths, and flat dyke trails.",
+            path: PATH,
+            images: ["/assets/west-dyke-trail.jpg"],
+            datePublished: PUBLISHED,
+            dateModified: PUBLISHED,
+          }),
+        )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([
+            { name: "Family Bike Rentals in Richmond, BC", path: PATH },
+          ]),
+        )}
+      />
       <section className="hero relative isolate overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 -z-10">
           <Image
@@ -76,9 +107,12 @@ export default function FamilyBikeRentalRichmondPage() {
                 A simple guide for families looking for kids bikes, bike trailers, and easy places to ride around Steveston and Richmond.
               </p>
             </div>
-            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
-              Planning a family ride in Richmond? Wander Bike Rentals offers adult bikes, kids bikes, and bike trailers for an easy day out near Steveston, Garry Point Park, the waterfront, and Richmond’s flat dyke trails.
-            </p>
+            <div className="hero-anim hero-d3 space-y-3">
+              <p className="max-w-2xl text-base leading-8 text-slate-200/85">
+                Planning a family ride in Richmond? Wander Bike Rentals offers adult bikes, kids bikes, and bike trailers for an easy day out near Steveston, Garry Point Park, the waterfront, and Richmond’s flat dyke trails.
+              </p>
+              <GuideByline published={PUBLISHED} />
+            </div>
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/kids-bike-rental-richmond"
@@ -103,18 +137,44 @@ export default function FamilyBikeRentalRichmondPage() {
 
           <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/90 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Why Richmond works well for family bike rides</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Where should families bike in Richmond, BC?</h2>
+            <div className="mt-5 text-sm leading-7 text-slate-600">
               <p>
-                Richmond is a good place for a family ride because many routes are flat, scenic, and easy to keep flexible without overplanning the day.
-              </p>
-              <p>
-                The best family plan is usually simple: choose one easy route, add one or two fun stops, and leave enough time for snacks, photos, and breaks.
+                <strong className="font-semibold text-slate-900">
+                  Families riding in Richmond have four easy options, all of them
+                  flat: the Steveston Village loop out to Garry Point Park, the
+                  West Dyke Trail, Terra Nova at the north end of that trail, and
+                  the mostly car-free Railway Greenway.
+                </strong>{" "}
+                None of these routes involve
+                climbing, which is what makes them workable with children. Wander
+                Bike Rentals stocks adult bikes, kids bikes for children who ride
+                on their own, and bike trailers for younger children or kids who
+                tire quickly — the trailer is what keeps the rest of the family
+                riding instead of turning back early. The West Dyke Trail north
+                toward the airport and back is about a two-hour round trip and can
+                be shortened at any point. The shop is at 12071 First Ave #101 in
+                Steveston, open 9:00 AM to 10:00 PM daily.
               </p>
             </div>
-            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
-              Whether your child is ready for their own bike or you prefer a trailer for a younger rider, this page helps you choose the better fit before you head out.
-            </div>
+            <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-6 text-teal-950 shadow-sm">
+              <div>
+                <dt className="font-semibold">Easy routes</dt>
+                <dd className="text-teal-900/85">4, all flat</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">For young kids</dt>
+                <dd className="text-teal-900/85">Bike trailer</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Longest route</dt>
+                <dd className="text-teal-900/85">≈2-hour round trip</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Rentals</dt>
+                <dd className="text-teal-900/85">9:00 AM – 10:00 PM daily</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </section>
@@ -123,7 +183,7 @@ export default function FamilyBikeRentalRichmondPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Easy family ride ideas</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Plan the ride around your family, not the longest route</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">What do you need for a family bike ride in Richmond?</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
             Use this page to decide whether kids bikes or trailers fit better, then choose one easy Richmond route that keeps the outing relaxed.
@@ -145,7 +205,7 @@ export default function FamilyBikeRentalRichmondPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Choose the family setup first, then plan the ride around it</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">Kids bikes or a bike trailer — which should you rent?</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
                 Once you know whether kids bikes or a trailer make more sense, it gets much easier to plan a simple Richmond family ride.
               </p>

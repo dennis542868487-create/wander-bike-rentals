@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { breadcrumbSchema, jsonLd } from "@/lib/seo/structured-data";
 
 const policies = {
   marketplace: {
@@ -158,6 +159,14 @@ export default async function PolicyPage({
 
   return (
     <main className="min-h-[70vh] bg-[#f5f7f9] px-6 py-14 text-slate-900 sm:px-8 lg:py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([
+            { name: item.title, path: `/policies/${policy}` },
+          ]),
+        )}
+      />
       <article className="mx-auto max-w-3xl">
         <h1 className="text-4xl font-bold tracking-[-0.035em] text-slate-950 sm:text-5xl">
           {item.title}

@@ -11,6 +11,11 @@ import {
   sourceLabel,
 } from "@/lib/marketplace/format";
 import { getPublicListingBySlug } from "@/lib/marketplace/data";
+import {
+  breadcrumbSchema,
+  jsonLd,
+  listingProductSchema,
+} from "@/lib/seo/structured-data";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 export async function generateMetadata({
@@ -43,8 +48,27 @@ export default async function BikeDetailPage({
   const canRent = listing.offerMode === "rent" || listing.offerMode === "rent_sale";
   const canBuy = listing.offerMode === "sale" || listing.offerMode === "rent_sale";
 
+  const collectionCrumb =
+    listing.source === "wander"
+      ? { name: "Wander Bikes", path: "/bikes/wander" }
+      : { name: "Community Bikes", path: "/bikes/community" };
+
   return (
     <main className="min-h-screen bg-[var(--background)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(listingProductSchema(listing))}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([
+            { name: "Find a Bike", path: "/bikes" },
+            collectionCrumb,
+            { name: listing.title, path: `/bikes/${listing.slug}` },
+          ]),
+        )}
+      />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-12">
         <nav aria-label="Breadcrumb" className="text-sm text-slate-500">
           <Link href="/bikes" className="hover:text-teal-800">Find a Bike</Link>

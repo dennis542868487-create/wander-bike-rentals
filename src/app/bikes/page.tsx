@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Find a Bike",
   description:
     "Choose between bikes listed by Wander Bike and bikes listed by local community owners.",
+  alternates: { canonical: "/bikes" },
 };
 
 export default function FindBikePage() {
@@ -20,7 +21,7 @@ export default function FindBikePage() {
               Two collections · one local marketplace
             </p>
             <h1 className="display-heading text-[2.65rem] leading-[0.98] sm:text-6xl lg:text-7xl">
-              Find a bike
+              Find a bike{" "}
               <span className="block text-[var(--teal)]">that fits the ride.</span>
             </h1>
             <p className="mt-4 text-base leading-7 text-slate-600 sm:mt-5 sm:text-lg sm:leading-8">

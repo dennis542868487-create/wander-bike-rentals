@@ -27,7 +27,13 @@ export const metadata: Metadata = {
   },
   description:
     "Physical bike rentals, local bike sales, and quick repair in Steveston, Richmond, plus a separate Community Bike marketplace.",
-  alternates: { canonical: "/" },
+  /*
+   * No canonical here on purpose. A layout-level canonical is inherited by every
+   * page that does not override it, so a page that forgets one silently declares
+   * itself a duplicate of the home page and drops out of the index. Leaving it
+   * unset means a forgotten page gets no canonical at all, and Google
+   * self-canonicalises — a much safer failure mode. Each page sets its own.
+   */
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },

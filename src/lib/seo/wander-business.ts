@@ -7,6 +7,26 @@ const address = {
   addressCountry: "CA",
 } as const;
 
+export const SITE_URL = "https://www.wanderbike.ca";
+export const BUSINESS_ID = `${SITE_URL}/#business`;
+
+/*
+ * Entity links. `sameAs` is how a search engine works out that this site, the
+ * Google Business Profile, and the social accounts are one business rather than
+ * four unrelated things — it is the highest-leverage structured-data field a
+ * local shop has, and brand mentions correlate with AI citation far more
+ * strongly than backlinks do.
+ *
+ * Deliberately empty until the real profile URLs are on hand. Guessed or
+ * search-style URLs (`google.com/maps/search?q=...`) are worse than nothing:
+ * they either resolve to the wrong entity or to no entity at all.
+ *
+ * Fill in with the canonical profile URLs, most authoritative first, e.g.
+ * the Google Business Profile share link, Facebook page, Instagram profile,
+ * Yelp and TripAdvisor listings. `sameAs` is omitted entirely while empty.
+ */
+const sameAs: readonly string[] = [];
+
 const everyDay = [
   "Monday",
   "Tuesday",
@@ -19,9 +39,10 @@ const everyDay = [
 
 export const wanderBusinessEntity = {
   "@type": ["BikeStore", "SportsActivityLocation"],
-  "@id": "https://www.wanderbike.ca/#business",
+  "@id": BUSINESS_ID,
   name: "Wander Bike Rentals",
   alternateName: "Wander Bike",
+  ...(sameAs.length > 0 ? { sameAs } : {}),
   description:
     "A physical bike rental, bike sale, and quick repair shop in Steveston, Richmond that also operates a local bike marketplace.",
   url: "https://www.wanderbike.ca/",

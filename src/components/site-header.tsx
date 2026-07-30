@@ -101,7 +101,10 @@ function DesktopDropdown({
           aria-hidden="true"
         />
       </button>
-      <div className="pointer-events-none absolute left-0 top-full z-50 w-80 pt-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+      {/* Scales from the trigger rather than fading in from nowhere. Kept to a
+          2% scale and the existing 200ms so the panel still reads as restrained
+          on a hover-opened nav menu. */}
+      <div className="pointer-events-none absolute left-0 top-full z-50 w-80 origin-top-left scale-[0.98] pt-3 opacity-0 transition duration-200 ease-[var(--ease-ui)] group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:scale-100 group-focus-within:opacity-100">
         <div className="rounded-[1.6rem] border border-slate-200 bg-white p-3 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
           <p className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
             {label}
@@ -257,7 +260,7 @@ export default function SiteHeader() {
                   aria-hidden="true"
                 />
               </Link>
-              <div className="pointer-events-none absolute right-0 top-full z-50 w-64 pt-3 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className="pointer-events-none absolute right-0 top-full z-50 w-64 origin-top-right scale-[0.98] pt-3 opacity-0 transition duration-200 ease-[var(--ease-ui)] group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:scale-100 group-focus-within:opacity-100">
                 <div className="rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
                   <p className="px-3 pb-2 pt-1 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                     {session ? "Your workspace" : "Dashboard"}

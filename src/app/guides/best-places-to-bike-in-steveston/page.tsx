@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { GuideByline } from "@/components/guide-byline";
+import {
+  breadcrumbSchema,
+  guideArticleSchema,
+  jsonLd,
+} from "@/lib/seo/structured-data";
+
+const PUBLISHED = "2026-06-15";
+const PATH = "/guides/best-places-to-bike-in-steveston";
 
 export const metadata: Metadata = {
   title: "Best Places to Bike in Steveston",
@@ -50,6 +59,28 @@ const guidePoints = [
 export default function BestPlacesToBikeInStevestonPage() {
   return (
     <main className="pb-20 text-slate-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          guideArticleSchema({
+            headline: "Best Places to Bike in Steveston",
+            description:
+              "A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.",
+            path: PATH,
+            images: ["/assets/garry-point-park.jpg"],
+            datePublished: PUBLISHED,
+            dateModified: PUBLISHED,
+          }),
+        )}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(
+          breadcrumbSchema([
+            { name: "Best Places to Bike in Steveston", path: PATH },
+          ]),
+        )}
+      />
       <section className="hero relative isolate overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 -z-10">
           <Image
@@ -76,9 +107,12 @@ export default function BestPlacesToBikeInStevestonPage() {
                 A local guide to easy waterfront rides, village stops, parks, dyke trails, and scenic places to visit by bike around Steveston, Richmond.
               </p>
             </div>
-            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
-              Steveston is one of the easier places in Richmond to explore by bike. From Garry Point Park and Fisherman’s Wharf to Britannia Shipyards, the South Dyke Trail, and the West Dyke Trail, many of the best local stops are close enough to enjoy in one relaxed ride.
-            </p>
+            <div className="hero-anim hero-d3 space-y-3">
+              <p className="max-w-2xl text-base leading-8 text-slate-200/85">
+                Steveston is one of the easier places in Richmond to explore by bike. From Garry Point Park and Fisherman’s Wharf to Britannia Shipyards, the South Dyke Trail, and the West Dyke Trail, many of the best local stops are close enough to enjoy in one relaxed ride.
+              </p>
+              <GuideByline published={PUBLISHED} />
+            </div>
             <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/bike-rental-steveston"
@@ -95,20 +129,47 @@ export default function BestPlacesToBikeInStevestonPage() {
             </div>
           </div>
 
-          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/90 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl">
+          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/90 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)] backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Use this page to pick the stops that fit your ride</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Where are the best places to bike in Steveston?</h2>
+            <div className="mt-5 text-sm leading-7 text-slate-600">
               <p>
-                Some riders want a short village loop, while others want a longer afternoon with more open space, food stops, and more time on the dyke trails.
-              </p>
-              <p>
-                Pick the places first so the ride feels more intentional and less like guesswork after pickup.
+                <strong className="font-semibold text-slate-900">
+                  The best places to bike in Steveston are Garry Point Park,
+                  Fisherman’s Wharf, Britannia Shipyards, the South Dyke Trail,
+                  London Farm and Finn Slough, and the West Dyke Trail toward
+                  Terra Nova.
+                </strong>{" "}
+                All six sit on flat ground within a short ride of Steveston
+                Village, so you can string together as many as the day allows
+                without any climbing. Garry Point Park is the usual first stop for
+                open water and driftwood beaches, Britannia Shipyards is a
+                National Historic Site of restored boardwalks and heritage
+                buildings, and Finn Slough is a stilt-house fishing community
+                farther east along the Fraser River. For a longer outing, the West
+                Dyke Trail north toward the airport and back is about a two-hour
+                round trip at a sightseeing pace. Wander Bike Rentals is at 12071
+                First Ave #101 in Steveston, open 9:00 AM to 10:00 PM daily.
               </p>
             </div>
-            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
-              A good Steveston ride usually includes one easy park stop, one village stop, and enough time left over to keep the day relaxed.
-            </div>
+            <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-3 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-6 text-teal-950 shadow-sm">
+              <div>
+                <dt className="font-semibold">Stops covered</dt>
+                <dd className="text-teal-900/85">6</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Terrain</dt>
+                <dd className="text-teal-900/85">Flat, paved, no climbs</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Longest leg</dt>
+                <dd className="text-teal-900/85">≈2-hour round trip</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Rentals</dt>
+                <dd className="text-teal-900/85">9:00 AM – 10:00 PM daily</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </section>
@@ -117,7 +178,7 @@ export default function BestPlacesToBikeInStevestonPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Best local stops</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Six places that make a Steveston ride feel worth doing</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Which Steveston stops are worth riding to?</h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-slate-600">
             Use these stops to build a short casual ride or a longer half-day route around the village, waterfront, and dyke trails.
@@ -139,7 +200,7 @@ export default function BestPlacesToBikeInStevestonPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Know the stops? Now plan the route and book a bike</h2>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">How do you turn these stops into a route?</h2>
               <p className="mt-4 text-base leading-8 text-slate-300">
                 Follow the step-by-step Steveston route, grab a rental, or check the shop location before you go.
               </p>

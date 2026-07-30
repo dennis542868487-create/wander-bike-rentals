@@ -31,7 +31,10 @@ export function ListingPhoto({
       fill
       sizes={sizes}
       priority={priority}
-      className="object-cover transition duration-500 group-hover:scale-[1.02]"
+      /* Transform only, 300ms: the bare `transition` shorthand dragged every
+         animatable property along at 500ms, and half a second to travel 2% read
+         as a drift rather than a response. */
+      className="object-cover transition-transform duration-300 ease-[var(--ease-ui)] group-hover:scale-[1.02]"
     />
   );
 }

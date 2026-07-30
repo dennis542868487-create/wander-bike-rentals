@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   title: "List Your Bike",
   description:
     "Create a free local bike rental or sale listing on Wander Bike.",
+  alternates: { canonical: "/list-your-bike" },
 };
 
 export default async function ListYourBikePage() {

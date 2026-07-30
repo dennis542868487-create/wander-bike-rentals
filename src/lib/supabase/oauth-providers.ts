@@ -1,4 +1,4 @@
-export const socialAuthProviders = ["google", "apple"] as const;
+export const socialAuthProviders = ["google"] as const;
 
 export type SocialAuthProvider = (typeof socialAuthProviders)[number];
 
@@ -24,9 +24,5 @@ export function readSocialAuthAvailability(
       external !== null &&
       "google" in external &&
       external.google === true,
-    apple:
-      external !== null &&
-      "apple" in external &&
-      external.apple === true,
   };
 }

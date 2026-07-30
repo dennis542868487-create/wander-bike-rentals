@@ -15,7 +15,10 @@ export default function AuthCallback() {
   useEffect(() => {
     const code = params.get("code");
     const nextValue = params.get("next");
-    const next = nextValue?.startsWith("/") && !nextValue.startsWith("//") ? nextValue : "/account/bookings";
+    const next =
+      nextValue?.startsWith("/") && !nextValue.startsWith("//")
+        ? nextValue
+        : "/auth/continue";
     if (!code || exchangeStarted.current) return;
     exchangeStarted.current = true;
 

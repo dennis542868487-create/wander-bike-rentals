@@ -1,40 +1,32 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { AccountShell } from "@/components/account/account-shell";
+import { getProfile } from "@/lib/marketplace/server-data";
+import { COMMUNITY_DASHBOARD_LABEL } from "@/lib/marketplace/workspace-labels";
+import { getCurrentUser } from "@/lib/supabase/auth";
 
 export const metadata: Metadata = {
-  title: "My Account",
+  title: COMMUNITY_DASHBOARD_LABEL,
   robots: { index: false, follow: false },
 };
 
-export default function AccountLayout({ children }: { children: React.ReactNode }) {
+export default async function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/auth?next=/account");
+  const profile = await getProfile(user.id);
   return (
-    <>
-      <nav
-        aria-label="Account"
-        className="border-b border-teal-100 bg-white/80 px-6 backdrop-blur"
-      >
-        <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto py-3">
-          <Link
-            href="/account"
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-teal-50"
-          >
-            Overview
-          </Link>
-          <Link
-            href="/account/orders"
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-teal-50"
-          >
-            Shop orders
-          </Link>
-          <Link
-            href="/account/bookings"
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-teal-50"
-          >
-            Rental bookings
-          </Link>
-        </div>
-      </nav>
+    <AccountShell
+      email={user.email ?? profile?.email ?? ""}
+      name={profile?.fullName ?? null}
+      role={profile?.role ?? "customer"}
+      marketplaceAccessStatus={profile?.marketplaceAccessStatus ?? "active"}
+      marketplaceAccessReason={profile?.marketplaceAccessReason ?? null}
+    >
       {children}
-    </>
+    </AccountShell>
   );
 }

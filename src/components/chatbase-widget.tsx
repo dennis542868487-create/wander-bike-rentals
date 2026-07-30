@@ -1,77 +1,73 @@
 "use client";
 
-import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import Script from "next/script";
+import { useEffect, useState } from "react";
 
-// Chatbase chatbot id — dashboard URL /chatbot/<ID>/deploy
 const CHATBASE_ID = "WqLC1J0pcU0oSFy2BCPcT";
-// The launcher button Chatbase injects into the page. We hide it and drive it
-// from our own branded button so we control the look and the animation.
 const NATIVE_BUTTON_ID = "chatbase-bubble-button";
-// The chat panel Chatbase opens. We watch it so our launcher gets out of the
-// way while the chat is open.
 const NATIVE_WINDOW_ID = "chatbase-bubble-window";
 
 export default function ChatbaseWidget() {
   const pathname = usePathname();
-  const isPrivatePage = pathname.startsWith("/booking") || pathname.startsWith("/auth") || pathname.startsWith("/account");
+  const isPrivatePage = ["/auth", "/account", "/admin", "/operations"].some(
+    (path) => pathname.startsWith(path),
+  );
   const [ready, setReady] = useState(false);
   const [teaser, setTeaser] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const dismissed = useRef(false);
 
-  // Wait for Chatbase's native launcher to mount, hide it, then reveal ours.
-  // If it never appears we leave Chatbase's own button alone so chat is never
-  // unreachable.
   useEffect(() => {
     if (isPrivatePage) return;
     let tries = 0;
-    const id = window.setInterval(() => {
+    const interval = window.setInterval(() => {
       if (document.getElementById(NATIVE_BUTTON_ID)) {
         document.documentElement.classList.add("wbr-custom-launcher");
         setReady(true);
-        window.clearInterval(id);
+        window.clearInterval(interval);
       } else if (++tries > 60) {
-        window.clearInterval(id); // give up after ~30s
+        window.clearInterval(interval);
       }
     }, 500);
-    return () => window.clearInterval(id);
+    return () => window.clearInterval(interval);
   }, [isPrivatePage]);
 
-  // Track whether the Chatbase panel is open so we can hide our launcher while
-  // it is — otherwise the FAB and teaser overlap and block the chat.
   useEffect(() => {
     if (!ready || isPrivatePage) return;
-    const win = document.getElementById(NATIVE_WINDOW_ID);
-    if (!win) return;
+    const chatWindow = document.getElementById(NATIVE_WINDOW_ID);
+    if (!chatWindow) return;
     const sync = () => {
-      const open = window.getComputedStyle(win).display !== "none";
+      const open = window.getComputedStyle(chatWindow).display !== "none";
       setChatOpen(open);
       if (open) setTeaser(false);
     };
     sync();
-    const obs = new MutationObserver(sync);
-    obs.observe(win, { attributes: true, attributeFilter: ["style", "class"] });
-    return () => obs.disconnect();
+    const observer = new MutationObserver(sync);
+    observer.observe(chatWindow, {
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
+    return () => observer.disconnect();
   }, [ready, isPrivatePage]);
 
-  // Nudge the visitor once per session, a few seconds after the launcher is live.
   useEffect(() => {
     if (!ready || isPrivatePage) return;
     try {
       if (sessionStorage.getItem("wbr-teaser-seen")) return;
-    } catch {}
-    const t = window.setTimeout(() => setTeaser(true), 4500);
-    return () => window.clearTimeout(t);
+    } catch {
+      // The launcher still works when session storage is unavailable.
+    }
+    const timeout = window.setTimeout(() => setTeaser(true), 4500);
+    return () => window.clearTimeout(timeout);
   }, [ready, isPrivatePage]);
 
   const closeTeaser = () => {
     setTeaser(false);
-    dismissed.current = true;
     try {
       sessionStorage.setItem("wbr-teaser-seen", "1");
-    } catch {}
+    } catch {
+      // A storage failure should not prevent chat from opening.
+    }
   };
 
   const toggleChat = () => {
@@ -87,9 +83,9 @@ export default function ChatbaseWidget() {
         {`(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="${CHATBASE_ID}";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();`}
       </Script>
 
-      {ready && (
+      {ready ? (
         <div className="wbr-launcher" hidden={chatOpen}>
-          {teaser && (
+          {teaser ? (
             <div className="wbr-teaser" role="status">
               <button
                 type="button"
@@ -99,12 +95,15 @@ export default function ChatbaseWidget() {
               >
                 ×
               </button>
-              <button type="button" className="wbr-teaser-body" onClick={toggleChat}>
+              <button
+                type="button"
+                className="wbr-teaser-body"
+                onClick={toggleChat}
+              >
                 Need a bike? Ask me 🚲
               </button>
             </div>
-          )}
-
+          ) : null}
           <button
             type="button"
             className="wbr-fab"
@@ -112,7 +111,13 @@ export default function ChatbaseWidget() {
             onClick={toggleChat}
           >
             <span className="wbr-fab-ring" aria-hidden="true" />
-            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              width="26"
+              height="26"
+              fill="none"
+              aria-hidden="true"
+            >
               <path
                 d="M7.5 8.5h9M7.5 12h6"
                 stroke="currentColor"
@@ -128,7 +133,7 @@ export default function ChatbaseWidget() {
             </svg>
           </button>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

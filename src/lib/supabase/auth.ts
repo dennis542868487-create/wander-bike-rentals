@@ -2,6 +2,10 @@ import "server-only";
 
 import { cache } from "react";
 import type { User } from "@supabase/supabase-js";
+import {
+  COMMUNITY_DASHBOARD_LABEL,
+  PLATFORM_DASHBOARD_LABEL,
+} from "@/lib/marketplace/workspace-labels";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -79,6 +83,49 @@ export async function requireStaff(
   };
 }
 
+export async function requireAdmin(
+  request?: Request,
+): Promise<AuthFailure | StaffAuthSuccess> {
+  const auth = await requireStaff(request);
+  if (!auth.ok) return auth;
+  if (auth.role !== "admin") {
+    return {
+      ok: false,
+      status: 403,
+      error: `This account does not have ${PLATFORM_DASHBOARD_LABEL} access.`,
+    };
+  }
+  return auth;
+}
+
+export async function requireMarketplaceActor(
+  request?: Request,
+): Promise<AuthFailure | UserAuthSuccess> {
+  const auth = await requireUser(request);
+  if (!auth.ok) return auth;
+
+  const { data, error } = await getSupabaseAdmin()
+    .from("profiles")
+    .select("marketplace_access_status")
+    .eq("id", auth.user.id)
+    .single();
+  if (error || !data) {
+    return {
+      ok: false,
+      status: 403,
+      error: "Marketplace access could not be verified.",
+    };
+  }
+  if (data.marketplace_access_status === "suspended") {
+    return {
+      ok: false,
+      status: 403,
+      error: `This account’s marketplace access is suspended. You can still view ${COMMUNITY_DASHBOARD_LABEL}.`,
+    };
+  }
+  return auth;
+}
+
 export const getCurrentUser = cache(async () => {
   const auth = await requireUser();
   return auth.ok ? auth.user : null;
@@ -86,6 +133,11 @@ export const getCurrentUser = cache(async () => {
 
 export const getCurrentStaff = cache(async () => {
   const auth = await requireStaff();
+  return auth.ok ? auth : null;
+});
+
+export const getCurrentAdmin = cache(async () => {
+  const auth = await requireAdmin();
   return auth.ok ? auth : null;
 });
 

@@ -1,36 +1,38 @@
-# Wander Bike Rentals
+# Wander Bike Marketplace
 
-Wander Bike is a single Next.js website for bike rentals, retail, repair
-information, customer accounts, and merchant operations. Commerce is
-sandboxed by default: the repository must not capture live payments or buy
-production shipping labels until the merchant explicitly approves go-live.
+Wander Bike is a free local bike marketplace for Richmond, BC. Wander can list
+its own bikes and signed-in community members can list theirs. Every bike has
+independent photos, availability, and pricing and can be offered for rental,
+sale, or both.
 
-## What is included
+The platform does not process payments or arrange shipping. A rider sends a
+request, the owner accepts or declines, and both parties complete pickup,
+inspection, and payment in person.
 
-- Existing rental, repair, guide, location, and SEO pages
-- Rental requests and customer booking history
-- Product catalog, variants, sortable images, search, filters, cart, and guest checkout
-- Per-variant pickup/delivery eligibility plus standard, large, and special packing rules
-- Atomic inventory reservations and a merchant-visible immutable inventory ledger
-- Stripe-hosted Checkout, verified webhooks, and full or partial refunds
-- Store pickup, configurable local delivery, and Canada Post sandbox shipping
-- Multi-package labels, PDFs, tracking, voids, and refund requests
-- Customer order status and account order history
-- Role-protected merchant dashboard for orders, catalog, stock, and settings
-- Durable Resend notification outbox with Vercel Cron retries
-- Supabase Auth, PostgreSQL migrations, Storage, RLS, and server-side role checks
+## Product structure
+
+- `/bikes/wander` — bikes listed by the Wander team
+- `/bikes/community` — bikes listed by local owners
+- `/bikes/[slug]` — bike details and rent/buy request
+- `/list-your-bike` — listing introduction
+- `/account` — customer workspace for renting and listing
+- `/operations` — Wander Bike inventory, requests, and pickup operations
+- `/admin` — site administration, safety signals, users, and email
+
+These are three separate responsive workspaces. A normal account can both rent
+and list bikes. Wander operators manage only Wander-owned bikes and related
+requests. Site administrators manage platform access, safety signals, and
+system operations.
 
 ## Stack
 
 - Next.js 16 App Router and React 19
-- Supabase PostgreSQL, Auth, and Storage
-- Stripe Checkout in test mode
-- Canada Post REST/JSON APIs with OAuth 2.0 through a Test app
-- Resend transactional email
-- Vercel hosting and Cron
+- Supabase PostgreSQL, Auth, Storage, and RLS
+- Google OAuth and email/password authentication
+- Resend with a durable PostgreSQL outbox
+- Vercel hosting and a daily notification cron
 
-Use Node.js `>=22`. Next.js 16 supports Node 20.9+, but the current Supabase
-JavaScript client no longer supports Node 20. Install and run locally:
+Use Node.js `>=22`:
 
 ```bash
 npm install
@@ -38,45 +40,30 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The site is available at `http://localhost:3000`.
+When Supabase variables are absent, public pages use clearly local demo
+listings so visual development remains possible. Authenticated mutations never
+fall back to demo storage or data.
 
-## Supabase
+## Database
 
-The chronological files in `supabase/migrations/` are the only schema source of
-truth. `supabase/schema.sql` is a legacy pointer and must not be run as a
-standalone schema.
-
-For a local Supabase stack:
+Migration files in `supabase/migrations/` are the schema source of truth:
 
 ```bash
 npx supabase start
 npx supabase db reset
 ```
 
-For a new linked cloud project:
+The marketplace migration is additive. Legacy commerce tables remain in the
+historical migration chain and existing database until a separate backup and
+archival decision is approved; the current application does not read or write
+them.
 
-```bash
-npx supabase link --project-ref YOUR_PROJECT_REF
-npx supabase db push --include-all --include-seed
-```
-
-The seed is deliberately marked `[TEST]` and enables only the sandbox catalog.
-Do not load it into a live customer catalog.
-
-## Safety gates
-
-All three conditions are required before Stripe Checkout can open:
-
-- `COMMERCE_SANDBOX_MODE=true`
-- `COMMERCE_CHECKOUT_ENABLED=true`
-- `commerce.checkout_enabled=true` in merchant settings
-
-Keep `COMMERCE_CHECKOUT_ENABLED=false` until Supabase migrations, the Stripe
-test webhook, and sandbox order reconciliation have been verified. Canada Post
-independently requires a Developer Portal **Test** app,
-`CANADA_POST_ENVIRONMENT=test`, and
-`fulfillment.canada_post_enabled=true`; the code rejects every other API host
-and shipping mode.
+Community listings publish immediately. Text rules and the browser-local
+NSFWJS image classifier can create advisory safety signals for the site
+administrator, but never hide a listing, reject it, or suspend an account
+automatically. Only a site administrator can take those actions manually.
+Exact pickup addresses are stored separately and shown only to the owner,
+authorized Wander operators or administrators, and an accepted rider.
 
 ## Verification
 
@@ -87,16 +74,12 @@ npm run build
 npm run test:e2e
 ```
 
-`npm run test:e2e` exercises production-rendered desktop Chrome, an iPad, and a Pixel 7
-viewport. `npm run test:all` runs the full sequence.
+See:
 
-## Operations and deployment
+- `docs/AUTH_SETUP.md`
+- `docs/RESEND_SETUP.md`
+- `docs/DEPLOYMENT.md`
+- `docs/MARKETPLACE_ACCEPTANCE.md`
 
-- Authentication and first-admin setup: `docs/AUTH_SETUP.md`
-- Environment, sandbox validation, Vercel CLI deployment, and rollback:
-  `docs/DEPLOYMENT.md`
-- Requirement-by-requirement evidence and pending hosted checks:
-  `docs/SANDBOX_ACCEPTANCE.md`
-
-Never commit `.env.local`, Supabase secret keys, Stripe secrets, Canada Post
-credentials, Resend keys, or webhook signing secrets.
+Never commit `.env.local`, Supabase secret keys, Resend keys, OAuth secrets, or
+cron secrets.

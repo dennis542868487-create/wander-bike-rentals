@@ -40,10 +40,9 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: "",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
       SUPABASE_SECRET_KEY: "",
-      COMMERCE_SANDBOX_MODE: "true",
-      COMMERCE_DEMO_CATALOG: "true",
-      COMMERCE_CHECKOUT_ENABLED: "false",
-      STRIPE_SECRET_KEY: "",
+      RESEND_API_KEY: "",
+      EMAIL_FROM: "",
+      MARKETPLACE_NOTIFICATION_EMAIL: "",
     },
   },
 });

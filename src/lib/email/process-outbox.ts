@@ -3,28 +3,22 @@ import "server-only";
 import { Resend } from "resend";
 import { getServerEnvironment, requireServerEnvironment } from "@/lib/env";
 import { renderTransactionalEmail } from "@/lib/email/templates";
-import { getCommerceStoreSettings } from "@/lib/commerce/settings";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-
-type UnknownRecord = Record<string, unknown>;
 
 type ClaimedNotification = {
   id: number;
-  order_id: number | null;
-  booking_id: string | null;
+  request_id: string | null;
+  listing_id: string | null;
   template_key: string;
   recipient: string;
-  payload: UnknownRecord;
+  payload: Record<string, unknown>;
   attempt_count: number;
 };
 
 export async function processNotificationOutbox(limit = 20) {
   const environment = requireServerEnvironment("RESEND_API_KEY", "EMAIL_FROM");
   const supabase = getSupabaseAdmin();
-  const storeSettings = await getCommerceStoreSettings();
-  const merchantEmail =
-    storeSettings.notificationEmail || environment.ORDER_NOTIFICATION_EMAIL;
-  const claimed = await supabase.rpc("commerce_claim_notifications", {
+  const claimed = await supabase.rpc("marketplace_claim_notifications", {
     p_limit: Math.max(1, Math.min(limit, 100)),
   });
   if (claimed.error) throw new Error("Notification queue could not be claimed.");
@@ -32,6 +26,8 @@ export async function processNotificationOutbox(limit = 20) {
   const rows = (claimed.data ?? []) as ClaimedNotification[];
   const resend = new Resend(environment.RESEND_API_KEY);
   const siteUrl = environment.NEXT_PUBLIC_SITE_URL ?? "https://www.wanderbike.ca";
+  const replyTo =
+    environment.EMAIL_REPLY_TO ?? environment.MARKETPLACE_NOTIFICATION_EMAIL;
   let sent = 0;
   let failed = 0;
 
@@ -42,33 +38,31 @@ export async function processNotificationOutbox(limit = 20) {
         payload: row.payload ?? {},
         siteUrl,
       });
-      const bcc =
-        row.template_key === "order_confirmation" &&
-        merchantEmail &&
-        merchantEmail.toLowerCase() !== row.recipient.toLowerCase()
-          ? merchantEmail
-          : undefined;
       const response = await resend.emails.send(
         {
           from: environment.EMAIL_FROM,
           to: row.recipient,
-          ...(bcc ? { bcc } : {}),
-          ...(merchantEmail ? { replyTo: merchantEmail } : {}),
+          ...(replyTo ? { replyTo } : {}),
           subject: email.subject,
           html: email.html,
           text: email.text,
           tags: [
             { name: "template", value: row.template_key },
-            { name: "source", value: row.order_id ? "order" : "booking" },
+            {
+              name: "source",
+              value: row.request_id ? "marketplace-request" : "bike-listing",
+            },
           ],
         },
-        { idempotencyKey: `wander-bike-outbox-${row.id}` },
+        { idempotencyKey: `wander-marketplace-outbox-${row.id}` },
       );
 
       if (response.error || !response.data?.id) {
-        throw new Error(response.error?.message ?? "Email provider rejected request.");
+        throw new Error(
+          response.error?.message ?? "Email provider rejected request.",
+        );
       }
-      const finished = await supabase.rpc("commerce_finish_notification", {
+      const finished = await supabase.rpc("marketplace_finish_notification", {
         p_notification_id: row.id,
         p_status: "sent",
         p_provider_message_id: response.data.id,
@@ -80,7 +74,7 @@ export async function processNotificationOutbox(limit = 20) {
       sent += 1;
     } catch (error) {
       failed += 1;
-      await supabase.rpc("commerce_finish_notification", {
+      await supabase.rpc("marketplace_finish_notification", {
         p_notification_id: row.id,
         p_status: "failed",
         p_provider_message_id: null,

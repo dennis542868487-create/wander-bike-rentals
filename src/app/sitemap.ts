@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getCatalogProducts } from "@/lib/commerce/catalog";
-import { getCommerceStoreSettings } from "@/lib/commerce/settings";
+import { getPublicListings } from "@/lib/marketplace/data";
+import { getOptionalSupabasePublicConfig } from "@/lib/supabase/config";
 
 const baseUrl = "https://www.wanderbike.ca";
 
@@ -9,9 +9,13 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     "",
-    "/shop",
+    "/bikes",
+    "/bikes/wander",
+    "/bikes/community",
     "/booking",
     "/pricing",
+    "/list-your-bike",
+    "/how-it-works",
     "/bike-rental-richmond",
     "/bike-rental-steveston",
     "/adult-bike-rental-richmond",
@@ -20,65 +24,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/quick-bike-repair-richmond",
     "/location",
     "/faq",
+    "/policies/marketplace",
+    "/policies/privacy",
+    "/policies/local-exchange",
+    "/policies/safety",
     "/guides/best-places-to-bike-in-steveston",
     "/guides/family-bike-rental-richmond",
     "/guides/steveston-bike-ride-guide",
     "/guides/bike-trailer-rental-richmond-guide",
   ];
-
   const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency:
-      route === "" || route === "/shop"
-        ? "weekly"
-        : route.startsWith("/guides/")
-          ? "monthly"
-          : "monthly",
+      route === "" || route.startsWith("/bikes") ? "weekly" : "monthly",
     priority:
       route === ""
         ? 1
-        : route === "/shop"
+        : route.startsWith("/bikes")
           ? 0.9
           : route.startsWith("/guides/")
-            ? 0.7
-            : 0.8,
+            ? 0.65
+            : 0.75,
   }));
 
-  const products = (await getCatalogProducts()).filter(
-    (product) => !product.isSandboxProduct,
+  if (!getOptionalSupabasePublicConfig()) return staticEntries;
+  const [wander, community] = await Promise.all([
+    getPublicListings("wander"),
+    getPublicListings("community"),
+  ]);
+  const listingEntries: MetadataRoute.Sitemap = [...wander, ...community].map(
+    (listing) => ({
+      url: `${baseUrl}/bikes/${encodeURIComponent(listing.slug)}`,
+      lastModified: new Date(listing.updatedAt),
+      changeFrequency: "weekly",
+      priority: 0.8,
+      images: listing.images.map((image) => image.src),
+    }),
   );
-  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${baseUrl}/shop/${encodeURIComponent(product.slug)}`,
-    changeFrequency: "weekly",
-    priority: 0.8,
-    images: product.images.map((image) =>
-      new URL(image.src, baseUrl).toString(),
-    ),
-  }));
-
-  const policyEntries: MetadataRoute.Sitemap = [];
-  try {
-    const settings = await getCommerceStoreSettings();
-    const policies = [
-      ["shipping", settings.policies.shipping],
-      ["refund", settings.policies.refund],
-      ["returns", settings.policies.returns],
-    ] as const;
-
-    for (const [policy, content] of policies) {
-      if (content.trim()) {
-        policyEntries.push({
-          url: `${baseUrl}/policies/${policy}`,
-          changeFrequency: "yearly",
-          priority: 0.4,
-        });
-      }
-    }
-  } catch {
-    // A missing database must not break the public sitemap. Approved policy
-    // URLs are added automatically after the commerce settings are available.
-  }
-
-  return [...staticEntries, ...productEntries, ...policyEntries];
+  return [...staticEntries, ...listingEntries];
 }

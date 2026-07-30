@@ -1,67 +1,142 @@
+import { ArrowRight, Bike, CalendarCheck, ClipboardList, Plus } from "lucide-react";
 import Link from "next/link";
-import { CalendarDays, PackageCheck } from "lucide-react";
-import { AccountSignOut } from "@/components/account-sign-out";
+import { redirect } from "next/navigation";
+import { ListingStatusBadge, RequestStatusBadge } from "@/components/marketplace/status-badge";
+import { RentalAgreementDashboardCard } from "@/components/rental-agreement/rental-agreement-dashboard-card";
+import {
+  getOwnedListings,
+  getProfile,
+  getRequestsForOwner,
+  getRequestsForRenter,
+} from "@/lib/marketplace/server-data";
+import { COMMUNITY_DASHBOARD_LABEL } from "@/lib/marketplace/workspace-labels";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
+  if (!user) redirect("/auth?next=/account");
+  const [profile, listings, rentals, incoming] = await Promise.all([
+    getProfile(user.id),
+    getOwnedListings(user.id),
+    getRequestsForRenter(user.id),
+    getRequestsForOwner(user.id),
+  ]);
+  const pendingIncoming = incoming.filter((request) => request.status === "pending");
 
   return (
-    <main className="min-h-[70vh] bg-[radial-gradient(circle_at_8%_5%,rgba(20,184,166,.18),transparent_34%),#f0fdf9] px-6 py-12 sm:py-16">
-      <div className="mx-auto max-w-5xl">
-        {!user ? (
-          <div className="rounded-[2rem] border border-teal-100 bg-white p-8 text-center shadow-sm">
-            <h1 className="text-3xl font-bold text-slate-950">Your Wander Bike account</h1>
-            <p className="mt-3 text-slate-600">
-              Sign in to see rental bookings and shop orders linked to your account.
-            </p>
-            <Link href="/auth?next=/account" className="btn-primary mt-6 px-6 py-3">
-              Sign in
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="text-sm font-bold text-teal-800">
+            {COMMUNITY_DASHBOARD_LABEL}
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            Welcome{profile?.fullName ? `, ${profile.fullName.split(" ")[0]}` : ""}.
+          </h1>
+          <p className="mt-2 text-slate-600">
+            Rent bikes and manage your own listings from the same account.
+          </p>
+        </div>
+        <Link href="/account/bikes/new" className="btn-primary">
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          List a bike
+        </Link>
+      </div>
+
+      <RentalAgreementDashboardCard mode="community" />
+
+      <section className="mt-8 grid divide-y divide-slate-200 rounded-[0.9rem] border border-slate-200 bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {[
+          { icon: CalendarCheck, label: "My open requests", value: rentals.filter((item) => ["pending", "accepted"].includes(item.status)).length, href: "/account/rentals" },
+          { icon: Bike, label: "My bike listings", value: listings.filter((item) => item.status !== "archived").length, href: "/account/bikes" },
+          { icon: ClipboardList, label: "Requests to review", value: pendingIncoming.length, href: "/account/requests" },
+        ].map((item) => (
+          <Link key={item.label} href={item.href} className="flex items-center justify-between gap-4 p-5 hover:bg-slate-50">
+            <div>
+              <p className="text-sm text-slate-500">{item.label}</p>
+              <p className="mt-1 text-2xl font-bold text-slate-950">{item.value}</p>
+            </div>
+            <item.icon className="h-5 w-5 text-teal-700" aria-hidden="true" />
+          </Link>
+        ))}
+      </section>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <section className="rounded-[0.9rem] border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <h2 className="font-bold text-slate-950">Recent rental activity</h2>
+            <Link href="/account/rentals" className="text-sm font-bold text-teal-800">
+              View all
             </Link>
           </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[.18em] text-teal-700">
-                  {user.email}
-                </p>
-                <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-950">
-                  My account
-                </h1>
-                <p className="mt-3 text-slate-600">
-                  Rental and retail records stay separate, but live in one account.
-                </p>
-              </div>
-              <AccountSignOut />
-            </div>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              <Link
-                href="/account/orders"
-                className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                <PackageCheck className="h-7 w-7 text-teal-700" aria-hidden="true" />
-                <h2 className="mt-5 text-2xl font-bold text-slate-950">Shop orders</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Review payment, fulfillment, tracking, and return status.
-                </p>
-              </Link>
-              <Link
-                href="/account/bookings"
-                className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                <CalendarDays className="h-7 w-7 text-teal-700" aria-hidden="true" />
-                <h2 className="mt-5 text-2xl font-bold text-slate-950">
-                  Rental bookings
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Review, change, or cancel eligible rental requests.
-                </p>
-              </Link>
-            </div>
-          </>
-        )}
+          <ul className="divide-y divide-slate-100">
+            {rentals.slice(0, 4).map((request) => (
+              <li key={request.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-950">
+                    {request.listing.title}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {request.intent === "rent" ? "Rental request" : "Purchase inquiry"}
+                  </p>
+                </div>
+                <RequestStatusBadge status={request.status} />
+              </li>
+            ))}
+            {rentals.length === 0 ? (
+              <li className="px-5 py-9 text-center text-sm text-slate-500">
+                You have not requested a bike yet.
+              </li>
+            ) : null}
+          </ul>
+        </section>
+
+        <section className="rounded-[0.9rem] border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <h2 className="font-bold text-slate-950">My latest bikes</h2>
+            <Link href="/account/bikes" className="text-sm font-bold text-teal-800">
+              Manage
+            </Link>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {listings.slice(0, 4).map((listing) => (
+              <li key={listing.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-950">
+                    {listing.title}
+                  </p>
+                  <p className="mt-1 text-xs capitalize text-slate-500">
+                    {listing.source} listing
+                  </p>
+                </div>
+                <ListingStatusBadge status={listing.status} />
+              </li>
+            ))}
+            {listings.length === 0 ? (
+              <li className="px-5 py-9 text-center text-sm text-slate-500">
+                No bikes listed yet.
+              </li>
+            ) : null}
+          </ul>
+        </section>
       </div>
-    </main>
+
+      {pendingIncoming.length > 0 ? (
+        <Link
+          href="/account/requests"
+          className="mt-6 flex items-center justify-between gap-4 rounded-[0.9rem] border border-amber-200 bg-amber-50 p-5"
+        >
+          <div>
+            <p className="font-bold text-amber-950">
+              {pendingIncoming.length} booking {pendingIncoming.length === 1 ? "request needs" : "requests need"} your reply
+            </p>
+            <p className="mt-1 text-sm text-amber-800">
+              Accept or decline from Booking Requests.
+            </p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-amber-800" aria-hidden="true" />
+        </Link>
+      ) : null}
+    </div>
   );
 }

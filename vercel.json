@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "path": "/api/cron/commerce",
+      "path": "/api/cron/marketplace",
       "schedule": "0 16 * * *"
     }
   ],
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "source": "/booking-admin(.*)",
+      "source": "/operations(.*)",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
         { "key": "Cache-Control", "value": "no-store" }

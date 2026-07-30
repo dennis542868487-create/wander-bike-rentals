@@ -9,14 +9,12 @@ import {
 
 const unavailableProviders: SocialAuthAvailability = {
   google: false,
-  apple: false,
 };
 
 export function useSocialAuth() {
   const [availability, setAvailability] =
     useState<SocialAuthAvailability>({
       google: null,
-      apple: null,
     });
 
   useEffect(() => {

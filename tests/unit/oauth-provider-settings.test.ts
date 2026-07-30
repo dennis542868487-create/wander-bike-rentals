@@ -1,43 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { readSocialAuthAvailability } from "@/lib/supabase/oauth-providers";
+import {
+  readSocialAuthAvailability,
+  socialAuthProviders,
+} from "@/lib/supabase/oauth-providers";
 
-describe("Supabase social auth provider settings", () => {
-  it("enables only providers explicitly reported by Supabase", () => {
-    expect(
-      readSocialAuthAvailability({
-        external: {
-          google: true,
-          apple: false,
-        },
-      }),
-    ).toEqual({
-      google: true,
-      apple: false,
-    });
+describe("supported authentication providers", () => {
+  it("exposes Google as the only social provider", () => {
+    expect(socialAuthProviders).toEqual(["google"]);
   });
 
-  it("fails closed when provider settings are missing", () => {
-    expect(readSocialAuthAvailability(null)).toEqual({
-      google: false,
-      apple: false,
-    });
-    expect(readSocialAuthAvailability({ external: null })).toEqual({
-      google: false,
-      apple: false,
-    });
-  });
-
-  it("does not treat string values as enabled providers", () => {
+  it("reads Google availability and ignores other hosted providers", () => {
     expect(
       readSocialAuthAvailability({
-        external: {
-          google: "true",
-          apple: 1,
-        },
+        external: { google: true, apple: true, facebook: true },
       }),
-    ).toEqual({
-      google: false,
-      apple: false,
-    });
+    ).toEqual({ google: true });
   });
 });

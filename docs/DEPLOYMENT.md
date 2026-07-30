@@ -1,166 +1,84 @@
-# Wander Bike deployment and rollback
+# Wander Bike deployment
 
-This runbook keeps payments and shipping in test mode. It does not authorize a
-Stripe live key or the Canada Post production API.
+## 1. Supabase
 
-## 1. Required merchant decisions
-
-Before a real-customer launch, confirm:
-
-- Store and shipping-origin address
-- Business hours and pickup instructions
-- Canadian sales provinces
-- Local-delivery postal prefixes and fee
-- Tax rates and whether tax is included in displayed prices
-- Free/fixed shipping rules
-- Actual bicycle and accessory package dimensions and weights
-- Canada Post account type (`contract` or `non_contract`) and applicable IDs
-- Customer-service and notification email
-- Shipping, refund, privacy, terms, and return policies
-- Initial owner/admin email
-
-These values are managed at `/admin/settings`; they are not hard-coded into the
-storefront.
-
-## 2. Supabase
-
-Create a new project in `ca-central-1`, then apply all migration files in
-timestamp order. The test seed may be loaded only while
-`COMMERCE_SANDBOX_MODE=true`.
-
-CLI equivalent:
+Apply chronological migrations from `supabase/migrations/`. For the linked
+project:
 
 ```bash
 npx supabase link --project-ref YOUR_PROJECT_REF
-npx supabase db push --include-all --include-seed
-npx supabase config push --project-ref YOUR_PROJECT_REF
+npx supabase db push --include-all
 ```
 
-Configure the Auth URLs in `docs/AUTH_SETUP.md`, create the first administrator,
-and verify:
+Verify:
 
-- RLS is enabled on customer, order, inventory, and operational tables.
-- `product-images` exists as the public product-image bucket.
-- Browser code receives only the publishable key.
-- `SUPABASE_SECRET_KEY` exists only in server/deployment environments.
+- `bike_listings`, `bike_listing_images`, and the private pickup table exist.
+- `marketplace_requests` has the accepted-rental overlap constraint.
+- `marketplace_safety_flags`, `marketplace_sensitive_terms`, and the private
+  staff allowlist exist.
+- all marketplace tables have RLS enabled and forced.
+- `bike-listing-images` exists with its file size and MIME restrictions.
+- browser code receives only the publishable key.
+- `SUPABASE_SECRET_KEY` exists only in server environments.
+
+The marketplace migration intentionally does not drop legacy commerce tables.
+Archive those only in a separately reviewed migration after a backup.
+
+## 2. Authentication
+
+Follow `docs/AUTH_SETUP.md`. Test both Google and email/password on the exact
+deployment host. Confirm a normal customer cannot access `/operations` or
+`/admin`, and a Wander operator can access `/operations` but not `/admin`.
+Confirm the two allowlisted roles are granted only after Google sign-in.
 
 ## 3. Vercel environment
 
-Set these for the intended Vercel environments. Secrets must be entered through
-Vercel CLI or the dashboard, never committed.
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Exact canonical or Preview origin |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser-safe publishable key |
+| `SUPABASE_SECRET_KEY` | Server-only trusted key |
+| `RESEND_API_KEY` | Resend server key |
+| `EMAIL_FROM` | Verified sender |
+| `EMAIL_REPLY_TO` | Optional reply address |
+| `MARKETPLACE_NOTIFICATION_EMAIL` | Site-admin safety and platform mailbox |
+| `CRON_SECRET` | Long random token used by Vercel Cron |
 
-| Variable                               | Sandbox value or purpose                                                       |
-| -------------------------------------- | ------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SITE_URL`                 | Exact Preview URL during acceptance; canonical domain only for Production      |
-| `NEXT_PUBLIC_SUPABASE_URL`             | New project URL                                                                |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | New publishable key                                                            |
-| `SUPABASE_SECRET_KEY`                  | Server-only new secret key                                                     |
-| `COMMERCE_SANDBOX_MODE`                | `true`                                                                         |
-| `COMMERCE_DEMO_CATALOG`                | `true` during sandbox acceptance                                               |
-| `COMMERCE_CHECKOUT_ENABLED`            | Start `false`; change to `true` only for test acceptance                       |
-| `STRIPE_SECRET_KEY`                    | Stripe `sk_test_…` key                                                         |
-| `STRIPE_WEBHOOK_SECRET`                | Signing secret for the deployed webhook                                        |
-| `CANADA_POST_API_KEY`                  | Canada Post Test app API key (OAuth client ID)                                 |
-| `CANADA_POST_API_SECRET`               | Canada Post Test app API secret (OAuth client secret)                          |
-| `CANADA_POST_ENVIRONMENT`              | Must remain `test`; live shipping is code-gated off                            |
-| `CANADA_POST_ACCOUNT_TYPE`             | `contract` or `non_contract`                                                   |
-| `CANADA_POST_CUSTOMER_NUMBER`          | Account customer number                                                        |
-| `CANADA_POST_MOBO_CUSTOMER_NUMBER`     | Optional mailed-on-behalf-of number                                            |
-| `CANADA_POST_CONTRACT_ID`              | Required for applicable contract shipments                                     |
-| `CANADA_POST_GROUP_ID`                 | Required when the account workflow uses a group                                |
-| `CANADA_POST_API_BASE`                 | `https://api.canadapost-postescanada.ca/prod/devportal-portaildesdeveloppeurs` |
-| `RESEND_API_KEY`                       | Resend server key                                                              |
-| `EMAIL_FROM`                           | Verified sender, for example `Wander Bike <orders@domain>`                     |
-| `ORDER_NOTIFICATION_EMAIL`             | Fallback merchant notification address                                         |
-| `CRON_SECRET`                          | Long random secret for the commerce cron                                       |
+There are no Stripe, shipping, Canada Post, tax, cart, or checkout variables.
 
-The database setting `commerce.checkout_enabled` is a second checkout gate.
-Both it and the environment gate must be enabled for test checkout.
+## 4. Resend and scheduled work
 
-### Current Preview acceptance host
+Follow `docs/RESEND_SETUP.md`. `vercel.json` invokes
+`/api/cron/marketplace` daily. The cron:
 
-The protected branch alias used for sandbox acceptance is:
+1. queues pickup reminders for accepted rentals starting in the next 24 hours;
+2. claims pending/failed outbox rows with `SKIP LOCKED`;
+3. sends through Resend using an idempotency key;
+4. records success or schedules retry backoff.
 
-```text
-https://wander-bike-rentals-git-co-75a04a-zyz18922182165-4022s-projects.vercel.app
-```
-
-Keep Vercel Standard Protection enabled. Use a short-lived, revocable Vercel
-share link for reviewers rather than weakening project protection. Supabase,
-the demo catalog, cart, Stripe test mode, and the Canada Post Test app are
-connected on this host. Transactional email remains fail-closed until Resend is
-configured.
-
-After the final acceptance commit is deployed, use the last validated CLI
-Preview as the rollback candidate:
-
-```text
-dpl_2iAK5fzvUMi1ijEw1Qw6B6uAKnVA
-https://wander-bike-rentals-hcx937qij-zyz18922182165-4022s-projects.vercel.app
-```
-
-## 4. Stripe test webhook
-
-Create a test-mode webhook endpoint using the exact deployed host:
-
-```text
-https://YOUR_DEPLOYMENT_HOST/api/stripe/webhook
-```
-
-For a Vercel-protected Preview, use an Automation Bypass token on the webhook
-URL and keep that token secret. Do not disable Preview protection or document
-the resulting URL.
-
-Subscribe to:
-
-- `checkout.session.completed`
-- `checkout.session.async_payment_succeeded`
-- `checkout.session.expired`
-- `checkout.session.async_payment_failed`
-- `refund.created`
-- `refund.updated`
-- `refund.failed`
-
-Copy its signing secret to `STRIPE_WEBHOOK_SECRET`. Do not treat the browser
-success redirect as payment confirmation; the application waits for verified
-webhook reconciliation.
-
-## 5. Deploy with Vercel CLI
-
-From the repository root:
+## 5. Preview and production
 
 ```bash
 npm ci
-npm run test:all
-npx vercel pull --yes
+npm run lint
+npm run test:unit
+npm run build
+npm run test:e2e
 npx vercel deploy
 ```
 
-This creates a Preview deployment and does not change the production alias.
-After sandbox acceptance and a separate production approval, use
-`npx vercel deploy --prod`. Verify the exact URL returned by the CLI before
-changing DNS or aliases.
+Test the exact Preview URL before deploying production:
 
-## 6. Sandbox acceptance
+```bash
+npx vercel deploy --prod
+```
 
-Verify at desktop, tablet, and mobile widths:
+The deployment does not add real bike data automatically. Wander operators add
+Wander bikes and their actual photos through `/operations`; community owners
+use `/account`.
 
-1. Existing rental pages, booking, guides, location, and redirects.
-2. Search/filter, variant selection, cart quantity, and guest checkout.
-3. Stripe test success, cancellation, failure/expiry, and duplicate-webhook
-   handling.
-4. Inventory reservation, release, sale, adjustment, and low-stock display.
-5. Pickup and eligible/ineligible local-delivery addresses.
-6. Canada Post sandbox quote, multiple parcel labels, PDF download, tracking,
-   and eligible void/refund flow.
-7. Full and partial refunds plus return status updates.
-8. Customer and merchant email events, including retry from the durable outbox.
-9. Customer isolation, staff/admin authorization, and cross-origin mutation
-   rejection.
-
-Do not enable live Stripe or Canada Post credentials as part of this checklist.
-
-## 7. Rollback
+## 6. Rollback
 
 For an application regression:
 
@@ -168,11 +86,6 @@ For an application regression:
 npx vercel rollback PREVIOUS_DEPLOYMENT_URL_OR_ID --yes
 ```
 
-For a commerce incident, also set `COMMERCE_CHECKOUT_ENABLED=false` immediately
-and redeploy/restart the production environment. Keep Canada Post disabled in
-`/admin/settings` if shipping is implicated.
-
-Database migrations are forward-only. Do not manually drop commerce tables or
-restore an old schema over new orders. Correct a migration with a reviewed new
-migration; use a Supabase backup or point-in-time recovery only through an
-explicit incident decision.
+Database migrations are forward-only. Correct an issue with a reviewed new
+migration or restore through an explicit backup/PITR decision; do not manually
+drop marketplace or legacy tables during an application rollback.

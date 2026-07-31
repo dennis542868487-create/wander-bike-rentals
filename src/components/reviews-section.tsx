@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GOOGLE_BUSINESS_URL } from "@/lib/seo/wander-business";
 
 type Review = {
   name: string;
@@ -6,8 +7,12 @@ type Review = {
   text: string;
 };
 
-const GOOGLE_REVIEWS_URL =
-  "https://www.google.com/maps/search/?api=1&query=Wander%20Bike%20Rentals%20Richmond%20BC";
+/*
+ * Points at the place record itself, not a maps search for the shop's name. A
+ * search URL can land on a competitor or a disambiguation list, and it is the
+ * same URL the business entity declares in sameAs — those two should agree.
+ */
+const GOOGLE_REVIEWS_URL = GOOGLE_BUSINESS_URL;
 
 const reviews: Review[] = [
   {

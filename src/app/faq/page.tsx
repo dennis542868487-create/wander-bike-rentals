@@ -27,8 +27,8 @@ const shopFaqs = [
     "Kids bikes and trailers are offered when a matching Wander listing is available. Check the individual collection page or call the shop to confirm the right size and current availability.",
   ],
   [
-    "Are a helmet and lock included?",
-    "Included items are shown on each Wander bike listing because equipment can vary by bike. Many rentals include a helmet and lock; call the shop if you need a specific helmet size or want to confirm.",
+    "Are a helmet, lock, and basket included?",
+    "Wander rentals come with a helmet, a lock, and a basket. Included items are still listed on each individual bike because equipment can vary, so check the listing — or call the shop if you need a specific helmet size or want to confirm before you come by.",
   ],
   [
     "Do I need photo ID or a deposit for a Wander rental?",

@@ -88,7 +88,8 @@ a {
 
 .btn-primary,
 .btn-secondary,
-.btn-quiet {
+.btn-quiet,
+.btn-danger {
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
@@ -102,6 +103,22 @@ a {
     border-color 160ms ease,
     color 160ms ease,
     transform var(--dur-press) var(--ease-ui);
+}
+
+/*
+ * Destructive actions. Previously each one was hand-rolled at its call site,
+ * so the three red buttons in the dashboards had three different behaviours —
+ * one with a hover, one without, none with a press state.
+ */
+.btn-danger {
+  border: 1px solid #fecdd3;
+  background: #fff;
+  color: #b42318;
+}
+
+.btn-danger:hover {
+  border-color: #fda4af;
+  background: #fff1f2;
 }
 
 .btn-primary {
@@ -147,7 +164,8 @@ a {
 
 .btn-primary:disabled,
 .btn-secondary:disabled,
-.btn-quiet:disabled {
+.btn-quiet:disabled,
+.btn-danger:disabled {
   cursor: not-allowed;
   opacity: 0.55;
   transform: none;
@@ -160,6 +178,7 @@ a {
 .btn-primary:not(:disabled):active,
 .btn-secondary:not(:disabled):active,
 .btn-quiet:not(:disabled):active,
+.btn-danger:not(:disabled):active,
 .btn-brand:not(:disabled):active,
 .btn-outline-light:not(:disabled):active,
 .pricing-glass-button:not(:disabled):active,
@@ -1335,6 +1354,120 @@ html.wbr-custom-launcher #chatbase-message-bubbles {
       transform: translateX(0) scale(1);
     }
   }
+}
+
+/*
+ * A field that appears mid-flow when the operator commits to a two-step action
+ * (declining a request, suspending an account). Without an entrance the row
+ * below it jumps, at exactly the moment the operator needs to notice they have
+ * moved into a different state.
+ */
+.inline-reveal {
+  transition:
+    opacity var(--dur-panel) var(--ease-ui),
+    transform var(--dur-panel) var(--ease-ui);
+}
+
+@starting-style {
+  .inline-reveal {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/*
+ * Dashboard press feedback. The .btn-* rules above only cover the shared button
+ * classes; the dashboards are full of bare-Tailwind pressables — the hamburger,
+ * the drawer close, nav links, the destructive row actions. Staff work these on
+ * iPads where :hover never fires, so :active is the only acknowledgement a tap
+ * ever gets.
+ */
+.dash-pressable {
+  transition: transform var(--dur-press) var(--ease-ui);
+}
+
+.dash-pressable:not(:disabled):not([aria-disabled="true"]):active {
+  transform: scale(0.97);
+}
+
+/*
+ * Base UI dialogs and drawers. Base UI stamps data-starting-style on the frame
+ * before entry and data-ending-style during exit, which is what lets a CSS
+ * transition run in both directions on an element it also unmounts.
+ *
+ * Exit is faster than entry throughout: the user has already decided by then,
+ * and a slow dismissal reads as the interface lagging behind them.
+ */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 23, 42, 0.55);
+  transition: opacity var(--dur-panel) var(--ease-ui);
+}
+
+.dialog-backdrop[data-starting-style],
+.dialog-backdrop[data-ending-style] {
+  opacity: 0;
+}
+
+.dialog-backdrop[data-ending-style] {
+  transition-duration: 200ms;
+}
+
+/*
+ * Modals keep transform-origin at the centre — they are not anchored to a
+ * trigger, so scaling from one would point at nothing.
+ */
+.dialog-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 61;
+  width: min(28rem, calc(100vw - 2rem));
+  border: 1px solid var(--card-border);
+  border-radius: 1.1rem;
+  background: #fff;
+  padding: 1.5rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    opacity var(--dur-panel) var(--ease-ui),
+    transform var(--dur-panel) var(--ease-ui);
+}
+
+.dialog-popup[data-starting-style],
+.dialog-popup[data-ending-style] {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.dialog-popup[data-ending-style] {
+  transition-duration: 200ms;
+}
+
+/* Side sheet: enters and leaves along the same edge it is anchored to. */
+.drawer-popup {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 61;
+  display: flex;
+  width: min(86vw, 20rem);
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  transform: translateX(0);
+  transition: transform var(--dur-panel) var(--ease-drawer);
+}
+
+.drawer-popup[data-starting-style],
+.drawer-popup[data-ending-style] {
+  transform: translateX(-100%);
+}
+
+.drawer-popup[data-ending-style] {
+  transition-duration: 200ms;
 }
 
 /*

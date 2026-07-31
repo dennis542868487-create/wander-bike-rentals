@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/confirm-dialog";
 import { FieldHint } from "@/components/forms/field-hint";
 import type { MarketplaceAccessStatus } from "@/lib/marketplace/types";
 
@@ -15,22 +17,22 @@ export function UserAccessActions({
   disabled: boolean;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [showReason, setShowReason] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
 
   async function update(nextStatus: MarketplaceAccessStatus) {
-    if (
-      nextStatus === "active" &&
-      !window.confirm(
-        "Restore this user’s marketplace access? Previously paused listings stay paused.",
-      )
-    ) {
-      return;
+    if (nextStatus === "active") {
+      const confirmed = await confirm({
+        title: "Restore marketplace access?",
+        description:
+          "The account can publish and request bikes again. Listings paused earlier stay paused until the owner republishes them.",
+        confirmLabel: "Restore access",
+      });
+      if (!confirmed) return;
     }
     setBusy(true);
-    setError("");
     try {
       const response = await fetch(
         `/api/admin/marketplace/users/${userId}/access`,
@@ -49,9 +51,14 @@ export function UserAccessActions({
       }
       setShowReason(false);
       setReason("");
+      toast.success(
+        nextStatus === "active"
+          ? "Marketplace access restored"
+          : "Account suspended and listings paused",
+      );
       router.refresh();
     } catch (updateError) {
-      setError(
+      toast.error(
         updateError instanceof Error
           ? updateError.message
           : "Could not update marketplace access.",
@@ -72,7 +79,6 @@ export function UserAccessActions({
         >
           Restore access
         </button>
-        {error ? <p className="mt-2 text-xs text-rose-700">{error}</p> : null}
       </div>
     );
   }
@@ -106,7 +112,7 @@ export function UserAccessActions({
               type="button"
               disabled={disabled || busy || reason.trim().length === 0}
               onClick={() => void update("suspended")}
-              className="inline-flex min-h-9 items-center rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-700 disabled:opacity-50"
+              className="btn-danger min-h-9 px-3 py-1.5 text-xs"
             >
               Suspend and pause listings
             </button>
@@ -130,7 +136,6 @@ export function UserAccessActions({
           </button>
         )}
       </div>
-      {error ? <p className="mt-2 text-xs text-rose-700">{error}</p> : null}
     </div>
   );
 }

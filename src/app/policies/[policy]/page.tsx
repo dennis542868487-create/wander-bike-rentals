@@ -94,7 +94,7 @@ const policies = {
         heading: "Meet and inspect",
         paragraphs: [
           "Meet in a suitable public place when possible, tell someone where you are going, and inspect the bike before payment or use.",
-          "Confirm brakes, tires, steering, frame condition, fit, and any included lock, helmet, trailer hitch, battery, or charger.",
+          "Confirm brakes, tires, steering, frame condition, fit, and any included lock, helmet, basket, trailer hitch, battery, or charger.",
         ],
       },
       {

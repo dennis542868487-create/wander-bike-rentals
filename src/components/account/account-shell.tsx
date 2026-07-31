@@ -11,13 +11,13 @@ import {
   Menu,
   Settings,
   ShieldCheck,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { PageTransition } from "@/components/page-transition";
 import { AccountSignOut } from "@/components/account-sign-out";
+import { DashboardDrawer } from "@/components/dashboard-drawer";
 import type { MarketplaceAccessStatus } from "@/lib/marketplace/types";
 import {
   COMMUNITY_DASHBOARD_LABEL,
@@ -64,7 +64,7 @@ function AccountNavigation({
               href={item.href}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+              className={`dash-pressable flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
                 active
                   ? "bg-teal-50 text-teal-900"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
@@ -119,22 +119,6 @@ export function AccountShell({
 }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!drawerOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setDrawerOpen(false);
-    };
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [drawerOpen]);
 
   return (
     <div className="min-h-screen bg-[#f5f7f9]">
@@ -146,7 +130,7 @@ export function AccountShell({
               onClick={() => setDrawerOpen(true)}
               aria-label="Open account navigation"
               aria-expanded={drawerOpen}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 lg:hidden"
+              className="dash-pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 lg:hidden"
             >
               <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -182,50 +166,23 @@ export function AccountShell({
         </div>
       </aside>
 
-      {drawerOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
-          <button
-            type="button"
-            className="absolute inset-0 bg-slate-950/45"
-            onClick={() => setDrawerOpen(false)}
-            aria-label="Close account navigation"
+      <DashboardDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        label={COMMUNITY_DASHBOARD_LABEL}
+        tone="light"
+      >
+        <div className="mt-5 flex-1 overflow-y-auto">
+          <AccountNavigation
+            pathname={pathname}
+            role={role}
+            onNavigate={() => setDrawerOpen(false)}
           />
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-label="Account navigation"
-            className="relative flex h-full w-[min(86vw,20rem)] flex-col bg-white p-4 shadow-2xl"
-          >
-            <div className="flex items-center justify-between gap-4 px-2 py-2">
-              <div>
-                <p className="font-bold text-slate-950">Wander Bike</p>
-                <p className="text-xs text-slate-500">
-                  {COMMUNITY_DASHBOARD_LABEL}
-                </p>
-              </div>
-              <button
-                ref={closeButtonRef}
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Close navigation"
-                className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 bg-white"
-              >
-                <X className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-            <div className="mt-5 flex-1 overflow-y-auto">
-              <AccountNavigation
-                pathname={pathname}
-                role={role}
-                onNavigate={() => setDrawerOpen(false)}
-              />
-            </div>
-            <div className="border-t border-slate-200 pt-4">
-              <AccountSignOut />
-            </div>
-          </aside>
         </div>
-      ) : null}
+        <div className="border-t border-slate-200 pt-4">
+          <AccountSignOut />
+        </div>
+      </DashboardDrawer>
 
       <main className="px-4 py-6 sm:px-6 sm:py-8 lg:ml-[17rem] lg:px-8">
         <div className="mx-auto max-w-6xl">

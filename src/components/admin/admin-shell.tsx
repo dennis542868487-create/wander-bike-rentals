@@ -10,12 +10,12 @@ import {
   ShieldAlert,
   UserRound,
   Users,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { AdminSignOut } from "@/components/admin/admin-sign-out";
+import { DashboardDrawer } from "@/components/dashboard-drawer";
 import { PageTransition } from "@/components/page-transition";
 import {
   COMMUNITY_DASHBOARD_LABEL,
@@ -55,7 +55,7 @@ function AdminNavigation({
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+            className={`dash-pressable flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
               active
                 ? "bg-teal-600 text-white"
                 : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -81,22 +81,6 @@ export function AdminShell({
 }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!drawerOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setDrawerOpen(false);
-    };
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [drawerOpen]);
 
   return (
     <div className="min-h-screen bg-[#f5f7f9]">
@@ -108,7 +92,7 @@ export function AdminShell({
               onClick={() => setDrawerOpen(true)}
               aria-label="Open admin navigation"
               aria-expanded={drawerOpen}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 lg:hidden"
+              className="dash-pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 lg:hidden"
             >
               <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -168,49 +152,22 @@ export function AdminShell({
         </div>
       </aside>
 
-      {drawerOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden" role="presentation">
-          <button
-            type="button"
-            className="absolute inset-0 bg-slate-950/55"
-            onClick={() => setDrawerOpen(false)}
-            aria-label={`Close ${PLATFORM_DASHBOARD_LABEL} navigation`}
+      <DashboardDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        label={PLATFORM_DASHBOARD_LABEL}
+        tone="dark"
+      >
+        <div className="mt-5 flex-1 overflow-y-auto">
+          <AdminNavigation
+            pathname={pathname}
+            onNavigate={() => setDrawerOpen(false)}
           />
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${PLATFORM_DASHBOARD_LABEL} navigation`}
-            className="relative flex h-full w-[min(86vw,20rem)] flex-col bg-slate-950 p-4 text-white shadow-2xl"
-          >
-            <div className="flex items-center justify-between gap-4 px-2 py-2">
-              <div>
-                <p className="font-bold">Wander Bike</p>
-                <p className="text-xs text-slate-400">
-                  {PLATFORM_DASHBOARD_LABEL}
-                </p>
-              </div>
-              <button
-                ref={closeButtonRef}
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Close navigation"
-                className="flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 bg-slate-900 text-white"
-              >
-                <X className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-            <div className="mt-5 flex-1 overflow-y-auto">
-              <AdminNavigation
-                pathname={pathname}
-                onNavigate={() => setDrawerOpen(false)}
-              />
-            </div>
-            <div className="border-t border-slate-800 pt-4">
-              <AdminSignOut />
-            </div>
-          </aside>
         </div>
-      ) : null}
+        <div className="border-t border-slate-800 pt-4">
+          <AdminSignOut />
+        </div>
+      </DashboardDrawer>
 
       <main className="px-4 py-6 sm:px-6 sm:py-8 lg:ml-[17rem] lg:px-8">
         <div className="mx-auto max-w-[88rem]">

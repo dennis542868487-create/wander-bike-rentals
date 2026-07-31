@@ -4,6 +4,8 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/confirm-dialog";
 import type { ListingImage } from "@/lib/marketplace/types";
 
 export function ListingPhotoManager({
@@ -14,15 +16,20 @@ export function ListingPhotoManager({
   images: ListingImage[];
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [removing, setRemoving] = useState<string | null>(null);
-  const [error, setError] = useState("");
 
   if (images.length === 0) return null;
 
   async function remove(imageId: string) {
-    if (!window.confirm("Remove this photo?")) return;
+    const confirmed = await confirm({
+      title: "Remove this photo?",
+      description: "It is deleted from the listing and cannot be restored.",
+      confirmLabel: "Remove",
+      tone: "danger",
+    });
+    if (!confirmed) return;
     setRemoving(imageId);
-    setError("");
     try {
       const response = await fetch(
         `/api/marketplace/listings/${listingId}/images/${imageId}`,
@@ -30,9 +37,10 @@ export function ListingPhotoManager({
       );
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Could not remove photo.");
+      toast.success("Photo removed");
       router.refresh();
     } catch (removeError) {
-      setError(
+      toast.error(
         removeError instanceof Error ? removeError.message : "Could not remove photo.",
       );
     } finally {
@@ -58,14 +66,13 @@ export function ListingPhotoManager({
               disabled={removing === image.id}
               onClick={() => void remove(image.id)}
               aria-label={`Remove ${image.alt}`}
-              className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white/95 text-rose-700 shadow"
+              className="dash-pressable absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white/95 text-rose-700 shadow disabled:opacity-50"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         ))}
       </div>
-      {error ? <p className="mt-3 text-sm text-rose-700">{error}</p> : null}
     </section>
   );
 }

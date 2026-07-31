@@ -2,6 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/confirm-dialog";
+
+const ROLE_LABEL = {
+  customer: "Customer",
+  staff: "Staff",
+  admin: "Admin",
+} as const;
+
+type Role = keyof typeof ROLE_LABEL;
 
 export function UserRoleSelect({
   userId,
@@ -9,23 +19,32 @@ export function UserRoleSelect({
   disabled,
 }: {
   userId: string;
-  role: "customer" | "staff" | "admin";
+  role: Role;
   disabled: boolean;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  /*
+   * The select is driven by local state rather than the role prop. Confirmation
+   * is asynchronous now, so between the change event and the answer the browser
+   * is already showing the new option — declining has to put it back, and a
+   * prop that never changed cannot do that on its own.
+   */
+  const [selected, setSelected] = useState<Role>(role);
 
-  async function change(nextRole: string) {
-    if (
-      !window.confirm(
-        `Change this account from ${role} to ${nextRole}?`,
-      )
-    ) {
+  async function change(nextRole: Role) {
+    setSelected(nextRole);
+    const confirmed = await confirm({
+      title: `Change this account to ${ROLE_LABEL[nextRole]}?`,
+      description: `It is currently ${ROLE_LABEL[role]}. The new role applies the next time the account loads a dashboard.`,
+      confirmLabel: "Change role",
+    });
+    if (!confirmed) {
+      setSelected(role);
       return;
     }
     setBusy(true);
-    setError("");
     try {
       const response = await fetch(`/api/admin/marketplace/users/${userId}`, {
         method: "PATCH",
@@ -34,9 +53,11 @@ export function UserRoleSelect({
       });
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Could not change role.");
+      toast.success(`Role changed to ${ROLE_LABEL[nextRole]}`);
       router.refresh();
     } catch (updateError) {
-      setError(
+      setSelected(role);
+      toast.error(
         updateError instanceof Error ? updateError.message : "Could not change role.",
       );
     } finally {
@@ -45,19 +66,18 @@ export function UserRoleSelect({
   }
 
   return (
-    <div>
-      <select
-        value={role}
-        disabled={disabled || busy}
-        onChange={(event) => void change(event.target.value)}
-        aria-label="Account role"
-        className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold disabled:bg-slate-100 disabled:text-slate-500"
-      >
-        <option value="customer">Customer</option>
-        <option value="staff">Staff</option>
-        <option value="admin">Admin</option>
-      </select>
-      {error ? <p className="mt-1 max-w-48 text-xs text-rose-700">{error}</p> : null}
-    </div>
+    <select
+      value={selected}
+      disabled={disabled || busy}
+      onChange={(event) => void change(event.target.value as Role)}
+      aria-label="Account role"
+      className="dash-pressable min-h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold disabled:bg-slate-100 disabled:text-slate-500"
+    >
+      {(Object.keys(ROLE_LABEL) as Role[]).map((value) => (
+        <option key={value} value={value}>
+          {ROLE_LABEL[value]}
+        </option>
+      ))}
+    </select>
   );
 }

@@ -2,8 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/confirm-dialog";
 import { FieldHint } from "@/components/forms/field-hint";
 import type { RequestStatus } from "@/lib/marketplace/types";
+
+const DONE_MESSAGE: Partial<Record<RequestStatus, string>> = {
+  accepted: "Request accepted — the rider gets the pickup details",
+  declined: "Request declined",
+  cancelled: "Request cancelled",
+  completed: "Marked completed",
+  no_show: "Marked as a no-show",
+};
 
 export function RequestActions({
   requestId,
@@ -15,20 +25,24 @@ export function RequestActions({
   viewer: "renter" | "owner" | "admin";
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
-  const [error, setError] = useState("");
   const [showDecline, setShowDecline] = useState(false);
 
   async function update(nextStatus: RequestStatus) {
-    if (
-      nextStatus === "cancelled" &&
-      !window.confirm("Cancel this request? The other person will be notified.")
-    ) {
-      return;
+    if (nextStatus === "cancelled") {
+      const confirmed = await confirm({
+        title: "Cancel this request?",
+        description:
+          "The other person is notified straight away. You would need to send a new request to pick this up again.",
+        confirmLabel: "Cancel request",
+        cancelLabel: "Keep it",
+        tone: "danger",
+      });
+      if (!confirmed) return;
     }
     setBusy(true);
-    setError("");
     try {
       const response = await fetch(`/api/marketplace/requests/${requestId}`, {
         method: "PATCH",
@@ -40,9 +54,10 @@ export function RequestActions({
       });
       const payload = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Could not update request.");
+      toast.success(DONE_MESSAGE[nextStatus] ?? "Request updated");
       router.refresh();
     } catch (updateError) {
-      setError(
+      toast.error(
         updateError instanceof Error
           ? updateError.message
           : "Could not update request.",
@@ -54,17 +69,14 @@ export function RequestActions({
 
   if (viewer === "renter" && ["pending", "accepted"].includes(status)) {
     return (
-      <div>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => void update("cancelled")}
-          className="btn-secondary min-h-10 px-3 py-2 text-sm"
-        >
-          {busy ? "Cancelling…" : "Cancel request"}
-        </button>
-        {error ? <p className="mt-2 text-sm text-rose-700">{error}</p> : null}
-      </div>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void update("cancelled")}
+        className="btn-secondary min-h-10 px-3 py-2 text-sm"
+      >
+        {busy ? "Cancelling…" : "Cancel request"}
+      </button>
     );
   }
 
@@ -72,7 +84,7 @@ export function RequestActions({
     return (
       <div className="w-full">
         {showDecline ? (
-          <label className="field-label mb-3">
+          <label className="inline-reveal field-label mb-3">
             Note to the rider
             <textarea
               value={note}
@@ -99,9 +111,9 @@ export function RequestActions({
                 type="button"
                 disabled={busy}
                 onClick={() => void update("declined")}
-                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-700 hover:bg-rose-50"
+                className="btn-danger min-h-10 px-3 py-2 text-sm"
               >
-                Confirm decline
+                {busy ? "Declining…" : "Confirm decline"}
               </button>
               <button
                 type="button"
@@ -123,33 +135,29 @@ export function RequestActions({
             </button>
           )}
         </div>
-        {error ? <p className="mt-2 text-sm text-rose-700">{error}</p> : null}
       </div>
     );
   }
 
   if ((viewer === "owner" || viewer === "admin") && status === "accepted") {
     return (
-      <div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void update("completed")}
-            className="btn-primary min-h-10 px-3 py-2 text-sm"
-          >
-            Mark completed
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void update("no_show")}
-            className="btn-secondary min-h-10 px-3 py-2 text-sm"
-          >
-            Mark no-show
-          </button>
-        </div>
-        {error ? <p className="mt-2 text-sm text-rose-700">{error}</p> : null}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void update("completed")}
+          className="btn-primary min-h-10 px-3 py-2 text-sm"
+        >
+          {busy ? "Saving…" : "Mark completed"}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void update("no_show")}
+          className="btn-secondary min-h-10 px-3 py-2 text-sm"
+        >
+          {busy ? "Saving…" : "Mark no-show"}
+        </button>
       </div>
     );
   }

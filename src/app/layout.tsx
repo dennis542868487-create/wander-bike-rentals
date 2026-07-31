@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import ChatbaseWidget from "@/components/chatbase-widget";
+import { ConfirmProvider } from "@/components/confirm-dialog";
 import { EnglishValidationMessages } from "@/components/forms/english-validation";
 import { MobileActionBar } from "@/components/mobile-action-bar";
 import { PublicOnly } from "@/components/public-only";
@@ -63,21 +65,29 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[#f0fdf9] text-slate-900">
-        <div className="min-h-screen">
-          <EnglishValidationMessages />
-          <Reveal />
+        <ConfirmProvider>
+          <div className="min-h-screen">
+            <EnglishValidationMessages />
+            <Reveal />
+            <PublicOnly>
+              <SiteHeader />
+            </PublicOnly>
+            {children}
+            <PublicOnly>
+              <SiteFooter />
+              <MobileActionBar />
+            </PublicOnly>
+          </div>
           <PublicOnly>
-            <SiteHeader />
+            <ChatbaseWidget />
           </PublicOnly>
-          {children}
-          <PublicOnly>
-            <SiteFooter />
-            <MobileActionBar />
-          </PublicOnly>
-        </div>
-        <PublicOnly>
-          <ChatbaseWidget />
-        </PublicOnly>
+          {/*
+            Bottom-right is free: every action that raises a toast lives under
+            /admin, /operations, or /account, and both the chat launcher and the
+            mobile action bar are hidden on those routes.
+          */}
+          <Toaster position="bottom-right" closeButton richColors />
+        </ConfirmProvider>
       </body>
     </html>
   );

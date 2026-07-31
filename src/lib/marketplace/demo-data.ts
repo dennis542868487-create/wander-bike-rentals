@@ -10,7 +10,7 @@ const base = {
   availableFrom: null,
   availableUntil: null,
   rentalRules: "Bring photo ID. Pickup time is confirmed directly with the owner.",
-  includedItems: ["Helmet", "Lock"],
+  includedItems: ["Helmet", "Lock", "Basket"],
   status: "active" as const,
   managementNote: null,
   publishedAt: "2026-07-26T18:00:00.000Z",

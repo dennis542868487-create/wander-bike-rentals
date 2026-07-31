@@ -11,21 +11,23 @@ export const SITE_URL = "https://www.wanderbike.ca";
 export const BUSINESS_ID = `${SITE_URL}/#business`;
 
 /*
- * Entity links. `sameAs` is how a search engine works out that this site, the
- * Google Business Profile, and the social accounts are one business rather than
- * four unrelated things — it is the highest-leverage structured-data field a
- * local shop has, and brand mentions correlate with AI citation far more
- * strongly than backlinks do.
+ * Entity links. `sameAs` is how a search engine works out that this site and
+ * the Google Business Profile are one business rather than two unrelated
+ * things — the highest-leverage structured-data field a local shop has.
  *
- * Deliberately empty until the real profile URLs are on hand. Guessed or
- * search-style URLs (`google.com/maps/search?q=...`) are worse than nothing:
- * they either resolve to the wrong entity or to no entity at all.
+ * The Google entry is the ?cid= form rather than the maps.app.goo.gl share
+ * link it came from: the share link is a redirect that can be rotated, while
+ * the CID addresses the place record directly and never moves. Do not
+ * substitute a /maps/search?q= URL — that is a query, not an entity.
  *
- * Fill in with the canonical profile URLs, most authoritative first, e.g.
- * the Google Business Profile share link, Facebook page, Instagram profile,
- * Yelp and TripAdvisor listings. `sameAs` is omitted entirely while empty.
+ * Still missing, in descending value: Facebook page, Instagram profile, Yelp
+ * and TripAdvisor listings. Add the canonical profile URL for each as they
+ * exist; `sameAs` is omitted entirely while this array is empty.
  */
-const sameAs: readonly string[] = [];
+export const GOOGLE_BUSINESS_URL =
+  "https://maps.google.com/?cid=4061658800160849931";
+
+const sameAs: readonly string[] = [GOOGLE_BUSINESS_URL];
 
 const everyDay = [
   "Monday",

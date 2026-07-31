@@ -77,7 +77,7 @@ export function UserAccessActions({
           onClick={() => void update("active")}
           className="btn-secondary min-h-9 px-3 py-1.5 text-xs"
         >
-          Restore access
+          {busy ? "Restoring…" : "Restore access"}
         </button>
       </div>
     );
@@ -86,7 +86,7 @@ export function UserAccessActions({
   return (
     <div>
       {showReason ? (
-        <label className="field-label mb-2 block">
+        <label className="inline-reveal field-label mb-2 block">
           Suspension reason
           <textarea
             value={reason}
@@ -114,7 +114,7 @@ export function UserAccessActions({
               onClick={() => void update("suspended")}
               className="btn-danger min-h-9 px-3 py-1.5 text-xs"
             >
-              Suspend and pause listings
+              {busy ? "Suspending…" : "Suspend and pause listings"}
             </button>
             <button
               type="button"

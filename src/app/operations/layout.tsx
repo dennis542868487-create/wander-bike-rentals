@@ -29,7 +29,7 @@ export default async function OperationsLayout({
       <main className="flex min-h-screen items-center justify-center bg-slate-950 p-6">
         <div className="w-full max-w-md rounded-[0.9rem] bg-white p-8 text-center shadow-2xl">
           <p className="text-xs font-bold text-rose-700">ACCESS DENIED</p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-950">
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
             {WANDER_DASHBOARD_LABEL} access required
           </h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">

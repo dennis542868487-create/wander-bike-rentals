@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import ChatbaseWidget from "@/components/chatbase-widget";
 import { EnglishValidationMessages } from "@/components/forms/english-validation";
@@ -73,6 +74,7 @@ export default function RootLayout({
           <ChatbaseWidget />
         </PublicOnly>
       </body>
+      <GoogleAnalytics gaId="G-15E3M7B9XV" />
     </html>
   );
 }

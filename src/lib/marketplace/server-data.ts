@@ -15,6 +15,7 @@ import type {
   SafetyFlagStatus,
   SafetySignalSource,
 } from "@/lib/marketplace/types";
+import { WANDER_SHOP_LISTING_DEFAULTS } from "@/lib/marketplace/wander-shop";
 import {
   PLATFORM_DASHBOARD_LABEL,
   WANDER_DASHBOARD_LABEL,
@@ -177,7 +178,15 @@ export async function getEditableListing(
   );
   return {
     listing,
-    privateDetails: privateRow
+    privateDetails:
+      listing.source === "wander"
+        ? {
+            pickupAddress: WANDER_SHOP_LISTING_DEFAULTS.pickupAddress,
+            postalCode: WANDER_SHOP_LISTING_DEFAULTS.postalCode,
+            pickupInstructions:
+              WANDER_SHOP_LISTING_DEFAULTS.pickupInstructions,
+          }
+        : privateRow
       ? {
           pickupAddress: requiredString(privateRow.pickup_address),
           postalCode: optionalString(privateRow.postal_code),
@@ -231,7 +240,14 @@ function mapRequest(value: unknown): MarketplaceRequest | null {
       images: listing.images,
     },
     pickupDetails:
-      canSeePickup && privateRow
+      canSeePickup && listing.source === "wander"
+        ? {
+            pickupAddress: WANDER_SHOP_LISTING_DEFAULTS.pickupAddress,
+            postalCode: WANDER_SHOP_LISTING_DEFAULTS.postalCode,
+            pickupInstructions:
+              WANDER_SHOP_LISTING_DEFAULTS.pickupInstructions,
+          }
+        : canSeePickup && privateRow
         ? {
             pickupAddress: requiredString(privateRow.pickup_address),
             postalCode: optionalString(privateRow.postal_code),

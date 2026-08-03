@@ -3,6 +3,7 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { demoListings } from "@/lib/marketplace/demo-data";
 import { primaryListingPrice } from "@/lib/marketplace/format";
+import { readListingStorage } from "@/lib/marketplace/listing-storage";
 import type {
   BikeListing,
   BikeType,
@@ -10,6 +11,7 @@ import type {
   ListingImage,
   ListingSource,
 } from "@/lib/marketplace/types";
+import { WANDER_SHOP_LISTING_DEFAULTS } from "@/lib/marketplace/wander-shop";
 import { getOptionalSupabasePublicConfig } from "@/lib/supabase/config";
 
 type UnknownRecord = Record<string, unknown>;
@@ -26,7 +28,6 @@ export const publicListingSelect = `
   brand,
   model,
   frame_size,
-  tire_size,
   condition,
   offer_mode,
   rental_hourly_cents,
@@ -109,20 +110,27 @@ export function mapListing(value: unknown): BikeListing | null {
   const imageRows = Array.isArray(row.bike_listing_images)
     ? row.bike_listing_images
     : [];
+  const source = row.source === "wander" ? "wander" : "community";
+  const storedListing = readListingStorage({
+    shortDescription: row.short_description,
+    description: row.description,
+    tireSize: row.tire_size,
+    includedItems: row.included_items,
+  });
 
   return {
     id,
     ownerId: requiredString(row.owner_id),
-    source: row.source === "wander" ? "wander" : "community",
+    source,
     slug,
     title: requiredString(row.title),
-    shortDescription: optionalString(row.short_description),
-    description: requiredString(row.description),
+    shortDescription: storedListing.shortDescription,
+    description: storedListing.description,
     bikeType: requiredString(row.bike_type) as BikeListing["bikeType"],
     brand: optionalString(row.brand),
     model: optionalString(row.model),
-    frameSize: optionalString(row.frame_size),
-    tireSize: optionalString(row.tire_size),
+    frameSize: source === "wander" ? null : optionalString(row.frame_size),
+    tireSize: storedListing.tireSize,
     condition: requiredString(row.condition) as BikeListing["condition"],
     offerMode: requiredString(row.offer_mode) as BikeListing["offerMode"],
     rentalHourlyCents: optionalNumber(row.rental_hourly_cents),
@@ -130,20 +138,30 @@ export function mapListing(value: unknown): BikeListing | null {
     salePriceCents: optionalNumber(row.sale_price_cents),
     currency: "CAD",
     minimumRentalHours: optionalNumber(row.minimum_rental_hours) ?? 1,
-    pickupArea: requiredString(row.pickup_area),
-    city: requiredString(row.city),
-    province: requiredString(row.province),
+    pickupArea:
+      source === "wander"
+        ? WANDER_SHOP_LISTING_DEFAULTS.pickupArea
+        : requiredString(row.pickup_area),
+    city:
+      source === "wander"
+        ? WANDER_SHOP_LISTING_DEFAULTS.city
+        : requiredString(row.city),
+    province:
+      source === "wander"
+        ? WANDER_SHOP_LISTING_DEFAULTS.province
+        : requiredString(row.province),
     approximateLatitude: optionalNumber(row.approximate_latitude),
     approximateLongitude: optionalNumber(row.approximate_longitude),
-    availableFrom: optionalString(row.available_from),
-    availableUntil: optionalString(row.available_until),
-    availabilitySummary: optionalString(row.availability_summary),
+    availableFrom:
+      source === "wander" ? null : optionalString(row.available_from),
+    availableUntil:
+      source === "wander" ? null : optionalString(row.available_until),
+    availabilitySummary:
+      source === "wander"
+        ? WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary
+        : optionalString(row.availability_summary),
     rentalRules: optionalString(row.rental_rules),
-    includedItems: Array.isArray(row.included_items)
-      ? row.included_items.filter(
-          (item): item is string => typeof item === "string",
-        )
-      : [],
+    includedItems: storedListing.includedItems,
     status: requiredString(row.status) as BikeListing["status"],
     featured: row.featured === true,
     managementNote: optionalString(row.management_note),

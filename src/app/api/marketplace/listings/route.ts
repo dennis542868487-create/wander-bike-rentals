@@ -3,6 +3,7 @@ import { isSameOriginRequest } from "@/lib/http/security";
 import { listingInputSchema } from "@/lib/marketplace/schemas";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
 import { refreshListingTextSignals } from "@/lib/marketplace/safety-server";
+import { prepareListingStorage } from "@/lib/marketplace/listing-storage";
 import { uniqueListingSlug } from "@/lib/marketplace/slug";
 import { applyWanderShopListingDefaults } from "@/lib/marketplace/wander-shop";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -49,6 +50,12 @@ export async function POST(request: Request) {
     const sells =
       listingData.offerMode === "sale" ||
       listingData.offerMode === "rent_sale";
+    const storedListing = prepareListingStorage({
+      shortDescription: listingData.shortDescription,
+      description: listingData.description,
+      tireSize: listingData.tireSize,
+      includedItems: listingData.includedItems,
+    });
 
     const { data: listing, error: listingError } = await supabase
       .from("bike_listings")
@@ -57,13 +64,12 @@ export async function POST(request: Request) {
         source,
         slug: uniqueListingSlug(listingData.title),
         title: listingData.title,
-        short_description: listingData.shortDescription ?? null,
-        description: listingData.description,
+        short_description: storedListing.shortDescription,
+        description: storedListing.description,
         bike_type: listingData.bikeType,
         brand: listingData.brand ?? null,
         model: listingData.model ?? null,
         frame_size: source === "wander" ? null : listingData.frameSize ?? null,
-        tire_size: listingData.tireSize ?? null,
         condition: listingData.condition,
         offer_mode: listingData.offerMode,
         rental_hourly_cents: rents
@@ -83,7 +89,7 @@ export async function POST(request: Request) {
         available_until: listingData.availableUntil ?? null,
         availability_summary: listingData.availabilitySummary ?? null,
         rental_rules: listingData.rentalRules ?? null,
-        included_items: listingData.includedItems,
+        included_items: storedListing.includedItems,
         status,
         published_at: publishedAt,
       })

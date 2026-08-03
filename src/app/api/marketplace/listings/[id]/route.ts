@@ -3,6 +3,7 @@ import { isSameOriginRequest } from "@/lib/http/security";
 import { getListingManagerAccess } from "@/lib/marketplace/access-server";
 import { listingInputSchema } from "@/lib/marketplace/schemas";
 import { refreshListingTextSignals } from "@/lib/marketplace/safety-server";
+import { prepareListingStorage } from "@/lib/marketplace/listing-storage";
 import { applyWanderShopListingDefaults } from "@/lib/marketplace/wander-shop";
 import {
   requireMarketplaceActor,
@@ -69,19 +70,24 @@ export async function PATCH(
     const sells =
       listingData.offerMode === "sale" ||
       listingData.offerMode === "rent_sale";
+    const storedListing = prepareListingStorage({
+      shortDescription: listingData.shortDescription,
+      description: listingData.description,
+      tireSize: listingData.tireSize,
+      includedItems: listingData.includedItems,
+    });
     const { data: listing, error } = await access.supabase
       .from("bike_listings")
       .update({
         source,
         slug: access.listing.slug,
         title: listingData.title,
-        short_description: listingData.shortDescription ?? null,
-        description: listingData.description,
+        short_description: storedListing.shortDescription,
+        description: storedListing.description,
         bike_type: listingData.bikeType,
         brand: listingData.brand ?? null,
         model: listingData.model ?? null,
         frame_size: source === "wander" ? null : listingData.frameSize ?? null,
-        tire_size: listingData.tireSize ?? null,
         condition: listingData.condition,
         offer_mode: listingData.offerMode,
         rental_hourly_cents: rents
@@ -101,7 +107,7 @@ export async function PATCH(
         available_until: listingData.availableUntil ?? null,
         availability_summary: listingData.availabilitySummary ?? null,
         rental_rules: listingData.rentalRules ?? null,
-        included_items: listingData.includedItems,
+        included_items: storedListing.includedItems,
       })
       .eq("id", id)
       .select("id,owner_id,slug,title,status,source,updated_at")

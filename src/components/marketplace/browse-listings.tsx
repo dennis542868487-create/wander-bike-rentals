@@ -2,7 +2,9 @@ import {
   Bike,
   Check,
   MapPin,
+  PackageCheck,
   Search,
+  ShieldCheck,
   SlidersHorizontal,
   Store,
   UsersRound,
@@ -198,76 +200,130 @@ export function BrowseListings({
       </section>
 
       <section className="marketplace-source-switcher border-b border-slate-200 bg-[#f0fdf9]">
-        <div className="marketplace-source-switcher-grid mx-auto grid max-w-7xl grid-cols-2 gap-2 px-4 py-4 sm:gap-3 sm:px-6 sm:py-6 lg:px-8">
+        <div
+          className={`marketplace-source-switcher-grid mx-auto grid max-w-7xl grid-cols-1 gap-2 px-4 py-4 sm:grid-cols-2 sm:gap-3 sm:px-6 sm:py-6 lg:px-8 ${
+            isWander
+              ? "xl:grid-cols-[1.24fr_0.76fr]"
+              : "xl:grid-cols-[0.76fr_1.24fr]"
+          }`}
+        >
           <Link
             href="/bikes/wander"
             aria-current={isWander ? "page" : undefined}
-            className={`group relative flex min-h-[5.5rem] flex-col items-start gap-2 rounded-2xl border p-3 transition sm:min-h-24 sm:flex-row sm:items-center sm:gap-4 sm:p-5 ${
+            className={`group relative flex min-h-[5.5rem] flex-col rounded-2xl border p-4 transition sm:min-h-24 sm:p-5 xl:p-6 ${
               isWander
                 ? "border-[var(--green)] bg-[var(--navy)] text-white shadow-lg"
-                : "border-slate-300 bg-white text-[var(--navy)] hover:border-[var(--teal)]"
+                : "justify-center border-slate-300 bg-white text-[var(--navy)] hover:border-[var(--teal)]"
             }`}
           >
-            <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border sm:h-12 sm:w-12 ${
-                isWander
-                  ? "border-white/40 text-white"
-                  : "border-slate-300 text-[var(--teal)]"
-              }`}
-            >
-              <Store className="h-4 w-4 sm:h-6 sm:w-6" aria-hidden="true" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-extrabold leading-tight sm:text-xl">
-                Wander Bikes
-              </span>
+            <span className="flex w-full items-center gap-3 pr-9 sm:gap-4 sm:pr-11">
               <span
-                className={`mt-1 hidden text-sm sm:block ${
-                  isWander ? "text-slate-300" : "text-slate-600"
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border sm:h-12 sm:w-12 ${
+                  isWander
+                    ? "border-white/40 text-white"
+                    : "border-slate-300 text-[var(--teal)]"
                 }`}
               >
-                Managed directly by our Steveston shop.
+                <Store className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span
+                  className={`block text-lg font-extrabold leading-tight sm:text-xl ${
+                    isWander ? "text-white" : "text-[var(--navy)]"
+                  }`}
+                >
+                  Wander Bikes
+                </span>
+                <span
+                  className={`mt-1 block text-sm leading-5 ${
+                    isWander ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  {isWander
+                    ? "Shop-managed, checked daily, and rental-ready."
+                    : "Managed directly by our Steveston shop."}
+                </span>
               </span>
             </span>
             {isWander ? (
-              <span className="absolute right-2 top-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white sm:static sm:ml-auto sm:h-9 sm:w-9">
-                <Check className="h-3.5 w-3.5 sm:h-5 sm:w-5" aria-hidden="true" />
-              </span>
+              <>
+                <span className="absolute right-3 top-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white sm:right-5 sm:top-5 sm:h-9 sm:w-9">
+                  <Check className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+                </span>
+                <span className="mt-5 grid w-full gap-3 border-t border-white/15 pt-4 xl:grid-cols-2">
+                  <span className="flex items-start gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-teal-200">
+                      <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-teal-300">
+                        Safety-checked daily
+                      </span>
+                      <span className="mt-1 block text-sm font-semibold leading-5 text-white">
+                        Kickstand, bell, white front reflector &amp; red rear
+                        reflector.
+                      </span>
+                    </span>
+                  </span>
+                  <span className="flex items-start gap-3 border-t border-white/15 pt-3 xl:border-l xl:border-t-0 xl:pl-4 xl:pt-0">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-teal-200">
+                      <PackageCheck className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-teal-300">
+                        Included with every rental
+                      </span>
+                      <span className="mt-1 block text-sm font-semibold leading-5 text-white">
+                        Helmet, basket &amp; lock.
+                      </span>
+                    </span>
+                  </span>
+                </span>
+              </>
             ) : null}
           </Link>
           <Link
             href="/bikes/community"
             aria-current={!isWander ? "page" : undefined}
-            className={`group relative flex min-h-[5.5rem] flex-col items-start gap-2 rounded-2xl border p-3 transition sm:min-h-24 sm:flex-row sm:items-center sm:gap-4 sm:p-5 ${
+            className={`group relative flex min-h-[5.5rem] flex-col justify-center rounded-2xl border p-4 transition sm:min-h-24 sm:p-5 xl:p-6 ${
               !isWander
                 ? "border-[var(--green)] bg-[var(--navy)] text-white shadow-lg"
                 : "border-slate-300 bg-white text-[var(--navy)] hover:border-[var(--teal)]"
             }`}
           >
-            <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border sm:h-12 sm:w-12 ${
-                !isWander
-                  ? "border-white/40 text-white"
-                  : "border-slate-300 text-[var(--teal)]"
-              }`}
-            >
-              <UsersRound className="h-4 w-4 sm:h-6 sm:w-6" aria-hidden="true" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-sm font-extrabold leading-tight sm:text-xl">
-                Community Bikes
-              </span>
+            <span className="flex w-full items-center gap-3 pr-9 sm:gap-4 sm:pr-11">
               <span
-                className={`mt-1 hidden text-sm sm:block ${
-                  !isWander ? "text-slate-300" : "text-slate-600"
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border sm:h-12 sm:w-12 ${
+                  !isWander
+                    ? "border-white/40 text-white"
+                    : "border-slate-300 text-[var(--teal)]"
                 }`}
               >
-                Listed separately by local owners.
+                <UsersRound
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  aria-hidden="true"
+                />
+              </span>
+              <span className="min-w-0">
+                <span
+                  className={`block text-lg font-extrabold leading-tight sm:text-xl ${
+                    !isWander ? "text-white" : "text-[var(--navy)]"
+                  }`}
+                >
+                  Community Bikes
+                </span>
+                <span
+                  className={`mt-1 block text-sm leading-5 ${
+                    !isWander ? "text-slate-300" : "text-slate-600"
+                  }`}
+                >
+                  Listed separately by local owners.
+                </span>
               </span>
             </span>
             {!isWander ? (
-              <span className="absolute right-2 top-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white sm:static sm:ml-auto sm:h-9 sm:w-9">
-                <Check className="h-3.5 w-3.5 sm:h-5 sm:w-5" aria-hidden="true" />
+              <span className="absolute right-3 top-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white sm:right-5 sm:top-5 sm:h-9 sm:w-9">
+                <Check className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               </span>
             ) : null}
           </Link>

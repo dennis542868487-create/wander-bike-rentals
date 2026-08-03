@@ -35,6 +35,46 @@ test("home presents the two marketplace actions and no commerce checkout", async
   expect(pageErrors).toEqual([]);
 });
 
+test("mobile quick actions include directions to the Wander store", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  const storeLink = page
+    .getByRole("navigation", { name: "Mobile quick actions" })
+    .getByRole("link", { name: "Go to Store" });
+  await expect(storeLink).toBeVisible();
+  await expect(storeLink).toHaveAttribute(
+    "href",
+    /google\.com\/maps\/dir.*destination=12071.*First.*Ave/,
+  );
+});
+
+test("about page states the shop history, current scope, and sharing mission", async ({
+  page,
+}) => {
+  await page.goto("/about");
+
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "A local bike shop with a bigger sharing mission.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("Opened in Steveston · April 2026")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Find the bike there. Leave yours at home.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("Local service from Steveston")).toBeVisible();
+  await expect(page).toHaveTitle(
+    "About Wander Bike | Steveston Bike Rental Shop",
+  );
+});
+
 test("Wander and Community bikes stay on separate pages", async ({ page }) => {
   await page.goto("/bikes/wander");
   await expect(
@@ -195,8 +235,10 @@ test("sitemap contains marketplace pages and no shop or checkout", async ({
   const response = await request.get("/sitemap.xml");
   expect(response.ok()).toBe(true);
   const xml = await response.text();
+  expect(xml).toContain("<loc>https://www.wanderbike.ca/about</loc>");
   expect(xml).toContain("<loc>https://www.wanderbike.ca/bikes/wander</loc>");
   expect(xml).toContain("<loc>https://www.wanderbike.ca/bikes/community</loc>");
+  expect(xml).toContain("<loc>https://www.wanderbike.ca/about-marketplace</loc>");
   expect(xml).toContain("<loc>https://www.wanderbike.ca/location</loc>");
   expect(xml).toContain(
     "<loc>https://www.wanderbike.ca/quick-bike-repair-richmond</loc>",

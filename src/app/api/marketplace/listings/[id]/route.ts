@@ -3,6 +3,7 @@ import { isSameOriginRequest } from "@/lib/http/security";
 import { getListingManagerAccess } from "@/lib/marketplace/access-server";
 import { listingInputSchema } from "@/lib/marketplace/schemas";
 import { refreshListingTextSignals } from "@/lib/marketplace/safety-server";
+import { applyWanderShopListingDefaults } from "@/lib/marketplace/wander-shop";
 import {
   requireMarketplaceActor,
   requireUser,
@@ -54,48 +55,53 @@ export async function PATCH(
         { status: 400 },
       );
     }
-    const rents =
-      parsed.data.offerMode === "rent" ||
-      parsed.data.offerMode === "rent_sale";
-    const sells =
-      parsed.data.offerMode === "sale" ||
-      parsed.data.offerMode === "rent_sale";
     const source =
       parsed.data.source === "wander" && access.isStaff
         ? "wander"
         : access.listing.source;
+    const listingData =
+      source === "wander"
+        ? applyWanderShopListingDefaults(parsed.data)
+        : parsed.data;
+    const rents =
+      listingData.offerMode === "rent" ||
+      listingData.offerMode === "rent_sale";
+    const sells =
+      listingData.offerMode === "sale" ||
+      listingData.offerMode === "rent_sale";
     const { data: listing, error } = await access.supabase
       .from("bike_listings")
       .update({
         source,
         slug: access.listing.slug,
-        title: parsed.data.title,
-        short_description: parsed.data.shortDescription ?? null,
-        description: parsed.data.description,
-        bike_type: parsed.data.bikeType,
-        brand: parsed.data.brand ?? null,
-        model: parsed.data.model ?? null,
-        frame_size: parsed.data.frameSize ?? null,
-        condition: parsed.data.condition,
-        offer_mode: parsed.data.offerMode,
+        title: listingData.title,
+        short_description: listingData.shortDescription ?? null,
+        description: listingData.description,
+        bike_type: listingData.bikeType,
+        brand: listingData.brand ?? null,
+        model: listingData.model ?? null,
+        frame_size: source === "wander" ? null : listingData.frameSize ?? null,
+        tire_size: listingData.tireSize ?? null,
+        condition: listingData.condition,
+        offer_mode: listingData.offerMode,
         rental_hourly_cents: rents
-          ? parsed.data.rentalHourlyCents ?? null
+          ? listingData.rentalHourlyCents ?? null
           : null,
         rental_daily_cents: rents
-          ? parsed.data.rentalDailyCents ?? null
+          ? listingData.rentalDailyCents ?? null
           : null,
-        sale_price_cents: sells ? parsed.data.salePriceCents ?? null : null,
-        minimum_rental_hours: parsed.data.minimumRentalHours,
-        pickup_area: parsed.data.pickupArea,
-        city: parsed.data.city,
-        province: parsed.data.province,
-        approximate_latitude: parsed.data.approximateLatitude ?? null,
-        approximate_longitude: parsed.data.approximateLongitude ?? null,
-        available_from: parsed.data.availableFrom ?? null,
-        available_until: parsed.data.availableUntil ?? null,
-        availability_summary: parsed.data.availabilitySummary ?? null,
-        rental_rules: parsed.data.rentalRules ?? null,
-        included_items: parsed.data.includedItems,
+        sale_price_cents: sells ? listingData.salePriceCents ?? null : null,
+        minimum_rental_hours: listingData.minimumRentalHours,
+        pickup_area: listingData.pickupArea,
+        city: listingData.city,
+        province: listingData.province,
+        approximate_latitude: listingData.approximateLatitude ?? null,
+        approximate_longitude: listingData.approximateLongitude ?? null,
+        available_from: listingData.availableFrom ?? null,
+        available_until: listingData.availableUntil ?? null,
+        availability_summary: listingData.availabilitySummary ?? null,
+        rental_rules: listingData.rentalRules ?? null,
+        included_items: listingData.includedItems,
       })
       .eq("id", id)
       .select("id,owner_id,slug,title,status,source,updated_at")
@@ -107,9 +113,9 @@ export async function PATCH(
       .upsert({
         listing_id: id,
         owner_id: access.listing.owner_id,
-        pickup_address: parsed.data.pickupAddress,
-        postal_code: parsed.data.postalCode ?? null,
-        pickup_instructions: parsed.data.pickupInstructions ?? null,
+        pickup_address: listingData.pickupAddress,
+        postal_code: listingData.postalCode ?? null,
+        pickup_instructions: listingData.pickupInstructions ?? null,
     });
     if (privateError) throw new Error("Pickup details could not be updated.");
 
@@ -120,7 +126,7 @@ export async function PATCH(
         listingTitle: listing.title,
         listingSlug: listing.slug,
         listingUpdatedAt: listing.updated_at,
-        text: parsed.data,
+        text: listingData,
       });
     } catch (safetyError) {
       console.error("Listing text signals could not be refreshed", safetyError);

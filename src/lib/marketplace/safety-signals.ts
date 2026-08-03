@@ -15,6 +15,7 @@ export type ListingTextForSafety = {
   brand?: string | null;
   model?: string | null;
   frameSize?: string | null;
+  tireSize?: string | null;
   pickupArea: string;
   availabilitySummary?: string | null;
   rentalRules?: string | null;
@@ -60,6 +61,7 @@ const fieldLabels: Record<keyof ListingTextForSafety, string> = {
   brand: "brand",
   model: "model",
   frameSize: "frame size",
+  tireSize: "wheel or tire size",
   pickupArea: "public pickup area",
   availabilitySummary: "availability",
   rentalRules: "owner notes",

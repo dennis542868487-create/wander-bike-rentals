@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   Bike,
   Check,
   MapPin,
@@ -280,7 +281,11 @@ export function BrowseListings({
                   </span>
                 </span>
               </>
-            ) : null}
+            ) : (
+              <span className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--navy)] text-white shadow-sm transition group-hover:translate-x-0.5 group-hover:bg-[var(--teal)] sm:right-5 sm:h-9 sm:w-9">
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+              </span>
+            )}
           </Link>
           <Link
             href="/bikes/community"
@@ -325,7 +330,11 @@ export function BrowseListings({
               <span className="absolute right-3 top-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-white sm:right-5 sm:top-5 sm:h-9 sm:w-9">
                 <Check className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               </span>
-            ) : null}
+            ) : (
+              <span className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--navy)] text-white shadow-sm transition group-hover:translate-x-0.5 group-hover:bg-[var(--teal)] sm:right-5 sm:h-9 sm:w-9">
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+              </span>
+            )}
           </Link>
         </div>
       </section>
@@ -390,7 +399,7 @@ export function BrowseListings({
         </div>
 
         {listings.length > 0 ? (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
             {listings.map((listing, index) => (
               <CompactListingCard
                 key={listing.id}

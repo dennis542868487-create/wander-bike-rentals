@@ -122,6 +122,7 @@ export default async function AdminListingsPage({
                 <td className="max-w-sm px-5 py-4">
                   <ListingManagementActions
                     listingId={listing.id}
+                    listingTitle={listing.title}
                     status={listing.status}
                     featured={listing.featured}
                   />
@@ -165,6 +166,7 @@ export default async function AdminListingsPage({
             <div className="mt-4">
               <ListingManagementActions
                 listingId={listing.id}
+                listingTitle={listing.title}
                 status={listing.status}
                 featured={listing.featured}
               />

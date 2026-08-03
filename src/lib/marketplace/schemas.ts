@@ -17,6 +17,11 @@ const optionalText = (maximum: number) =>
     z.string().trim().max(maximum).optional(),
   );
 
+const optionalUnlimitedText = z.preprocess(
+  emptyToUndefined,
+  z.string().trim().optional(),
+);
+
 const optionalPositiveCents = z.preprocess(
   emptyToUndefined,
   z.coerce.number().int().positive().max(100_000_000).optional(),
@@ -31,12 +36,13 @@ export const listingInputSchema = z
   .object({
     source: z.enum(["community", "wander"]).default("community"),
     title: z.string().trim().min(3).max(120),
-    shortDescription: optionalText(240),
-    description: z.string().trim().min(20).max(5000),
+    shortDescription: optionalUnlimitedText,
+    description: z.string().trim().min(1, "Add a full description."),
     bikeType: z.enum(bikeTypes),
     brand: optionalText(80),
     model: optionalText(100),
     frameSize: optionalText(60),
+    tireSize: optionalText(80),
     condition: z.enum(["new", "like_new", "good", "fair"]).default("good"),
     offerMode: z.enum(offerModes),
     rentalHourlyCents: optionalPositiveCents,

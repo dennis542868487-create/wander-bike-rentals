@@ -11,6 +11,7 @@ const listing = {
   description:
     "A comfortable city bike in good condition with a rear rack and lock.",
   bikeType: "hybrid",
+  tireSize: "700C",
   condition: "good",
   offerMode: "rent_sale",
   rentalDailyCents: 4200,
@@ -58,6 +59,30 @@ describe("bike listing input", () => {
         availableUntil: "2026-08-10",
       }).success,
     ).toBe(false);
+  });
+
+  it("accepts one character in the full description and optional summary/items", () => {
+    const parsed = listingInputSchema.parse({
+      ...listing,
+      shortDescription: "",
+      description: "x",
+      includedItems: undefined,
+    });
+
+    expect(parsed.shortDescription).toBeUndefined();
+    expect(parsed.description).toBe("x");
+    expect(parsed.includedItems).toEqual([]);
+  });
+
+  it("does not cap short summaries or full descriptions", () => {
+    const parsed = listingInputSchema.parse({
+      ...listing,
+      shortDescription: "s".repeat(500),
+      description: "d".repeat(6_000),
+    });
+
+    expect(parsed.shortDescription).toHaveLength(500);
+    expect(parsed.description).toHaveLength(6_000);
   });
 });
 

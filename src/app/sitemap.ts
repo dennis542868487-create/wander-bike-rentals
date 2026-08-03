@@ -9,9 +9,11 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     "",
+    "/about",
     "/bikes",
     "/bikes/wander",
     "/bikes/community",
+    "/about-marketplace",
     "/booking",
     "/pricing",
     "/list-your-bike",

@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
-import { BadgeCheck, CalendarDays, HandCoins, MapPin, PackageCheck, ShieldCheck } from "lucide-react";
+import {
+  BadgeCheck,
+  CalendarDays,
+  Circle,
+  HandCoins,
+  MapPin,
+  PackageCheck,
+  Ruler,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ListingPhoto } from "@/components/marketplace/listing-photo";
@@ -11,6 +20,7 @@ import {
   sourceLabel,
 } from "@/lib/marketplace/format";
 import { getPublicListingBySlug } from "@/lib/marketplace/data";
+import { WANDER_SHOP_LISTING_DEFAULTS } from "@/lib/marketplace/wander-shop";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 export async function generateMetadata({
@@ -100,9 +110,7 @@ export default async function BikeDetailPage({
                 {listing.title}
               </h1>
               <p className="mt-3 text-slate-500">
-                {[listing.brand, listing.model, listing.frameSize]
-                  .filter(Boolean)
-                  .join(" · ")}
+                {[listing.brand, listing.model].filter(Boolean).join(" · ")}
               </p>
 
               <div className="mt-7 flex flex-wrap gap-x-9 gap-y-4 border-y border-slate-100 py-6">
@@ -164,10 +172,39 @@ export default async function BikeDetailPage({
                   <div>
                     <dt className="text-sm font-bold text-slate-950">Availability</dt>
                     <dd className="mt-1 text-sm text-slate-600">
-                      {listing.availabilitySummary ?? "Confirm dates with the owner"}
+                      {listing.availabilitySummary ??
+                        (listing.source === "wander"
+                          ? WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary
+                          : "Confirm dates with the owner")}
                     </dd>
                   </div>
                 </div>
+                {listing.source === "community" && listing.frameSize ? (
+                  <div className="flex gap-3">
+                    <Ruler className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                    <div>
+                      <dt className="text-sm font-bold text-slate-950">
+                        Frame size / rider fit
+                      </dt>
+                      <dd className="mt-1 text-sm text-slate-600">
+                        {listing.frameSize}
+                      </dd>
+                    </div>
+                  </div>
+                ) : null}
+                {listing.tireSize ? (
+                  <div className="flex gap-3">
+                    <Circle className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                    <div>
+                      <dt className="text-sm font-bold text-slate-950">
+                        Wheel / tire size
+                      </dt>
+                      <dd className="mt-1 text-sm text-slate-600">
+                        {listing.tireSize}
+                      </dd>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="flex gap-3">
                   <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
                   <div>
@@ -184,7 +221,9 @@ export default async function BikeDetailPage({
                     <dd className="mt-1 text-sm text-slate-600">
                       {listing.includedItems.length > 0
                         ? listing.includedItems.join(", ")
-                        : "Confirm with the owner"}
+                        : listing.source === "wander" && canRent
+                          ? "Helmet, basket, and lock"
+                          : "Confirm with the owner"}
                     </dd>
                   </div>
                 </div>

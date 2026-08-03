@@ -28,6 +28,8 @@ type NavLink = {
 };
 
 const serviceLinks: NavLink[] = [
+  { href: "/about", label: "About Wander Bike" },
+  { href: "/about-marketplace", label: "About Marketplace" },
   { href: "/pricing", label: "Pricing" },
   { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
   { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },

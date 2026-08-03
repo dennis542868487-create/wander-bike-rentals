@@ -1,16 +1,19 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ListingStatus } from "@/lib/marketplace/types";
 
 export function ListingManagementActions({
   listingId,
+  listingTitle,
   status,
   featured,
   endpointBase = "/api/admin/marketplace/listings",
 }: {
   listingId: string;
+  listingTitle?: string;
   status: ListingStatus;
   featured: boolean;
   endpointBase?: string;
@@ -50,6 +53,36 @@ export function ListingManagementActions({
         updateError instanceof Error
           ? updateError.message
           : "Could not update listing.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove() {
+    const confirmed = window.confirm(
+      "Permanently delete “" +
+        (listingTitle ?? "this bike") +
+        "”? This cannot be undone.",
+    );
+    if (!confirmed) return;
+
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(endpointBase + "/" + listingId, {
+        method: "DELETE",
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Could not delete listing.");
+      }
+      router.refresh();
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Could not delete listing.",
       );
     } finally {
       setBusy(false);
@@ -120,8 +153,21 @@ export function ListingManagementActions({
             {featured ? "Unfeature" : "Feature"}
           </button>
         ) : null}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void remove()}
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-700 transition hover:border-rose-300 hover:bg-rose-50 disabled:opacity-50"
+        >
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+          {busy ? "Working…" : "Delete"}
+        </button>
       </div>
-      {error ? <p className="mt-2 text-xs text-rose-700">{error}</p> : null}
+      {error ? (
+        <p className="mt-2 text-xs text-rose-700" aria-live="polite">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

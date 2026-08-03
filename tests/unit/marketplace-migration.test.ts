@@ -25,4 +25,23 @@ describe("marketplace migration", () => {
     expect(sql).not.toContain("stripe");
     expect(sql).not.toContain("canada_post");
   });
+
+  it("adds tire size, removes copy length checks, and fixes Wander shop details", async () => {
+    const path = resolve(
+      process.cwd(),
+      "supabase/migrations/20260803023500_marketplace_wheel_size_and_wander_defaults.sql",
+    );
+    const sql = await readFile(path, "utf8");
+
+    await expect(parse(sql)).resolves.toBeDefined();
+    expect(sql).toContain("add column if not exists tire_size text");
+    expect(sql).toContain(
+      "drop constraint if exists bike_listings_short_description_check",
+    );
+    expect(sql).toContain(
+      "drop constraint if exists bike_listings_description_check",
+    );
+    expect(sql).toContain("12071 First Ave #101, Richmond, BC V7E 3M1");
+    expect(sql).toContain("Open daily 9:00 AM–10:00 PM");
+  });
 });

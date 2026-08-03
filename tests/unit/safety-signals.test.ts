@@ -13,6 +13,7 @@ const cleanListing: ListingTextForSafety = {
   brand: "Giant",
   model: "Escape",
   frameSize: "Medium",
+  tireSize: "700C",
   pickupArea: "Steveston Village",
   availabilitySummary: "Weekends and weekday evenings",
   rentalRules: "Bring photo ID and inspect the bike at pickup.",

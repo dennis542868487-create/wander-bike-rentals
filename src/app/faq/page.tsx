@@ -28,7 +28,7 @@ const shopFaqs = [
   ],
   [
     "Are a helmet and lock included?",
-    "Included items are shown on each Wander bike listing because equipment can vary by bike. Many rentals include a helmet and lock; call the shop if you need a specific helmet size or want to confirm.",
+    "Yes. Every Wander Bike rental includes a helmet, basket, and lock. Call the shop if you need a specific helmet size or want to confirm any extra equipment.",
   ],
   [
     "Do I need photo ID or a deposit for a Wander rental?",

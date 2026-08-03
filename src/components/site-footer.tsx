@@ -40,6 +40,11 @@ export function SiteFooter() {
           <p className="text-sm font-bold text-white">Marketplace</p>
           <ul className="mt-4 space-y-3 text-sm text-slate-300">
             <li>
+              <Link className="hover:text-teal-300" href="/about-marketplace">
+                About Marketplace
+              </Link>
+            </li>
+            <li>
               <Link className="hover:text-teal-300" href="/bikes/wander">
                 Wander Bikes
               </Link>
@@ -94,6 +99,11 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-bold text-white">Help & guides</p>
           <ul className="mt-4 space-y-3 text-sm text-slate-300">
+            <li>
+              <Link className="hover:text-teal-300" href="/about">
+                About Wander Bike
+              </Link>
+            </li>
             <li>
               <Link className="hover:text-teal-300" href="/how-it-works">
                 How It Works

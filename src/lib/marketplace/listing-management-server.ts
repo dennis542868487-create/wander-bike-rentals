@@ -89,3 +89,111 @@ export async function manageListing(input: {
   }
   return { ok: true as const, listing };
 }
+
+export async function deleteManagedListing(input: {
+  listingId: string;
+  allowedSource?: "wander" | "community";
+}) {
+  const supabase = getSupabaseAdmin();
+  let listingQuery = supabase
+    .from("bike_listings")
+    .select("id,title,source")
+    .eq("id", input.listingId);
+  if (input.allowedSource) {
+    listingQuery = listingQuery.eq("source", input.allowedSource);
+  }
+  const { data: current, error: listingError } =
+    await listingQuery.maybeSingle();
+  if (listingError || !current) {
+    return {
+      ok: false as const,
+      status: 404,
+      error: "Bike listing not found.",
+    };
+  }
+
+  const { count: requestCount, error: requestError } = await supabase
+    .from("marketplace_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("listing_id", input.listingId);
+  if (requestError) {
+    return {
+      ok: false as const,
+      status: 500,
+      error: "Could not verify this bike’s request history.",
+    };
+  }
+  if ((requestCount ?? 0) > 0) {
+    return {
+      ok: false as const,
+      status: 409,
+      error:
+        "This bike has request history and cannot be permanently deleted. Pause it instead.",
+    };
+  }
+
+  const { data: images, error: imageError } = await supabase
+    .from("bike_listing_images")
+    .select("storage_path")
+    .eq("listing_id", input.listingId);
+  if (imageError) {
+    return {
+      ok: false as const,
+      status: 500,
+      error: "Could not prepare this bike for deletion.",
+    };
+  }
+
+  // Listing-only notification rows must be removed first because their
+  // integrity constraint does not allow both source references to become null.
+  const { error: notificationError } = await supabase
+    .from("marketplace_notification_outbox")
+    .delete()
+    .eq("listing_id", input.listingId);
+  if (notificationError) {
+    return {
+      ok: false as const,
+      status: 500,
+      error: "Could not remove this bike’s notification history.",
+    };
+  }
+
+  let deleteQuery = supabase
+    .from("bike_listings")
+    .delete()
+    .eq("id", input.listingId);
+  if (input.allowedSource) {
+    deleteQuery = deleteQuery.eq("source", input.allowedSource);
+  }
+  const { data: deleted, error: deleteError } = await deleteQuery
+    .select("id")
+    .maybeSingle();
+  if (deleteError || !deleted) {
+    return {
+      ok: false as const,
+      status: 500,
+      error: "Could not permanently delete this bike.",
+    };
+  }
+
+  const storagePaths = (images ?? []).map((image) => image.storage_path);
+  if (storagePaths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from("bike-listing-images")
+      .remove(storagePaths);
+    if (storageError) {
+      console.error(
+        "Deleted listing image files could not be cleaned up",
+        storageError,
+      );
+    }
+  }
+
+  return {
+    ok: true as const,
+    deletedListing: {
+      id: current.id,
+      title: current.title,
+    },
+  };
+}

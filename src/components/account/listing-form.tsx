@@ -16,6 +16,7 @@ import {
   type OfferMode,
 } from "@/lib/marketplace/types";
 import type { EditableListing } from "@/lib/marketplace/server-data";
+import { WANDER_SHOP_LISTING_DEFAULTS } from "@/lib/marketplace/wander-shop";
 
 function dollars(cents: number | null) {
   return cents === null ? "" : (cents / 100).toFixed(cents % 100 === 0 ? 0 : 2);
@@ -67,9 +68,6 @@ export function ListingForm({
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [photoNames, setPhotoNames] = useState<string[]>([]);
-  const [descriptionLength, setDescriptionLength] = useState(
-    listing?.description?.length ?? 0,
-  );
   const formRef = useRef<HTMLFormElement>(null);
   const fieldErrors = useFieldErrors(formRef);
 
@@ -177,6 +175,7 @@ export function ListingForm({
       brand: form.get("brand"),
       model: form.get("model"),
       frameSize: form.get("frame_size"),
+      tireSize: form.get("tire_size"),
       condition: form.get("condition"),
       offerMode,
       rentalHourlyCents: cents(form.get("rental_hourly")),
@@ -262,6 +261,7 @@ export function ListingForm({
 
   const canRent = offerMode === "rent" || offerMode === "rent_sale";
   const canSell = offerMode === "sale" || offerMode === "rent_sale";
+  const isWanderSource = source === "wander";
 
   return (
     <form ref={formRef} onSubmit={submit} className="space-y-6">
@@ -345,17 +345,38 @@ export function ListingForm({
             Model <span className="font-normal text-slate-400">(optional)</span>
             <input name="model" defaultValue={listing?.model ?? ""} className="market-input" />
           </label>
+          {!isWanderSource ? (
+            <label className="field-label">
+              Frame size / rider fit{" "}
+              <span className="font-normal text-slate-400">(optional)</span>
+              <input
+                name="frame_size"
+                defaultValue={listing?.frameSize ?? ""}
+                className="market-input"
+                placeholder="e.g. Medium · 5′5″–5′10″"
+              />
+            </label>
+          ) : (
+            <input type="hidden" name="frame_size" value="" />
+          )}
           <label className="field-label">
-            Frame size / rider fit
+            Wheel / tire size{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
-              name="frame_size"
-              defaultValue={listing?.frameSize ?? ""}
+              name="tire_size"
+              defaultValue={listing?.tireSize ?? ""}
               className="market-input"
-              placeholder="e.g. Medium · 5′5″–5′10″"
+              placeholder="e.g. 26-inch, 27.5-inch, or 700C"
             />
           </label>
-          <label className="field-label">
-            Included items
+          <label
+            className={[
+              "field-label",
+              !isWanderSource ? "sm:col-span-2" : "",
+            ].join(" ")}
+          >
+            Included items{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="included_items"
               defaultValue={listing?.includedItems.join(", ") ?? ""}
@@ -367,10 +388,10 @@ export function ListingForm({
             </span>
           </label>
           <label className="field-label sm:col-span-2">
-            Short summary
+            Short summary{" "}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="short_description"
-              maxLength={240}
               defaultValue={listing?.shortDescription ?? ""}
               className="market-input"
               placeholder="One sentence shown in browse results"
@@ -382,22 +403,11 @@ export function ListingForm({
             <textarea
               name="description"
               required
-              minLength={20}
-              maxLength={5000}
               defaultValue={listing?.description ?? ""}
-              onChange={(event) => setDescriptionLength(event.target.value.length)}
               className="market-textarea"
               placeholder="Describe fit, maintenance, ride feel, and anything a rider should know."
             />
-            <span
-              className={`mt-1.5 block text-xs font-normal ${
-                descriptionLength >= 20 ? "text-slate-500" : "text-amber-700"
-              }`}
-            >
-              {descriptionLength >= 20
-                ? `${descriptionLength} characters`
-                : `At least 20 characters needed to publish · ${descriptionLength} so far`}
-            </span>
+            <FieldError message={fieldErrors.description} />
           </label>
         </div>
       </section>
@@ -517,96 +527,166 @@ export function ListingForm({
           <div>
             <p className="text-xs font-bold text-teal-800">STEP 3</p>
             <h2 className="text-xl font-bold text-slate-950">
-              Pickup and availability
+              {isWanderSource
+                ? "Shop pickup and availability"
+                : "Pickup and availability"}
             </h2>
           </div>
         </div>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
-          <label className="field-label">
-            Public pickup area
-            <input
-              name="pickup_area"
-              required
-              defaultValue={listing?.pickupArea ?? ""}
-              className="market-input"
-              placeholder="e.g. Steveston Village"
-            />
-                      <FieldError message={fieldErrors.pickup_area} />
-          </label>
-          <label className="field-label">
-            City
-            <input
-              name="city"
-              required
-              defaultValue={listing?.city ?? "Richmond"}
-              className="market-input"
-            />
-                      <FieldError message={fieldErrors.city} />
-          </label>
-          <label className="field-label">
-            Province
-            <input
-              name="province"
-              required
-              defaultValue={listing?.province ?? "BC"}
-              className="market-input"
-            />
-                      <FieldError message={fieldErrors.province} />
-          </label>
-          <label className="field-label">
-            Postal code <span className="font-normal text-slate-400">(private)</span>
-            <input
-              name="postal_code"
-              defaultValue={initial?.privateDetails?.postalCode ?? ""}
-              className="market-input"
-              autoComplete="postal-code"
-            />
-          </label>
-          <label className="field-label sm:col-span-2">
-            Exact pickup address <span className="font-normal text-teal-700">(kept private until accepted)</span>
-            <input
-              name="pickup_address"
-              required
-              defaultValue={initial?.privateDetails?.pickupAddress ?? ""}
-              className="market-input"
-              autoComplete="street-address"
-            />
-                      <FieldError message={fieldErrors.pickup_address} />
-          </label>
-          <label className="field-label">
-            Available from <span className="font-normal text-slate-400">(optional)</span>
-            <DateField
-              name="available_from"
-              defaultValue={listing?.availableFrom ?? ""}
-            />
-            <FieldError message={fieldErrors.available_from} />
-          </label>
-          <label className="field-label">
-            Available until <span className="font-normal text-slate-400">(optional)</span>
-            <DateField
-              name="available_until"
-              defaultValue={listing?.availableUntil ?? ""}
-            />
-            <FieldError message={fieldErrors.available_until} />
-          </label>
-          <label className="field-label sm:col-span-2">
-            Public availability summary
-            <input
-              name="availability_summary"
-              defaultValue={listing?.availabilitySummary ?? ""}
-              className="market-input"
-              placeholder="e.g. Weekdays after 4 PM · flexible weekends"
-            />
-          </label>
-          <label className="field-label sm:col-span-2">
-            Private pickup instructions
-            <textarea
-              name="pickup_instructions"
-              defaultValue={initial?.privateDetails?.pickupInstructions ?? ""}
-              className="market-textarea min-h-24"
-              placeholder="Meeting point, buzzer, or contact instructions shown only after acceptance."
-            />
-          </label>
+          {isWanderSource ? (
+            <>
+              <div className="sm:col-span-2 rounded-2xl border border-teal-200 bg-teal-50 p-5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-teal-800">
+                  Fixed shop details
+                </p>
+                <p className="mt-2 text-lg font-bold text-slate-950">
+                  {WANDER_SHOP_LISTING_DEFAULTS.pickupArea}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-700">
+                  {WANDER_SHOP_LISTING_DEFAULTS.pickupAddress}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-teal-900">
+                  {WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary}
+                </p>
+                <p className="mt-3 text-xs leading-5 text-slate-600">
+                  Every Wander bike uses the shop address and opening hours
+                  automatically.
+                </p>
+              </div>
+              <input
+                type="hidden"
+                name="pickup_area"
+                value={WANDER_SHOP_LISTING_DEFAULTS.pickupArea}
+              />
+              <input
+                type="hidden"
+                name="city"
+                value={WANDER_SHOP_LISTING_DEFAULTS.city}
+              />
+              <input
+                type="hidden"
+                name="province"
+                value={WANDER_SHOP_LISTING_DEFAULTS.province}
+              />
+              <input
+                type="hidden"
+                name="postal_code"
+                value={WANDER_SHOP_LISTING_DEFAULTS.postalCode}
+              />
+              <input
+                type="hidden"
+                name="pickup_address"
+                value={WANDER_SHOP_LISTING_DEFAULTS.pickupAddress}
+              />
+              <input type="hidden" name="available_from" value="" />
+              <input type="hidden" name="available_until" value="" />
+              <input
+                type="hidden"
+                name="availability_summary"
+                value={WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary}
+              />
+              <input
+                type="hidden"
+                name="pickup_instructions"
+                value={WANDER_SHOP_LISTING_DEFAULTS.pickupInstructions}
+              />
+            </>
+          ) : (
+            <>
+              <label className="field-label">
+                Public pickup area
+                <input
+                  name="pickup_area"
+                  required
+                  defaultValue={listing?.pickupArea ?? ""}
+                  className="market-input"
+                  placeholder="e.g. Steveston Village"
+                />
+                <FieldError message={fieldErrors.pickup_area} />
+              </label>
+              <label className="field-label">
+                City
+                <input
+                  name="city"
+                  required
+                  defaultValue={listing?.city ?? "Richmond"}
+                  className="market-input"
+                />
+                <FieldError message={fieldErrors.city} />
+              </label>
+              <label className="field-label">
+                Province
+                <input
+                  name="province"
+                  required
+                  defaultValue={listing?.province ?? "BC"}
+                  className="market-input"
+                />
+                <FieldError message={fieldErrors.province} />
+              </label>
+              <label className="field-label">
+                Postal code{" "}
+                <span className="font-normal text-slate-400">(private)</span>
+                <input
+                  name="postal_code"
+                  defaultValue={initial?.privateDetails?.postalCode ?? ""}
+                  className="market-input"
+                  autoComplete="postal-code"
+                />
+              </label>
+              <label className="field-label sm:col-span-2">
+                Exact pickup address{" "}
+                <span className="font-normal text-teal-700">
+                  (kept private until accepted)
+                </span>
+                <input
+                  name="pickup_address"
+                  required
+                  defaultValue={initial?.privateDetails?.pickupAddress ?? ""}
+                  className="market-input"
+                  autoComplete="street-address"
+                />
+                <FieldError message={fieldErrors.pickup_address} />
+              </label>
+              <label className="field-label">
+                Available from{" "}
+                <span className="font-normal text-slate-400">(optional)</span>
+                <DateField
+                  name="available_from"
+                  defaultValue={listing?.availableFrom ?? ""}
+                />
+                <FieldError message={fieldErrors.available_from} />
+              </label>
+              <label className="field-label">
+                Available until{" "}
+                <span className="font-normal text-slate-400">(optional)</span>
+                <DateField
+                  name="available_until"
+                  defaultValue={listing?.availableUntil ?? ""}
+                />
+                <FieldError message={fieldErrors.available_until} />
+              </label>
+              <label className="field-label sm:col-span-2">
+                Public availability summary
+                <input
+                  name="availability_summary"
+                  defaultValue={listing?.availabilitySummary ?? ""}
+                  className="market-input"
+                  placeholder="e.g. Weekdays after 4 PM · flexible weekends"
+                />
+              </label>
+              <label className="field-label sm:col-span-2">
+                Private pickup instructions
+                <textarea
+                  name="pickup_instructions"
+                  defaultValue={initial?.privateDetails?.pickupInstructions ?? ""}
+                  className="market-textarea min-h-24"
+                  placeholder="Meeting point, buzzer, or contact instructions shown only after acceptance."
+                />
+              </label>
+            </>
+          )}
           <label className="field-label sm:col-span-2">
             Rules and owner notes
             <textarea

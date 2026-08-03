@@ -22,6 +22,7 @@ export const wanderBusinessEntity = {
   "@id": "https://www.wanderbike.ca/#business",
   name: "Wander Bike Rentals",
   alternateName: "Wander Bike",
+  foundingDate: "2026-04",
   description:
     "A physical bike rental, bike sale, and quick repair shop in Steveston, Richmond that also operates a local bike marketplace.",
   url: "https://www.wanderbike.ca/",

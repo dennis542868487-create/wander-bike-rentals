@@ -4,6 +4,7 @@ import { listingInputSchema } from "@/lib/marketplace/schemas";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
 import { refreshListingTextSignals } from "@/lib/marketplace/safety-server";
 import { uniqueListingSlug } from "@/lib/marketplace/slug";
+import { applyWanderShopListingDefaults } from "@/lib/marketplace/wander-shop";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireMarketplaceActor } from "@/lib/supabase/auth";
 
@@ -36,48 +37,53 @@ export async function POST(request: Request) {
     const isStaff = profile.role === "staff" || profile.role === "admin";
     const source =
       parsed.data.source === "wander" && isStaff ? "wander" : "community";
+    const listingData =
+      source === "wander"
+        ? applyWanderShopListingDefaults(parsed.data)
+        : parsed.data;
     const status = "active";
     const publishedAt = new Date().toISOString();
     const rents =
-      parsed.data.offerMode === "rent" ||
-      parsed.data.offerMode === "rent_sale";
+      listingData.offerMode === "rent" ||
+      listingData.offerMode === "rent_sale";
     const sells =
-      parsed.data.offerMode === "sale" ||
-      parsed.data.offerMode === "rent_sale";
+      listingData.offerMode === "sale" ||
+      listingData.offerMode === "rent_sale";
 
     const { data: listing, error: listingError } = await supabase
       .from("bike_listings")
       .insert({
         owner_id: auth.user.id,
         source,
-        slug: uniqueListingSlug(parsed.data.title),
-        title: parsed.data.title,
-        short_description: parsed.data.shortDescription ?? null,
-        description: parsed.data.description,
-        bike_type: parsed.data.bikeType,
-        brand: parsed.data.brand ?? null,
-        model: parsed.data.model ?? null,
-        frame_size: parsed.data.frameSize ?? null,
-        condition: parsed.data.condition,
-        offer_mode: parsed.data.offerMode,
+        slug: uniqueListingSlug(listingData.title),
+        title: listingData.title,
+        short_description: listingData.shortDescription ?? null,
+        description: listingData.description,
+        bike_type: listingData.bikeType,
+        brand: listingData.brand ?? null,
+        model: listingData.model ?? null,
+        frame_size: source === "wander" ? null : listingData.frameSize ?? null,
+        tire_size: listingData.tireSize ?? null,
+        condition: listingData.condition,
+        offer_mode: listingData.offerMode,
         rental_hourly_cents: rents
-          ? parsed.data.rentalHourlyCents ?? null
+          ? listingData.rentalHourlyCents ?? null
           : null,
         rental_daily_cents: rents
-          ? parsed.data.rentalDailyCents ?? null
+          ? listingData.rentalDailyCents ?? null
           : null,
-        sale_price_cents: sells ? parsed.data.salePriceCents ?? null : null,
-        minimum_rental_hours: parsed.data.minimumRentalHours,
-        pickup_area: parsed.data.pickupArea,
-        city: parsed.data.city,
-        province: parsed.data.province,
-        approximate_latitude: parsed.data.approximateLatitude ?? null,
-        approximate_longitude: parsed.data.approximateLongitude ?? null,
-        available_from: parsed.data.availableFrom ?? null,
-        available_until: parsed.data.availableUntil ?? null,
-        availability_summary: parsed.data.availabilitySummary ?? null,
-        rental_rules: parsed.data.rentalRules ?? null,
-        included_items: parsed.data.includedItems,
+        sale_price_cents: sells ? listingData.salePriceCents ?? null : null,
+        minimum_rental_hours: listingData.minimumRentalHours,
+        pickup_area: listingData.pickupArea,
+        city: listingData.city,
+        province: listingData.province,
+        approximate_latitude: listingData.approximateLatitude ?? null,
+        approximate_longitude: listingData.approximateLongitude ?? null,
+        available_from: listingData.availableFrom ?? null,
+        available_until: listingData.availableUntil ?? null,
+        availability_summary: listingData.availabilitySummary ?? null,
+        rental_rules: listingData.rentalRules ?? null,
+        included_items: listingData.includedItems,
         status,
         published_at: publishedAt,
       })
@@ -90,9 +96,9 @@ export async function POST(request: Request) {
       .insert({
         listing_id: listing.id,
         owner_id: auth.user.id,
-        pickup_address: parsed.data.pickupAddress,
-        postal_code: parsed.data.postalCode ?? null,
-        pickup_instructions: parsed.data.pickupInstructions ?? null,
+        pickup_address: listingData.pickupAddress,
+        postal_code: listingData.postalCode ?? null,
+        pickup_instructions: listingData.pickupInstructions ?? null,
       });
     if (privateError) {
       await supabase.from("bike_listings").delete().eq("id", listing.id);
@@ -106,7 +112,7 @@ export async function POST(request: Request) {
         listingTitle: listing.title,
         listingSlug: listing.slug,
         listingUpdatedAt: listing.updated_at,
-        text: parsed.data,
+        text: listingData,
       });
     } catch (safetyError) {
       console.error("Listing text signals could not be refreshed", safetyError);

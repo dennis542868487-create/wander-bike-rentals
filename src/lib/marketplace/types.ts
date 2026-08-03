@@ -54,6 +54,7 @@ export type BikeListing = {
   brand: string | null;
   model: string | null;
   frameSize: string | null;
+  tireSize: string | null;
   condition: "new" | "like_new" | "good" | "fair";
   offerMode: OfferMode;
   rentalHourlyCents: number | null;

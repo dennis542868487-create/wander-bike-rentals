@@ -22,7 +22,7 @@ $$;
 revoke all on function private.set_updated_at() from public, anon, authenticated;
 grant execute on function private.set_updated_at() to service_role;
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   full_name text,
@@ -36,10 +36,11 @@ create table public.profiles (
   )
 );
 
-create index profiles_role_idx
+create index if not exists profiles_role_idx
   on public.profiles (role)
   where role in ('staff', 'admin');
 
+drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
 before update on public.profiles
 for each row execute function private.set_updated_at();
@@ -76,11 +77,12 @@ $$;
 revoke all on function private.sync_auth_user_profile() from public, anon, authenticated;
 grant execute on function private.sync_auth_user_profile() to service_role;
 
+drop trigger if exists sync_auth_user_profile on auth.users;
 create trigger sync_auth_user_profile
 after insert or update of email, raw_user_meta_data on auth.users
 for each row execute function private.sync_auth_user_profile();
 
-create table public.bookings (
+create table if not exists public.bookings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   customer_name text not null,
@@ -108,14 +110,17 @@ create table public.bookings (
   constraint bookings_has_item check (adult_bikes + kids_bikes + trailers > 0)
 );
 
-create index bookings_user_starts_idx
+create index if not exists bookings_user_starts_idx
   on public.bookings (user_id, starts_at desc);
-create index bookings_status_starts_idx
+create index if not exists bookings_status_starts_idx
   on public.bookings (status, starts_at);
 
+drop trigger if exists bookings_set_updated_at on public.bookings;
 create trigger bookings_set_updated_at
 before update on public.bookings
 for each row execute function private.set_updated_at();
+
+drop function if exists public.set_booking_updated_at();
 
 alter table public.profiles enable row level security;
 alter table public.profiles force row level security;

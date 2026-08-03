@@ -146,6 +146,7 @@ export default async function OperationsBikesPage({
               ) : null}
               <ListingManagementActions
                 listingId={listing.id}
+                listingTitle={listing.title}
                 status={listing.status}
                 featured={listing.featured}
                 endpointBase="/api/operations/marketplace/listings"

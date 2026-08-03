@@ -1,0 +1,3 @@
+-- Historical production migration adopted into source control.
+-- The remote project already applied this version before the current
+-- repository migration baseline was created.

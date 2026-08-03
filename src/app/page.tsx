@@ -12,6 +12,7 @@ import Link from "next/link";
 import { CompactListingCard } from "@/components/marketplace/compact-listing-card";
 import ReviewsSection from "@/components/reviews-section";
 import { getFeaturedListings } from "@/lib/marketplace/data";
+import { WANDER_SHOP_DIRECTIONS_URL } from "@/lib/marketplace/wander-shop";
 import { wanderWebsiteSchema } from "@/lib/seo/wander-business";
 
 export const metadata: Metadata = {
@@ -89,7 +90,7 @@ export default async function HomePage() {
                 Call (778) 952-1389
               </a>
               <a
-                href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
+                href={WANDER_SHOP_DIRECTIONS_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="underline decoration-white/50 underline-offset-4 transition hover:decoration-white"
@@ -157,6 +158,15 @@ export default async function HomePage() {
                     community owner.
                   </p>
                 </div>
+                <a
+                  href={WANDER_SHOP_DIRECTIONS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-primary w-full px-5 py-3"
+                >
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                  Go to Store
+                </a>
               </div>
             </div>
 

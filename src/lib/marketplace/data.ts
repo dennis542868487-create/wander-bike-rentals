@@ -26,6 +26,7 @@ export const publicListingSelect = `
   brand,
   model,
   frame_size,
+  tire_size,
   condition,
   offer_mode,
   rental_hourly_cents,
@@ -121,6 +122,7 @@ export function mapListing(value: unknown): BikeListing | null {
     brand: optionalString(row.brand),
     model: optionalString(row.model),
     frameSize: optionalString(row.frame_size),
+    tireSize: optionalString(row.tire_size),
     condition: requiredString(row.condition) as BikeListing["condition"],
     offerMode: requiredString(row.offer_mode) as BikeListing["offerMode"],
     rentalHourlyCents: optionalNumber(row.rental_hourly_cents),
@@ -182,6 +184,8 @@ function filterListings(
         listing.title,
         listing.brand,
         listing.model,
+        listing.frameSize,
+        listing.tireSize,
         listing.pickupArea,
         listing.bikeType,
       ]
@@ -243,6 +247,12 @@ export async function getPublicListings(
   source: ListingSource,
   filters: ListingFilters = {},
 ) {
+  if (process.env.MARKETPLACE_DEMO_MODE === "true") {
+    return filterListings(
+      demoListings.filter((listing) => listing.source === source),
+      filters,
+    );
+  }
   const remote = await loadRemoteListings(source);
   const listings =
     remote ??
@@ -257,6 +267,9 @@ export async function getFeaturedListings(source: ListingSource, limit = 3) {
 }
 
 export async function getPublicListingBySlug(slug: string) {
+  if (process.env.MARKETPLACE_DEMO_MODE === "true") {
+    return demoListings.find((listing) => listing.slug === slug) ?? null;
+  }
   const config = getOptionalSupabasePublicConfig();
   if (!config) {
     return demoListings.find((listing) => listing.slug === slug) ?? null;

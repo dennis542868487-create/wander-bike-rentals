@@ -1,5 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const localChromiumExecutable =
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+const localLaunchOptions = localChromiumExecutable
+  ? { executablePath: localChromiumExecutable }
+  : undefined;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -16,17 +22,18 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { ...devices["Desktop Chrome"], launchOptions: localLaunchOptions },
     },
     {
       name: "mobile-chromium",
-      use: { ...devices["Pixel 7"] },
+      use: { ...devices["Pixel 7"], launchOptions: localLaunchOptions },
     },
     {
       name: "tablet-chromium",
       use: {
         ...devices["iPad (gen 11)"],
         browserName: "chromium",
+        launchOptions: localLaunchOptions,
       },
     },
   ],
@@ -43,6 +50,7 @@ export default defineConfig({
       RESEND_API_KEY: "",
       EMAIL_FROM: "",
       MARKETPLACE_NOTIFICATION_EMAIL: "",
+      MARKETPLACE_DEMO_MODE: "true",
     },
   },
 });

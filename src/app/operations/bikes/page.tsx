@@ -119,6 +119,9 @@ export default async function OperationsBikesPage({
                 <p className="mt-1 text-sm text-slate-500">
                   {listing.pickupArea} · Updated {formatDateTime(listing.updatedAt)}
                 </p>
+                <p className="mt-2 text-sm font-bold text-teal-800">
+                  Available: {listing.availableQuantity}
+                </p>
               </div>
               <ListingStatusBadge status={listing.status} />
             </div>

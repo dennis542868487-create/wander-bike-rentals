@@ -62,6 +62,7 @@ export type BikeListing = {
   salePriceCents: number | null;
   currency: "CAD";
   minimumRentalHours: number;
+  availableQuantity: number;
   pickupArea: string;
   city: string;
   province: string;

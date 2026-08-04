@@ -49,6 +49,10 @@ export const listingInputSchema = z
     rentalDailyCents: optionalPositiveCents,
     salePriceCents: optionalPositiveCents,
     minimumRentalHours: z.coerce.number().int().min(1).max(168).default(1),
+    availableQuantity: z.preprocess(
+      (value) => (value === null ? undefined : emptyToUndefined(value)),
+      z.coerce.number().int().min(0).max(1000).default(1),
+    ),
     pickupArea: z.string().trim().min(2).max(120),
     pickupAddress: z.string().trim().min(5).max(240),
     postalCode: optionalText(20),

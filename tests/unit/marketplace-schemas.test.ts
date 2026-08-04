@@ -29,6 +29,31 @@ describe("bike listing input", () => {
     const parsed = listingInputSchema.parse(listing);
     expect(parsed.rentalDailyCents).toBe(4200);
     expect(parsed.salePriceCents).toBe(37500);
+    expect(parsed.availableQuantity).toBe(1);
+  });
+
+  it("accepts a Wander available quantity and rejects invalid counts", () => {
+    expect(
+      listingInputSchema.parse({
+        ...listing,
+        source: "wander",
+        availableQuantity: 4,
+      }).availableQuantity,
+    ).toBe(4);
+    expect(
+      listingInputSchema.safeParse({
+        ...listing,
+        source: "wander",
+        availableQuantity: -1,
+      }).success,
+    ).toBe(false);
+    expect(
+      listingInputSchema.safeParse({
+        ...listing,
+        source: "wander",
+        availableQuantity: 1.5,
+      }).success,
+    ).toBe(false);
   });
 
   it("requires a rental price when the bike is offered for rent", () => {

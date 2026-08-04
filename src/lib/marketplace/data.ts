@@ -35,6 +35,7 @@ export const publicListingSelect = `
   sale_price_cents,
   currency,
   minimum_rental_hours,
+  available_quantity,
   pickup_area,
   city,
   province,
@@ -132,6 +133,8 @@ export function mapListing(value: unknown): BikeListing | null {
     salePriceCents: optionalNumber(row.sale_price_cents),
     currency: "CAD",
     minimumRentalHours: optionalNumber(row.minimum_rental_hours) ?? 1,
+    availableQuantity:
+      source === "wander" ? optionalNumber(row.available_quantity) ?? 1 : 1,
     pickupArea:
       source === "wander"
         ? WANDER_SHOP_LISTING_DEFAULTS.pickupArea

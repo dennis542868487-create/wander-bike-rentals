@@ -182,6 +182,9 @@ export function ListingForm({
       rentalDailyCents: cents(form.get("rental_daily")),
       salePriceCents: cents(form.get("sale_price")),
       minimumRentalHours: form.get("minimum_rental_hours"),
+      availableQuantity: isWanderSource
+        ? form.get("available_quantity")
+        : 1,
       pickupArea: form.get("pickup_area"),
       pickupAddress: form.get("pickup_address"),
       postalCode: form.get("postal_code"),
@@ -536,6 +539,24 @@ export function ListingForm({
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           {isWanderSource ? (
             <>
+              <label className="field-label sm:col-span-2 sm:max-w-xs">
+                Available quantity
+                <input
+                  name="available_quantity"
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="1000"
+                  step="1"
+                  required
+                  defaultValue={listing?.availableQuantity ?? 1}
+                  className="market-input"
+                />
+                <span className="mt-1.5 block text-xs font-normal text-slate-500">
+                  Number of matching Wander bikes currently available.
+                </span>
+                <FieldError message={fieldErrors.available_quantity} />
+              </label>
               <div className="sm:col-span-2 rounded-2xl border border-teal-200 bg-teal-50 p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-teal-800">
                   Fixed shop details

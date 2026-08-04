@@ -5,6 +5,7 @@ const base = {
   currency: "CAD" as const,
   condition: "good" as const,
   minimumRentalHours: 2,
+  availableQuantity: 1,
   city: "Richmond",
   province: "BC",
   availableFrom: null,

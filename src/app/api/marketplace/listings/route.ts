@@ -74,6 +74,8 @@ export async function POST(request: Request) {
           : null,
         sale_price_cents: sells ? listingData.salePriceCents ?? null : null,
         minimum_rental_hours: listingData.minimumRentalHours,
+        available_quantity:
+          source === "wander" ? listingData.availableQuantity : 1,
         pickup_area: listingData.pickupArea,
         city: listingData.city,
         province: listingData.province,

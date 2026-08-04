@@ -44,4 +44,18 @@ describe("marketplace migration", () => {
     expect(sql).toContain("12071 First Ave #101, Richmond, BC V7E 3M1");
     expect(sql).toContain("Open daily 9:00 AM–10:00 PM");
   });
+
+  it("adds a Wander-only available quantity with a default of one", async () => {
+    const path = resolve(
+      process.cwd(),
+      "supabase/migrations/20260804034806_add_wander_available_quantity.sql",
+    );
+    const sql = await readFile(path, "utf8");
+
+    await expect(parse(sql)).resolves.toBeDefined();
+    expect(sql).toContain("add column if not exists available_quantity integer");
+    expect(sql).toContain("alter column available_quantity set default 1");
+    expect(sql).toContain("available_quantity between 0 and 1000");
+    expect(sql).toContain("source = 'wander' or available_quantity = 1");
+  });
 });

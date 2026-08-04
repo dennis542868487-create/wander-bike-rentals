@@ -1,4 +1,5 @@
 -- Wander Bike marketplace foundation.
+-- Production migration timestamp: 20260729223000.
 --
 -- The existing commerce tables are intentionally left untouched in this
 -- migration because they contain sandbox history and are referenced by the

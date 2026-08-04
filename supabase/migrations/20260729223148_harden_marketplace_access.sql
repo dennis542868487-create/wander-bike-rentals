@@ -1,4 +1,5 @@
 -- Keep extension objects out of the exposed public schema.
+-- Production migration timestamp: 20260729223148.
 alter extension btree_gist set schema extensions;
 
 -- The image bucket is public, so object URLs do not require a broad storage

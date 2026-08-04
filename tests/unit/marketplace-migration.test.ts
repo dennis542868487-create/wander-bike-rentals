@@ -7,7 +7,7 @@ describe("marketplace migration", () => {
   it("parses as PostgreSQL and contains the critical privacy and overlap controls", async () => {
     const path = resolve(
       process.cwd(),
-      "supabase/migrations/20260729062650_marketplace_platform.sql",
+      "supabase/migrations/20260729223000_marketplace_platform.sql",
     );
     const sql = await readFile(path, "utf8");
     await expect(parse(sql)).resolves.toBeDefined();

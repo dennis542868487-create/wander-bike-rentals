@@ -3,7 +3,6 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import { demoListings } from "@/lib/marketplace/demo-data";
 import { primaryListingPrice } from "@/lib/marketplace/format";
-import { readListingStorage } from "@/lib/marketplace/listing-storage";
 import type {
   BikeListing,
   BikeType,
@@ -28,6 +27,7 @@ export const publicListingSelect = `
   brand,
   model,
   frame_size,
+  tire_size,
   condition,
   offer_mode,
   rental_hourly_cents,
@@ -111,12 +111,6 @@ export function mapListing(value: unknown): BikeListing | null {
     ? row.bike_listing_images
     : [];
   const source = row.source === "wander" ? "wander" : "community";
-  const storedListing = readListingStorage({
-    shortDescription: row.short_description,
-    description: row.description,
-    tireSize: row.tire_size,
-    includedItems: row.included_items,
-  });
 
   return {
     id,
@@ -124,13 +118,13 @@ export function mapListing(value: unknown): BikeListing | null {
     source,
     slug,
     title: requiredString(row.title),
-    shortDescription: storedListing.shortDescription,
-    description: storedListing.description,
+    shortDescription: optionalString(row.short_description),
+    description: requiredString(row.description),
     bikeType: requiredString(row.bike_type) as BikeListing["bikeType"],
     brand: optionalString(row.brand),
     model: optionalString(row.model),
     frameSize: source === "wander" ? null : optionalString(row.frame_size),
-    tireSize: storedListing.tireSize,
+    tireSize: optionalString(row.tire_size),
     condition: requiredString(row.condition) as BikeListing["condition"],
     offerMode: requiredString(row.offer_mode) as BikeListing["offerMode"],
     rentalHourlyCents: optionalNumber(row.rental_hourly_cents),
@@ -161,7 +155,11 @@ export function mapListing(value: unknown): BikeListing | null {
         ? WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary
         : optionalString(row.availability_summary),
     rentalRules: optionalString(row.rental_rules),
-    includedItems: storedListing.includedItems,
+    includedItems: Array.isArray(row.included_items)
+      ? row.included_items.filter(
+          (item): item is string => typeof item === "string",
+        )
+      : [],
     status: requiredString(row.status) as BikeListing["status"],
     featured: row.featured === true,
     managementNote: optionalString(row.management_note),

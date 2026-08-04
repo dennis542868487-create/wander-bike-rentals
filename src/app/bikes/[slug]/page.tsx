@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
   BadgeCheck,
+  Bike,
   CalendarDays,
   Circle,
   HandCoins,
@@ -205,6 +206,18 @@ export default async function BikeDetailPage({
                     </div>
                   </div>
                 ) : null}
+                <div className="flex gap-3">
+                  <Bike className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
+                  <div>
+                    <dt className="text-sm font-bold text-slate-950">
+                      Available bikes
+                    </dt>
+                    <dd className="mt-1 text-sm text-slate-600">
+                      {listing.availableQuantity}{" "}
+                      {listing.availableQuantity === 1 ? "bike" : "bikes"}
+                    </dd>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
                   <div>

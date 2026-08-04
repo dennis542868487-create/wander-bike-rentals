@@ -16,6 +16,7 @@ type RequestListing = Pick<
   | "rentalDailyCents"
   | "salePriceCents"
   | "minimumRentalHours"
+  | "availableQuantity"
 >;
 
 function toIso(value: FormDataEntryValue | null) {
@@ -87,6 +88,19 @@ export function RequestPanel({
         <Link href="/account/bikes" className="btn-primary mt-5 w-full">
           Open My Bikes
         </Link>
+      </aside>
+    );
+  }
+
+  if (listing.availableQuantity < 1) {
+    return (
+      <aside className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6">
+        <h2 className="text-xl font-bold text-slate-950">
+          Currently unavailable
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">
+          This bike is still listed, but there are no units available right now.
+        </p>
       </aside>
     );
   }

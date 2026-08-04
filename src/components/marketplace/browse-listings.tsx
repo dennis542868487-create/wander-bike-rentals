@@ -132,6 +132,10 @@ export function BrowseListings({
 }) {
   const isWander = source === "wander";
   const basePath = isWander ? "/bikes/wander" : "/bikes/community";
+  const availableBikeCount = listings.reduce(
+    (total, listing) => total + listing.availableQuantity,
+    0,
+  );
   const hasFilters = Boolean(
     filters.q ||
       (filters.type && filters.type !== "all") ||
@@ -391,7 +395,11 @@ export function BrowseListings({
 
         <div className="mb-5 mt-8 flex items-center justify-between gap-4">
           <h2 className="text-sm font-semibold text-slate-600">
-            {listings.length} {listings.length === 1 ? "bike" : "bikes"} available
+            {availableBikeCount} {availableBikeCount === 1 ? "bike" : "bikes"}
+            {isWander && listings.length !== availableBikeCount
+              ? ` across ${listings.length} listings`
+              : ""}{" "}
+            available
           </h2>
           <p className="hidden text-xs text-slate-500 sm:block">
             Prices belong to each individual bike

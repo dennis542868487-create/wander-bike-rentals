@@ -1,4 +1,4 @@
-import { ArrowRight, MapPin, Store, UsersRound } from "lucide-react";
+import { ArrowRight, Bike, MapPin, Store, UsersRound } from "lucide-react";
 import Link from "next/link";
 import {
   listingPriceLines,
@@ -30,6 +30,9 @@ export function CompactListingCard({
           priority={priority}
           sizes="(min-width: 1280px) 28vw, (min-width: 640px) 45vw, 46vw"
         />
+        <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-1 text-[0.65rem] font-extrabold text-[var(--navy)] shadow-sm backdrop-blur sm:left-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs">
+          {listing.availableQuantity} available
+        </span>
         <div
           className={`absolute bottom-0 right-0 h-6 w-16 sm:h-8 sm:w-24 ${
             listing.source === "wander"
@@ -62,6 +65,12 @@ export function CompactListingCard({
           <MapPin className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
           <span className="truncate">{listing.pickupArea}</span>
         </p>
+        {listing.tireSize ? (
+          <p className="mt-1 flex min-w-0 items-center gap-1 text-xs text-slate-500 sm:mt-1.5 sm:gap-1.5 sm:text-sm">
+            <Bike className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+            <span className="truncate">Tire size {listing.tireSize}</span>
+          </p>
+        ) : null}
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:mt-4 sm:items-end sm:gap-4 sm:pt-4">
           {primaryPrice ? (
             <span className="min-w-0 text-xs sm:hidden">

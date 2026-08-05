@@ -17,7 +17,7 @@ import { wanderBusinessEntity } from "@/lib/seo/wander-business";
 
 const pageTitle = "About Wander Bike | Steveston Bike Rental Shop";
 const pageDescription =
-  "Meet Wander Bike Rentals, opened in Steveston in April 2026 for bike rentals and quick repairs, with a mission to make shared bikes easier to access.";
+  "Wander Bike Rentals is one of Richmond’s largest and most dependable local used bike rental and sales shops, based in Steveston with quick repairs.";
 
 export const metadata: Metadata = {
   title: { absolute: pageTitle },
@@ -80,7 +80,7 @@ const aboutSchema = {
       name: pageTitle,
       description: pageDescription,
       datePublished: "2026-08-02",
-      dateModified: "2026-08-02",
+      dateModified: "2026-08-04",
       mainEntity: { "@id": "https://www.wanderbike.ca/#business" },
       isPartOf: {
         "@type": "WebSite",
@@ -179,10 +179,11 @@ export default function AboutPage() {
               A local bike shop with a bigger sharing mission.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-xl sm:leading-8">
-              Wander Bike Rentals began as a physical bike rental and quick
-              repair shop in Steveston. We are building toward a simple idea:
-              wherever people go, a useful bike should be easier to find
-              locally—without bringing their own bike everywhere.
+              Based in Steveston, Wander Bike Rentals is one of Richmond&apos;s
+              largest and most dependable used bike rental and sales shops. We
+              are building toward a simple idea: wherever people go, a useful
+              bike should be easier to find locally—without bringing their own
+              bike everywhere.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a

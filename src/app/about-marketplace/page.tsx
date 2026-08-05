@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getPublicListings } from "@/lib/marketplace/data";
+
+export const dynamic = "force-dynamic";
 
 const pageDescription =
   "Browse used bikes and local bike rentals in Richmond, BC, or list your idle bike for free on Wander Bike’s bicycle-only marketplace for local riders today.";
@@ -129,7 +132,14 @@ const marketplaceSteps = [
   },
 ] as const;
 
-export default function AboutMarketplacePage() {
+export default async function AboutMarketplacePage() {
+  const wanderListings = await getPublicListings("wander");
+  const availableBikeCount = wanderListings.reduce(
+    (total, listing) => total + listing.availableQuantity,
+    0,
+  );
+  const listingCount = wanderListings.length;
+
   return (
     <main className="bg-[var(--background)]">
       <script
@@ -203,7 +213,11 @@ export default function AboutMarketplacePage() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-3 sm:px-6 sm:py-8 lg:px-8">
           {[
-            [Bike, "Built only for bikes", "No furniture, electronics, or unrelated listings."],
+            [
+              Bike,
+              `${availableBikeCount} Wander ${availableBikeCount === 1 ? "bike" : "bikes"} available`,
+              `Across ${listingCount} active shop ${listingCount === 1 ? "listing" : "listings"} for rental or sale.`,
+            ],
             [HandCoins, "Free to list", "Post your bike with no listing fee."],
             [MapPin, "Local Richmond exchanges", "Meet in Steveston or elsewhere in Richmond."],
           ].map(([Icon, title, text]) => (

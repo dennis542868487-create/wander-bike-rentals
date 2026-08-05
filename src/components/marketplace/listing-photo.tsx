@@ -7,11 +7,13 @@ export function ListingPhoto({
   title,
   priority = false,
   sizes = "(min-width: 1024px) 34vw, 100vw",
+  imageClassName = "object-cover",
 }: {
   image?: ListingImage;
   title: string;
   priority?: boolean;
   sizes?: string;
+  imageClassName?: string;
 }) {
   if (!image) {
     return (
@@ -31,7 +33,7 @@ export function ListingPhoto({
       fill
       sizes={sizes}
       priority={priority}
-      className="object-cover transition duration-500 group-hover:scale-[1.02]"
+      className={`${imageClassName} transition duration-500 group-hover:scale-[1.02]`}
     />
   );
 }

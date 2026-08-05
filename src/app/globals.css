@@ -1196,22 +1196,13 @@ html.wbr-custom-launcher #chatbase-message-bubbles {
 
 @media (max-width: 640px) {
   .wbr-launcher {
-    right: 12px;
-    bottom: calc(5rem + env(safe-area-inset-bottom));
+    right: 16px;
+    bottom: calc(5.75rem + env(safe-area-inset-bottom));
   }
 
   .wbr-fab {
-    width: 48px;
-    height: 48px;
-  }
-
-  .wbr-fab svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .wbr-teaser {
-    display: none;
+    width: 54px;
+    height: 54px;
   }
 }
 

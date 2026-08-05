@@ -16,7 +16,8 @@ export function CompactListingCard({
   priority?: boolean;
 }) {
   const prices = listingPriceLines(listing);
-  const primaryPrice = prices[0];
+  const rentalPrices = prices.filter((price) => price.label !== "buy");
+  const salePrice = prices.find((price) => price.label === "buy");
 
   return (
     <Link
@@ -29,6 +30,7 @@ export function CompactListingCard({
           title={listing.title}
           priority={priority}
           sizes="(min-width: 1280px) 28vw, (min-width: 640px) 45vw, 46vw"
+          imageClassName="object-contain sm:object-cover"
         />
         <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-1 text-[0.65rem] font-extrabold text-[var(--navy)] shadow-sm backdrop-blur sm:left-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs">
           {listing.availableQuantity} available
@@ -61,45 +63,40 @@ export function CompactListingCard({
             {listing.title}
           </h3>
         </div>
-        <p className="mt-1.5 flex min-w-0 items-center gap-1 text-[0.68rem] text-slate-500 sm:hidden">
-          <MapPin
-            className="h-3 w-3 shrink-0 text-teal-700"
-            aria-hidden="true"
-          />
-          <span className="truncate">
-            {listing.source === "wander" ? "Steveston" : listing.pickupArea}
-            {listing.tireSize ? ` · ${listing.tireSize}` : ""}
-          </span>
-        </p>
-        <p className="mt-2 hidden min-w-0 items-center gap-1.5 text-sm text-slate-500 sm:flex">
-          <MapPin
-            className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5"
-            aria-hidden="true"
-          />
+        <p className="mt-1.5 flex min-w-0 items-center gap-1 text-xs text-slate-500 sm:mt-2 sm:gap-1.5 sm:text-sm">
+          <MapPin className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
           <span className="truncate">{listing.pickupArea}</span>
         </p>
         {listing.tireSize ? (
-          <p className="mt-1.5 hidden min-w-0 items-center gap-1.5 text-sm text-slate-500 sm:flex">
-            <Bike
-              className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5"
-              aria-hidden="true"
-            />
+          <p className="mt-1 flex min-w-0 items-center gap-1 text-xs text-slate-500 sm:mt-1.5 sm:gap-1.5 sm:text-sm">
+            <Bike className="h-3 w-3 shrink-0 text-teal-700 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
             <span className="truncate">Tire size {listing.tireSize}</span>
           </p>
         ) : null}
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:mt-4 sm:items-end sm:gap-4 sm:pt-4">
-          {primaryPrice ? (
-            <span className="min-w-0 text-xs sm:hidden">
-              <strong className="text-sm text-[var(--teal)]">
-                {primaryPrice.value}
-              </strong>{" "}
-              <span className="text-slate-500">/{primaryPrice.label}</span>
-              {prices.length > 1 ? (
-                <span className="ml-1 text-[0.62rem] font-bold text-slate-400">
-                  +{prices.length - 1}
+          {prices.length > 0 ? (
+            <div className="grid min-w-0 gap-0.5 sm:hidden">
+              {rentalPrices.length > 0 ? (
+                <span className="flex min-w-0 items-baseline gap-x-1 whitespace-nowrap text-[0.58rem] text-slate-500">
+                  {rentalPrices.map((price) => (
+                    <span key={price.label} className="shrink-0">
+                      <strong className="text-[0.72rem] text-[var(--teal)]">
+                        {price.value}
+                      </strong>
+                      /{price.label === "hour" ? "hr" : price.label}
+                    </span>
+                  ))}
                 </span>
               ) : null}
-            </span>
+              {salePrice ? (
+                <span className="whitespace-nowrap text-[0.58rem] text-slate-500">
+                  <strong className="text-[0.72rem] text-[var(--green)]">
+                    {salePrice.value}
+                  </strong>
+                  /buy
+                </span>
+              ) : null}
+            </div>
           ) : null}
           <div className="hidden flex-wrap gap-x-4 gap-y-2 sm:flex">
             {prices.map((price) => (

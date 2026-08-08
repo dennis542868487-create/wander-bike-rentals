@@ -181,8 +181,8 @@ test("browse filters and individual bike prices work", async ({ page }) => {
 test("auth exposes only Google and email", async ({ page }) => {
   await page.goto("/auth");
   await expect(
-    page.getByRole("button", { name: "Google sign-in — setup needed" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: "Continue with Google" }),
+  ).toBeEnabled();
   await expect(page.getByText(/Apple/i)).toHaveCount(0);
   await expect(page.getByText(/Facebook/i)).toHaveCount(0);
   await expect(page.getByLabel("Email")).toBeVisible();

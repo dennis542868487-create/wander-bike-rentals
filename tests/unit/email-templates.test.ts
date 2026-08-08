@@ -28,10 +28,25 @@ describe("marketplace emails", () => {
       payload: {
         bike_title: "Blue city bike",
         pickup_area: "Steveston",
+        response_note: "Please bring photo ID and arrive by 2:20 PM.",
       },
       siteUrl: "https://example.test",
     });
     expect(email.text).toContain("Payment happens in person");
+    expect(email.text).toContain("Please bring photo ID");
     expect(email.text).not.toContain("payment method");
+  });
+
+  it("uses the operational request path supplied for staff notifications", () => {
+    const email = renderTransactionalEmail({
+      templateKey: "request_received",
+      payload: {
+        bike_title: "Blue city bike",
+        request_path: "/operations/requests",
+      },
+      siteUrl: "https://example.test",
+    });
+
+    expect(email.text).toContain("https://example.test/operations/requests");
   });
 });

@@ -57,8 +57,8 @@ function contentForTemplate(templateKey: string, payload: UnknownRecord) {
     case "request_received":
       return {
         heading: "You have a new bike request",
-        body: "A rider is interested in your bike. Review the dates or message before you accept or decline.",
-        path: "/account/requests",
+        body: "A new rental or purchase request was submitted. Review the dates and message before accepting or declining.",
+        path: value(payload, "request_path") || "/account/requests",
         action: "Review request",
       };
     case "request_sent":
@@ -69,14 +69,19 @@ function contentForTemplate(templateKey: string, payload: UnknownRecord) {
         action: "View request",
       };
     case "request_accepted":
-      return {
-        heading: "Your bike request was accepted",
-        body: pickupArea
+      {
+        const acceptance = pickupArea
           ? `The owner accepted your request. Open your dashboard for the pickup details near ${pickupArea}. Payment happens in person.`
-          : "The owner accepted your request. Open your dashboard for pickup details. Payment happens in person.",
+          : "The owner accepted your request. Open your dashboard for pickup details. Payment happens in person.";
+        return {
+        heading: "Your bike request was accepted",
+        body: responseNote
+          ? `${acceptance} Note from the owner or team: ${responseNote}`
+          : acceptance,
         path: "/account/rentals",
         action: "View pickup details",
       };
+      }
     case "request_declined":
       return {
         heading: "Your bike request was declined",

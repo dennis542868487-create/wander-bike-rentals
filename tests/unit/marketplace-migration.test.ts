@@ -58,4 +58,16 @@ describe("marketplace migration", () => {
     expect(sql).toContain("available_quantity between 0 and 1000");
     expect(sql).toContain("source = 'wander' or available_quantity = 1");
   });
+
+  it("adds Nancy to the Google Staff allowlist", async () => {
+    const path = resolve(
+      process.cwd(),
+      "supabase/migrations/20260808192801_add_nancy_staff_allowlist.sql",
+    );
+    const sql = await readFile(path, "utf8");
+
+    await expect(parse(sql)).resolves.toBeDefined();
+    expect(sql).toContain("'nancyzhuo2586@gmail.com', 'staff'");
+    expect(sql).toContain("raw_app_meta_data");
+  });
 });

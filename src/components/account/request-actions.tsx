@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import type { RequestStatus } from "@/lib/marketplace/types";
 
 export function RequestActions({
@@ -18,6 +20,8 @@ export function RequestActions({
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [showDecline, setShowDecline] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   async function update(nextStatus: RequestStatus) {
     if (
@@ -34,7 +38,7 @@ export function RequestActions({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           status: nextStatus,
-          responseNote: note || undefined,
+          responseNote: note.trim() || undefined,
         }),
       });
       const payload = (await response.json()) as { error?: string };
@@ -69,23 +73,39 @@ export function RequestActions({
 
   if ((viewer === "owner" || viewer === "admin") && status === "pending") {
     return (
-      <div className="w-full">
-        {showDecline ? (
-          <label className="field-label mb-3">
-            Note to the rider
-            <textarea
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              className="market-textarea min-h-20"
-              placeholder="Optional context about availability"
-            />
-          </label>
-        ) : null}
+      <form
+        ref={formRef}
+        className="w-full"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const submitter = (event.nativeEvent as SubmitEvent)
+            .submitter as HTMLButtonElement | null;
+          void update(submitter?.value === "declined" ? "declined" : "accepted");
+        }}
+      >
+        <label className="field-label mb-3">
+          Note to the rider{" "}
+          <span className="font-normal text-slate-400">(optional)</span>
+          <textarea
+            name="response_note"
+            value={note}
+            maxLength={1000}
+            data-trim-length="true"
+            onChange={(event) => setNote(event.target.value)}
+            className="market-textarea min-h-20"
+            placeholder="Pickup instructions, availability details, or a short reply"
+          />
+          <span className="mt-1.5 block text-xs font-normal text-slate-500">
+            This note is saved and included in the acceptance or decline email.
+          </span>
+          <FieldError message={fieldErrors.response_note} />
+        </label>
         <div className="flex flex-wrap gap-2">
           <button
-            type="button"
+            type="submit"
+            name="request_status"
+            value="accepted"
             disabled={busy}
-            onClick={() => void update("accepted")}
             className="btn-primary min-h-10 px-3 py-2 text-sm"
           >
             {busy ? "Saving…" : "Accept"}
@@ -93,9 +113,10 @@ export function RequestActions({
           {showDecline ? (
             <>
               <button
-                type="button"
+                type="submit"
+                name="request_status"
+                value="declined"
                 disabled={busy}
-                onClick={() => void update("declined")}
                 className="inline-flex min-h-10 items-center justify-center rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm font-bold text-rose-700 hover:bg-rose-50"
               >
                 Confirm decline
@@ -103,7 +124,10 @@ export function RequestActions({
               <button
                 type="button"
                 disabled={busy}
-                onClick={() => setShowDecline(false)}
+                onClick={() => {
+                  setShowDecline(false);
+                  setError("");
+                }}
                 className="btn-quiet min-h-10 px-3 py-2 text-sm"
               >
                 Back
@@ -113,7 +137,10 @@ export function RequestActions({
             <button
               type="button"
               disabled={busy}
-              onClick={() => setShowDecline(true)}
+              onClick={() => {
+                setShowDecline(true);
+                setError("");
+              }}
               className="btn-secondary min-h-10 px-3 py-2 text-sm"
             >
               Decline
@@ -121,7 +148,7 @@ export function RequestActions({
           )}
         </div>
         {error ? <p className="mt-2 text-sm text-rose-700">{error}</p> : null}
-      </div>
+      </form>
     );
   }
 

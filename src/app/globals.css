@@ -1035,6 +1035,11 @@ a {
 }
 
 @media (max-width: 767px) {
+  html {
+    /* Keep focused fields and their inline errors above mobile action bars. */
+    scroll-padding-bottom: 7rem;
+  }
+
   .btn-primary,
   .btn-secondary,
   .btn-quiet,
@@ -1047,10 +1052,12 @@ a {
   .market-select {
     min-height: 3.15rem;
     font-size: 1rem;
+    scroll-margin-bottom: 7rem;
   }
 
   .market-textarea {
     font-size: 1rem;
+    scroll-margin-bottom: 7rem;
   }
 
   .photo-arch-right,

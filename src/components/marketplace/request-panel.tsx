@@ -2,8 +2,11 @@
 
 import { CalendarClock, CheckCircle2, HandCoins, LockKeyhole } from "lucide-react";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 import { DateField } from "@/components/forms/date-field";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
+import { requestLiveErrors } from "@/lib/forms/live-validation";
 import { formatCad } from "@/lib/marketplace/format";
 import type { BikeListing, RequestIntent } from "@/lib/marketplace/types";
 
@@ -17,6 +20,8 @@ type RequestListing = Pick<
   | "salePriceCents"
   | "minimumRentalHours"
   | "availableQuantity"
+  | "availableFrom"
+  | "availableUntil"
 >;
 
 function toIso(value: FormDataEntryValue | null) {
@@ -42,6 +47,27 @@ export function RequestPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [complete, setComplete] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const validateRequest = useCallback(
+    (formElement: HTMLFormElement, changedFieldName?: string) => {
+      const values = Object.fromEntries(
+        [...new FormData(formElement).entries()].filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string",
+        ),
+      );
+      return requestLiveErrors(
+        { ...values, intent },
+        {
+          minimumRentalHours: listing.minimumRentalHours,
+          availableFrom: listing.availableFrom,
+          availableUntil: listing.availableUntil,
+        },
+        changedFieldName,
+      );
+    },
+    [intent, listing.availableFrom, listing.availableUntil, listing.minimumRentalHours],
+  );
+  const fieldErrors = useFieldErrors(formRef, validateRequest);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -194,16 +220,18 @@ export function RequestPanel({
         )}
       </div>
 
-      <form onSubmit={submit} className="mt-5">
+      <form ref={formRef} onSubmit={submit} className="mt-5">
         {intent === "rent" ? (
           <div className="grid gap-4">
             <label className="field-label">
               Pickup
               <DateField name="starts_at" type="datetime-local" required />
+              <FieldError message={fieldErrors.starts_at} />
             </label>
             <label className="field-label">
               Return
               <DateField name="ends_at" type="datetime-local" required />
+              <FieldError message={fieldErrors.ends_at} />
             </label>
           </div>
         ) : null}
@@ -212,23 +240,33 @@ export function RequestPanel({
           <input
             name="renter_name"
             required
+            minLength={2}
+            maxLength={120}
+            data-trim-length="true"
             autoComplete="name"
             className="market-input"
           />
+          <FieldError message={fieldErrors.renter_name} />
         </label>
         <label className="field-label mt-4">
           Phone <span className="font-normal text-slate-400">(optional)</span>
           <input
             name="renter_phone"
             type="tel"
+            minLength={7}
+            maxLength={40}
+            data-trim-length="true"
             autoComplete="tel"
             className="market-input"
           />
+          <FieldError message={fieldErrors.renter_phone} />
         </label>
         <label className="field-label mt-4">
           Message <span className="font-normal text-slate-400">(optional)</span>
           <textarea
             name="message"
+            maxLength={1000}
+            data-trim-length="true"
             className="market-textarea min-h-24"
             placeholder={
               intent === "rent"
@@ -236,10 +274,11 @@ export function RequestPanel({
                 : "Ask a question or suggest a time to see the bike."
             }
           />
+          <FieldError message={fieldErrors.message} />
         </label>
         <label className="sr-only" aria-hidden="true">
           Website
-          <input name="website" tabIndex={-1} autoComplete="off" />
+          <input name="website" maxLength={200} tabIndex={-1} autoComplete="off" />
         </label>
         {error ? (
           <p role="alert" className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">

@@ -70,15 +70,19 @@ export async function PATCH(
     }
 
     const now = new Date().toISOString();
+    const isResponse = ["accepted", "declined"].includes(nextStatus);
     const { data: updated, error } = await supabase
       .from("marketplace_requests")
       .update({
         status: nextStatus,
-        response_note: parsed.data.responseNote ?? null,
-        responded_at:
-          ["accepted", "declined"].includes(nextStatus) ? now : undefined,
-        cancelled_at: nextStatus === "cancelled" ? now : undefined,
-        completed_at: nextStatus === "completed" ? now : undefined,
+        ...(isResponse
+          ? {
+              response_note: parsed.data.responseNote ?? null,
+              responded_at: now,
+            }
+          : {}),
+        ...(nextStatus === "cancelled" ? { cancelled_at: now } : {}),
+        ...(nextStatus === "completed" ? { completed_at: now } : {}),
       })
       .eq("id", id)
       .select("id,status")

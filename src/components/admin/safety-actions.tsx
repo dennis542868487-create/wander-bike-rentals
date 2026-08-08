@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import type {
   ListingStatus,
   SafetyFlagStatus,
@@ -103,6 +105,8 @@ export function SensitiveTermManager({
   const router = useRouter();
   const [busyId, setBusyId] = useState<number | "new" | null>(null);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   async function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -164,21 +168,26 @@ export function SensitiveTermManager({
   return (
     <div>
       <form
+        ref={formRef}
         onSubmit={add}
         className="grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-[minmax(10rem,1fr)_13rem_auto]"
       >
         <label className="sr-only" htmlFor="new-sensitive-term">
           New sensitive term
         </label>
-        <input
-          id="new-sensitive-term"
-          name="term"
-          required
-          minLength={2}
-          maxLength={80}
-          className="market-input mt-0 bg-white"
-          placeholder="Add a word or phrase"
-        />
+        <div>
+          <input
+            id="new-sensitive-term"
+            name="term"
+            required
+            minLength={2}
+            maxLength={80}
+            data-trim-length="true"
+            className="market-input mt-0 bg-white"
+            placeholder="Add a word or phrase"
+          />
+          <FieldError message={fieldErrors.term} />
+        </div>
         <select
           name="category"
           className="market-select mt-0 bg-white"

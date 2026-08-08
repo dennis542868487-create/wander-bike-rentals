@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -20,6 +21,7 @@ import {
 import { DateField } from "@/components/forms/date-field";
 import { FieldError } from "@/components/forms/field-error";
 import { useFieldErrors } from "@/components/forms/use-field-errors";
+import { rentalAgreementLiveErrors } from "@/lib/forms/live-validation";
 import {
   buildRentalAgreementClauses,
   rentalAgreementFilename,
@@ -48,8 +50,10 @@ function numberValue(form: FormData, name: string) {
 
 function SignaturePad({
   onChange,
+  onBlur,
 }: {
   onChange: (dataUrl: string) => void;
+  onBlur: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingRef = useRef(false);
@@ -127,6 +131,8 @@ function SignaturePad({
           onPointerUp={finish}
           onPointerCancel={finish}
           onPointerLeave={finish}
+          onBlur={onBlur}
+          tabIndex={0}
           className="block h-[11rem] w-full cursor-crosshair touch-none sm:h-[12.5rem]"
           role="img"
           aria-label="Signature drawing area"
@@ -185,10 +191,22 @@ export function RentalAgreementForm({
   defaultPreparedBy: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const fieldErrors = useFieldErrors(formRef);
+  const validateAgreement = useCallback(
+    (formElement: HTMLFormElement, changedFieldName?: string) => {
+      const values = Object.fromEntries(
+        [...new FormData(formElement).entries()].filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string",
+        ),
+      );
+      return rentalAgreementLiveErrors(values, changedFieldName);
+    },
+    [],
+  );
+  const fieldErrors = useFieldErrors(formRef, validateAgreement);
   const [providerName, setProviderName] = useState(defaultProviderName);
   const [signatureDataUrl, setSignatureDataUrl] = useState("");
   const [signatureKey, setSignatureKey] = useState(0);
+  const [signatureTouched, setSignatureTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
@@ -216,6 +234,7 @@ export function RentalAgreementForm({
     const formElement = event.currentTarget;
     if (!formElement.reportValidity()) return;
     if (!signatureDataUrl) {
+      setSignatureTouched(true);
       setError("The renter must sign in the signature box before downloading.");
       document
         .getElementById("rental-signature")
@@ -293,6 +312,7 @@ export function RentalAgreementForm({
     formRef.current?.reset();
     setProviderName(defaultProviderName);
     setSignatureDataUrl("");
+    setSignatureTouched(false);
     setSignatureKey((value) => value + 1);
     setDirty(false);
     setDownloaded(false);
@@ -384,6 +404,7 @@ export function RentalAgreementForm({
                 name="provider_name"
                 required
                 maxLength={120}
+                data-trim-length="true"
                 value={providerName}
                 readOnly={mode === "wander"}
                 onChange={(event) => {
@@ -401,6 +422,7 @@ export function RentalAgreementForm({
                 name="provider_contact"
                 required
                 maxLength={160}
+                data-trim-length="true"
                 defaultValue={defaultProviderContact}
                 className="market-input text-base"
                 placeholder="Email or phone number"
@@ -413,6 +435,7 @@ export function RentalAgreementForm({
                 name="prepared_by"
                 required
                 maxLength={120}
+                data-trim-length="true"
                 defaultValue={defaultPreparedBy}
                 className="market-input text-base"
                 placeholder="Owner or staff name"
@@ -430,6 +453,7 @@ export function RentalAgreementForm({
                   name="renter_first_name"
                   required
                   maxLength={80}
+                  data-trim-length="true"
                   className="market-input text-base"
                   autoComplete="given-name"
                 />
@@ -441,6 +465,7 @@ export function RentalAgreementForm({
                   name="renter_last_name"
                   required
                   maxLength={80}
+                  data-trim-length="true"
                   className="market-input text-base"
                   autoComplete="family-name"
                 />
@@ -452,7 +477,9 @@ export function RentalAgreementForm({
                   name="renter_phone"
                   type="tel"
                   required
+                  minLength={7}
                   maxLength={40}
+                  data-trim-length="true"
                   className="market-input text-base"
                   autoComplete="tel"
                   placeholder="Include country code if not Canadian"
@@ -466,6 +493,7 @@ export function RentalAgreementForm({
                   type="email"
                   required
                   maxLength={160}
+                  data-trim-length="true"
                   className="market-input text-base"
                   autoComplete="email"
                 />
@@ -496,6 +524,7 @@ export function RentalAgreementForm({
                   name="photo_id_number"
                   required
                   maxLength={80}
+                  data-trim-length="true"
                   className="market-input text-base"
                   autoComplete="off"
                 />
@@ -547,6 +576,7 @@ export function RentalAgreementForm({
                 name="bike_description"
                 required
                 maxLength={240}
+                data-trim-length="true"
                 className="market-input text-base"
                 placeholder="e.g. Blue Trek hybrid, listing name, frame size, lock"
               />
@@ -563,6 +593,8 @@ export function RentalAgreementForm({
                     inputMode="numeric"
                     min="0"
                     max="30"
+                    step="1"
+                    required
                     defaultValue="1"
                     className="market-input text-base"
                   />
@@ -576,6 +608,8 @@ export function RentalAgreementForm({
                     inputMode="numeric"
                     min="0"
                     max="30"
+                    step="1"
+                    required
                     defaultValue="0"
                     className="market-input text-base"
                   />
@@ -589,6 +623,8 @@ export function RentalAgreementForm({
                     inputMode="numeric"
                     min="0"
                     max="30"
+                    step="1"
+                    required
                     defaultValue="0"
                     className="market-input text-base"
                   />
@@ -602,6 +638,7 @@ export function RentalAgreementForm({
               <textarea
                 name="notes"
                 maxLength={500}
+                data-trim-length="true"
                 className="market-textarea min-h-28 text-base"
                 placeholder="Existing scratches, included accessories, or other handoff details"
               />
@@ -639,6 +676,7 @@ export function RentalAgreementForm({
                 name="signer_legal_name"
                 required
                 maxLength={160}
+                data-trim-length="true"
                 className="market-input text-base"
                 autoComplete="name"
                 placeholder="Must match the signer's photo ID"
@@ -695,8 +733,17 @@ export function RentalAgreementForm({
               key={signatureKey}
               onChange={(dataUrl) => {
                 setSignatureDataUrl(dataUrl);
+                setSignatureTouched(true);
                 markChanged();
               }}
+              onBlur={() => setSignatureTouched(true)}
+            />
+            <FieldError
+              message={
+                signatureTouched && !signatureDataUrl
+                  ? "Add the renter or authorized signer’s signature."
+                  : undefined
+              }
             />
           </div>
         </section>

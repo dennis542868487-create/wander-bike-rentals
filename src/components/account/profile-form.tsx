@@ -1,13 +1,17 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import type { MarketplaceProfile } from "@/lib/marketplace/server-data";
 
 export function ProfileForm({ profile }: { profile: MarketplaceProfile }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,16 +44,19 @@ export function ProfileForm({ profile }: { profile: MarketplaceProfile }) {
   }
 
   return (
-    <form onSubmit={submit} className="max-w-2xl rounded-[0.9rem] border border-slate-200 bg-white p-6 sm:p-8">
+    <form ref={formRef} onSubmit={submit} className="max-w-2xl rounded-[0.9rem] border border-slate-200 bg-white p-6 sm:p-8">
       <label className="field-label">
         Full name
         <input
           name="full_name"
           required
+          maxLength={120}
+          data-trim-length="true"
           autoComplete="name"
           defaultValue={profile.fullName ?? ""}
           className="market-input"
         />
+        <FieldError message={fieldErrors.full_name} />
       </label>
       <label className="field-label mt-5">
         Email
@@ -67,20 +74,26 @@ export function ProfileForm({ profile }: { profile: MarketplaceProfile }) {
         <input
           name="phone"
           type="tel"
+          minLength={7}
+          maxLength={40}
+          data-trim-length="true"
           autoComplete="tel"
           defaultValue={profile.phone ?? ""}
           className="market-input"
         />
+        <FieldError message={fieldErrors.phone} />
       </label>
       <label className="field-label mt-5">
         Short bio <span className="font-normal text-slate-400">(optional)</span>
         <textarea
           name="bio"
           maxLength={500}
+          data-trim-length="true"
           defaultValue={profile.bio ?? ""}
           className="market-textarea"
           placeholder="A little context for people you exchange bikes with."
         />
+        <FieldError message={fieldErrors.bio} />
       </label>
       {saved ? (
         <p className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">

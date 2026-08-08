@@ -67,6 +67,21 @@ describe("bike listing input", () => {
     ).toBe(false);
   });
 
+  it("matches the database maximum for hourly and daily rental prices", () => {
+    expect(
+      listingInputSchema.safeParse({
+        ...listing,
+        rentalHourlyCents: 1_000_001,
+      }).success,
+    ).toBe(false);
+    expect(
+      listingInputSchema.safeParse({
+        ...listing,
+        rentalDailyCents: 10_000_001,
+      }).success,
+    ).toBe(false);
+  });
+
   it("requires a sale price when the bike can be bought", () => {
     expect(
       listingInputSchema.safeParse({
@@ -84,6 +99,21 @@ describe("bike listing input", () => {
         availableUntil: "2026-08-10",
       }).success,
     ).toBe(false);
+  });
+
+  it("identifies the exact pickup address when it is too short", () => {
+    const parsed = listingInputSchema.safeParse({
+      ...listing,
+      pickupAddress: "123",
+    });
+
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(parsed.error.issues[0]).toMatchObject({
+        path: ["pickupAddress"],
+        message: "Exact pickup address must be at least 5 characters.",
+      });
+    }
   });
 
   it("accepts one character in the full description and optional summary/items", () => {
@@ -120,6 +150,22 @@ describe("marketplace requests", () => {
         renterName: "River Chen",
       }).success,
     ).toBe(true);
+  });
+
+  it("validates an optional phone number against the database rule", () => {
+    const parsed = requestInputSchema.safeParse({
+      listingId: "10000000-0000-4000-8000-000000000001",
+      intent: "buy",
+      renterName: "River Chen",
+      renterPhone: "123",
+    });
+
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(parsed.error.issues[0]?.message).toBe(
+        "Phone number must be at least 7 characters.",
+      );
+    }
   });
 
   it("requires ordered pickup and return times for a rental", () => {

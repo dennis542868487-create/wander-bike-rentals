@@ -1,6 +1,7 @@
 export const WANDER_OPERATOR_EMAILS = [
   "zys1389@gmail.com",
   "dennis18922182165@gmail.com",
+  "nancyzhuo2586@gmail.com",
 ] as const;
 
 export const SITE_ADMIN_EMAILS = ["zyz18922182165@gmail.com"] as const;

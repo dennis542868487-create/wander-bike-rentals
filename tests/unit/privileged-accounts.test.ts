@@ -5,9 +5,10 @@ import {
 } from "@/lib/marketplace/privileged-accounts";
 
 describe("privileged marketplace accounts", () => {
-  it("recognizes both Wander Operations Google accounts", () => {
+  it("recognizes every Wander Operations Google account", () => {
     expect(isWanderOperatorEmail("zys1389@gmail.com")).toBe(true);
     expect(isWanderOperatorEmail(" DENNIS18922182165@GMAIL.COM ")).toBe(true);
+    expect(isWanderOperatorEmail("NANCYZHUO2586@GMAIL.COM")).toBe(true);
     expect(isWanderOperatorEmail("rider@example.com")).toBe(false);
   });
 

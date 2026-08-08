@@ -16,11 +16,15 @@ function isValidatable(target: EventTarget | null): target is ValidatableElement
 }
 
 function fieldName(element: ValidatableElement) {
-  const labelled = element.labels?.[0]?.textContent?.trim();
-  if (labelled) {
-    return labelled.split("\n")[0].trim().replace(/\s+/g, " ");
+  const label = element.labels?.[0];
+  if (!label) return "";
+
+  const textBeforeControl: string[] = [];
+  for (const child of label.childNodes) {
+    if (child === element || child.contains(element)) break;
+    textBeforeControl.push(child.textContent ?? "");
   }
-  return "";
+  return textBeforeControl.join(" ").trim().replace(/\s+/g, " ");
 }
 
 function missingMessage(element: ValidatableElement) {
@@ -46,12 +50,24 @@ function missingMessage(element: ValidatableElement) {
 export function englishValidationMessage(element: ValidatableElement) {
   const validity = element.validity;
   const label = fieldName(element);
+  const value =
+    element.dataset.trimLength === "true"
+      ? element.value.trim()
+      : element.value;
 
   if (validity.customError && element.validationMessage) {
     return element.validationMessage;
   }
 
-  if (validity.valueMissing) return missingMessage(element);
+  if (
+    validity.valueMissing ||
+    (element.required &&
+      !(element instanceof HTMLInputElement &&
+        ["checkbox", "file", "radio"].includes(element.type)) &&
+      value.length === 0)
+  ) {
+    return missingMessage(element);
+  }
 
   if (validity.typeMismatch && element instanceof HTMLInputElement) {
     if (element.type === "email") {
@@ -63,12 +79,24 @@ export function englishValidationMessage(element: ValidatableElement) {
     return "Enter a value in the requested format.";
   }
 
-  if (validity.tooShort && "minLength" in element) {
-    const used = element.value.length;
+  // Chromium does not always update `validity.tooShort` for values inserted by
+  // autofill or automation until submit. Checking the declared length directly
+  // keeps the inline blur validation reliable for every input path.
+  if (
+    "minLength" in element &&
+    element.minLength > 0 &&
+    value.length > 0 &&
+    value.length < element.minLength
+  ) {
+    const used = value.length;
     return `${label || "This field"} needs at least ${element.minLength} characters (you have ${used}).`;
   }
 
-  if (validity.tooLong && "maxLength" in element) {
+  if (
+    "maxLength" in element &&
+    element.maxLength >= 0 &&
+    value.length > element.maxLength
+  ) {
     return `${label || "This field"} can be at most ${element.maxLength} characters.`;
   }
 
@@ -100,7 +128,7 @@ export function englishValidationMessage(element: ValidatableElement) {
     return "Enter a valid value.";
   }
 
-  return "Check this field and try again.";
+  return validity.valid ? "" : "Check this field and try again.";
 }
 
 /**

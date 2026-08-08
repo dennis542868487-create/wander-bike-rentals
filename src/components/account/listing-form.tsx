@@ -2,11 +2,21 @@
 
 import { Camera, CheckCircle2, DollarSign, MapPin, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { DateField } from "@/components/forms/date-field";
 import { FieldError } from "@/components/forms/field-error";
 import { useBlockedSubmitMessage } from "@/components/forms/use-blocked-submit";
 import { useFieldErrors } from "@/components/forms/use-field-errors";
+import {
+  listingLiveErrors,
+  listingPhotoError,
+} from "@/lib/forms/live-validation";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { bikeTypeLabel } from "@/lib/marketplace/format";
 import { scanBikePhotos } from "@/lib/marketplace/image-safety-client";
@@ -69,12 +79,36 @@ export function ListingForm({
   const [saved, setSaved] = useState(false);
   const [photoNames, setPhotoNames] = useState<string[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
-  const fieldErrors = useFieldErrors(formRef);
+  const validateListing = useCallback(
+    (formElement: HTMLFormElement, changedFieldName?: string) => {
+      const values = Object.fromEntries(
+        [...new FormData(formElement).entries()].filter(
+          (entry): entry is [string, string] => typeof entry[1] === "string",
+        ),
+      );
+      return listingLiveErrors(
+        { ...values, offer_mode: offerMode },
+        changedFieldName,
+      );
+    },
+    [offerMode],
+  );
+  const fieldErrors = useFieldErrors(formRef, validateListing);
 
   useBlockedSubmitMessage(formRef, (message) => {
     setSaved(false);
     setError(`This listing is not published yet. ${message}`);
   });
+
+  function selectPhotos(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.currentTarget.files ?? []);
+    const message = listingPhotoError(files, listing?.images.length ?? 0);
+    event.currentTarget.setCustomValidity(message);
+    setPhotoNames(files.map((file) => file.name));
+    event.currentTarget.dispatchEvent(
+      new CustomEvent("field-revalidate", { bubbles: true }),
+    );
+  }
 
   async function uploadPhotos(
     listingId: string,
@@ -304,12 +338,14 @@ export function ListingForm({
             <input
               name="title"
               required
+              minLength={3}
               maxLength={120}
+              data-trim-length="true"
               defaultValue={listing?.title ?? ""}
               className="market-input"
               placeholder="e.g. Medium hybrid bike with rear rack"
             />
-                      <FieldError message={fieldErrors.title} />
+            <FieldError message={fieldErrors.title} />
           </label>
           <label className="field-label">
             Bike type
@@ -325,7 +361,7 @@ export function ListingForm({
                 </option>
               ))}
             </select>
-                      <FieldError message={fieldErrors.bike_type} />
+            <FieldError message={fieldErrors.bike_type} />
           </label>
           <label className="field-label">
             Condition
@@ -342,11 +378,25 @@ export function ListingForm({
           </label>
           <label className="field-label">
             Brand <span className="font-normal text-slate-400">(optional)</span>
-            <input name="brand" defaultValue={listing?.brand ?? ""} className="market-input" />
+            <input
+              name="brand"
+              maxLength={80}
+              data-trim-length="true"
+              defaultValue={listing?.brand ?? ""}
+              className="market-input"
+            />
+            <FieldError message={fieldErrors.brand} />
           </label>
           <label className="field-label">
             Model <span className="font-normal text-slate-400">(optional)</span>
-            <input name="model" defaultValue={listing?.model ?? ""} className="market-input" />
+            <input
+              name="model"
+              maxLength={100}
+              data-trim-length="true"
+              defaultValue={listing?.model ?? ""}
+              className="market-input"
+            />
+            <FieldError message={fieldErrors.model} />
           </label>
           {!isWanderSource ? (
             <label className="field-label">
@@ -354,10 +404,13 @@ export function ListingForm({
               <span className="font-normal text-slate-400">(optional)</span>
               <input
                 name="frame_size"
+                maxLength={60}
+                data-trim-length="true"
                 defaultValue={listing?.frameSize ?? ""}
                 className="market-input"
                 placeholder="e.g. Medium · 5′5″–5′10″"
               />
+              <FieldError message={fieldErrors.frame_size} />
             </label>
           ) : (
             <input type="hidden" name="frame_size" value="" />
@@ -367,10 +420,13 @@ export function ListingForm({
             <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="tire_size"
+              maxLength={80}
+              data-trim-length="true"
               defaultValue={listing?.tireSize ?? ""}
               className="market-input"
               placeholder="e.g. 26-inch, 27.5-inch, or 700C"
             />
+            <FieldError message={fieldErrors.tire_size} />
           </label>
           <label
             className={[
@@ -382,6 +438,7 @@ export function ListingForm({
             <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="included_items"
+              data-trim-length="true"
               defaultValue={listing?.includedItems.join(", ") ?? ""}
               className="market-input"
               placeholder="Helmet, lock, basket"
@@ -389,23 +446,26 @@ export function ListingForm({
             <span className="mt-1.5 block text-xs font-normal text-slate-500">
               Separate items with commas.
             </span>
+            <FieldError message={fieldErrors.included_items} />
           </label>
           <label className="field-label sm:col-span-2">
             Short summary{" "}
             <span className="font-normal text-slate-400">(optional)</span>
             <input
               name="short_description"
+              data-trim-length="true"
               defaultValue={listing?.shortDescription ?? ""}
               className="market-input"
               placeholder="One sentence shown in browse results"
             />
-                      <FieldError message={fieldErrors.short_description} />
+            <FieldError message={fieldErrors.short_description} />
           </label>
           <label className="field-label sm:col-span-2">
             Full description
             <textarea
               name="description"
               required
+              data-trim-length="true"
               defaultValue={listing?.description ?? ""}
               className="market-textarea"
               placeholder="Describe fit, maintenance, ride feel, and anything a rider should know."
@@ -462,12 +522,13 @@ export function ListingForm({
                   name="rental_hourly"
                   type="number"
                   min="0.01"
+                  max="10000"
                   step="0.01"
                   defaultValue={dollars(listing?.rentalHourlyCents ?? null)}
                   className="market-input"
                   placeholder="12"
                 />
-                              <FieldError message={fieldErrors.rental_hourly} />
+                <FieldError message={fieldErrors.rental_hourly} />
               </label>
               <label className="field-label">
                 Daily price (CAD)
@@ -475,12 +536,13 @@ export function ListingForm({
                   name="rental_daily"
                   type="number"
                   min="0.01"
+                  max="100000"
                   step="0.01"
                   defaultValue={dollars(listing?.rentalDailyCents ?? null)}
                   className="market-input"
                   placeholder="45"
                 />
-                              <FieldError message={fieldErrors.rental_daily} />
+                <FieldError message={fieldErrors.rental_daily} />
               </label>
               <label className="field-label">
                 Minimum rental (hours)
@@ -493,7 +555,7 @@ export function ListingForm({
                   defaultValue={listing?.minimumRentalHours ?? 1}
                   className="market-input"
                 />
-                              <FieldError message={fieldErrors.minimum_rental_hours} />
+                <FieldError message={fieldErrors.minimum_rental_hours} />
               </label>
             </>
           ) : (
@@ -506,13 +568,14 @@ export function ListingForm({
                 name="sale_price"
                 type="number"
                 min="0.01"
+                max="1000000"
                 step="0.01"
                 required
                 defaultValue={dollars(listing?.salePriceCents ?? null)}
                 className="market-input"
                 placeholder="450"
               />
-                          <FieldError message={fieldErrors.sale_price} />
+              <FieldError message={fieldErrors.sale_price} />
             </label>
           ) : null}
         </div>
@@ -620,6 +683,9 @@ export function ListingForm({
                 <input
                   name="pickup_area"
                   required
+                  minLength={2}
+                  maxLength={120}
+                  data-trim-length="true"
                   defaultValue={listing?.pickupArea ?? ""}
                   className="market-input"
                   placeholder="e.g. Steveston Village"
@@ -631,6 +697,9 @@ export function ListingForm({
                 <input
                   name="city"
                   required
+                  minLength={2}
+                  maxLength={100}
+                  data-trim-length="true"
                   defaultValue={listing?.city ?? "Richmond"}
                   className="market-input"
                 />
@@ -641,6 +710,9 @@ export function ListingForm({
                 <input
                   name="province"
                   required
+                  minLength={2}
+                  maxLength={80}
+                  data-trim-length="true"
                   defaultValue={listing?.province ?? "BC"}
                   className="market-input"
                 />
@@ -651,10 +723,14 @@ export function ListingForm({
                 <span className="font-normal text-slate-400">(private)</span>
                 <input
                   name="postal_code"
+                  minLength={3}
+                  maxLength={20}
+                  data-trim-length="true"
                   defaultValue={initial?.privateDetails?.postalCode ?? ""}
                   className="market-input"
                   autoComplete="postal-code"
                 />
+                <FieldError message={fieldErrors.postal_code} />
               </label>
               <label className="field-label sm:col-span-2">
                 Exact pickup address{" "}
@@ -664,6 +740,9 @@ export function ListingForm({
                 <input
                   name="pickup_address"
                   required
+                  minLength={5}
+                  maxLength={240}
+                  data-trim-length="true"
                   defaultValue={initial?.privateDetails?.pickupAddress ?? ""}
                   className="market-input"
                   autoComplete="street-address"
@@ -692,19 +771,25 @@ export function ListingForm({
                 Public availability summary
                 <input
                   name="availability_summary"
+                  maxLength={240}
+                  data-trim-length="true"
                   defaultValue={listing?.availabilitySummary ?? ""}
                   className="market-input"
                   placeholder="e.g. Weekdays after 4 PM · flexible weekends"
                 />
+                <FieldError message={fieldErrors.availability_summary} />
               </label>
               <label className="field-label sm:col-span-2">
                 Private pickup instructions
                 <textarea
                   name="pickup_instructions"
+                  maxLength={1000}
+                  data-trim-length="true"
                   defaultValue={initial?.privateDetails?.pickupInstructions ?? ""}
                   className="market-textarea min-h-24"
                   placeholder="Meeting point, buzzer, or contact instructions shown only after acceptance."
                 />
+                <FieldError message={fieldErrors.pickup_instructions} />
               </label>
             </>
           )}
@@ -712,10 +797,13 @@ export function ListingForm({
             Rules and owner notes
             <textarea
               name="rental_rules"
+              maxLength={2000}
+              data-trim-length="true"
               defaultValue={listing?.rentalRules ?? ""}
               className="market-textarea min-h-24"
               placeholder="ID requirements, permitted use, or anything the rider should know."
             />
+            <FieldError message={fieldErrors.rental_rules} />
           </label>
           <input
             type="hidden"
@@ -760,11 +848,7 @@ export function ListingForm({
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/avif"
                 multiple
-                onChange={(event) =>
-                  setPhotoNames(
-                    Array.from(event.target.files ?? []).map((file) => file.name),
-                  )
-                }
+                onChange={selectPhotos}
                 className="sr-only"
               />
               <span className="btn-secondary mt-4 inline-flex px-5 py-2 text-sm">
@@ -775,6 +859,7 @@ export function ListingForm({
                   ? "No photos selected yet"
                   : `${photoNames.length} selected · ${photoNames.join(", ")}`}
               </span>
+              <FieldError message={fieldErrors.photos} />
             </label>
             <p className="mt-3 text-xs leading-5 text-slate-500">
               You can save the listing without photos and add the real bike images

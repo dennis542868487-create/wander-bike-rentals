@@ -2,7 +2,9 @@
 
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import type { ListingStatus } from "@/lib/marketplace/types";
 
 export function ListingManagementActions({
@@ -23,6 +25,8 @@ export function ListingManagementActions({
   const [note, setNote] = useState("");
   const [pausing, setPausing] = useState(false);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   async function update(
     nextStatus: ListingStatus | undefined,
@@ -90,16 +94,28 @@ export function ListingManagementActions({
   }
 
   return (
-    <div className="min-w-0">
+    <form
+      ref={formRef}
+      className="min-w-0"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void update("paused");
+      }}
+    >
       {pausing ? (
         <label className="field-label mb-2 block">
           Reason shown to the owner
           <textarea
+            name="management_note"
+            required
+            maxLength={1000}
+            data-trim-length="true"
             value={note}
             onChange={(event) => setNote(event.target.value)}
             className="market-textarea min-h-20"
             placeholder="Explain why this listing is being paused."
           />
+          <FieldError message={fieldErrors.management_note} />
         </label>
       ) : null}
       <div className="flex flex-wrap gap-2">
@@ -107,9 +123,8 @@ export function ListingManagementActions({
           pausing ? (
             <>
               <button
-                type="button"
-                disabled={busy || note.trim().length === 0}
-                onClick={() => void update("paused")}
+                type="submit"
+                disabled={busy}
                 className="inline-flex min-h-9 items-center rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-700 disabled:opacity-50"
               >
                 Confirm pause
@@ -168,6 +183,6 @@ export function ListingManagementActions({
           {error}
         </p>
       ) : null}
-    </div>
+    </form>
   );
 }

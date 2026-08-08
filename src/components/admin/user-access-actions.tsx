@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import type { MarketplaceAccessStatus } from "@/lib/marketplace/types";
 
 export function UserAccessActions({
@@ -18,6 +20,8 @@ export function UserAccessActions({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
 
   async function update(nextStatus: MarketplaceAccessStatus) {
     if (
@@ -77,25 +81,35 @@ export function UserAccessActions({
   }
 
   return (
-    <div>
+    <form
+      ref={formRef}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void update("suspended");
+      }}
+    >
       {showReason ? (
         <label className="field-label mb-2 block">
           Suspension reason
           <textarea
+            name="reason"
+            required
+            maxLength={1000}
+            data-trim-length="true"
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             className="market-textarea min-h-20"
             placeholder="Explain the account restriction for the audit record."
           />
+          <FieldError message={fieldErrors.reason} />
         </label>
       ) : null}
       <div className="flex flex-wrap gap-2">
         {showReason ? (
           <>
             <button
-              type="button"
-              disabled={disabled || busy || reason.trim().length === 0}
-              onClick={() => void update("suspended")}
+              type="submit"
+              disabled={disabled || busy}
               className="inline-flex min-h-9 items-center rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-700 disabled:opacity-50"
             >
               Suspend and pause listings
@@ -121,6 +135,6 @@ export function UserAccessActions({
         )}
       </div>
       {error ? <p className="mt-2 text-xs text-rose-700">{error}</p> : null}
-    </div>
+    </form>
   );
 }

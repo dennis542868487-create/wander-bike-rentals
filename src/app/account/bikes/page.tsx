@@ -59,6 +59,11 @@ export default async function MyBikesPage({
                     title={listing.title}
                     sizes="(min-width: 640px) 13rem, 100vw"
                   />
+                  {listing.images.length > 0 ? (
+                    <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/75 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-sm">
+                      {listing.images.length} {listing.images.length === 1 ? "photo" : "photos"}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="min-w-0 p-5 sm:p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">

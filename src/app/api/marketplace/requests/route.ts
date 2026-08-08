@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { queueMarketplaceNotifications } from "@/lib/marketplace/notifications";
+import {
+  requestReceivedRecipients,
+  type StaffNotificationProfile,
+} from "@/lib/marketplace/notification-recipients";
 import { requestInputSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireMarketplaceActor } from "@/lib/supabase/auth";
@@ -79,19 +83,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const { data: ownerProfile } = await supabase
-      .from("profiles")
-      .select("email,full_name")
-      .eq("id", listing.owner_id)
-      .maybeSingle();
+    const [ownerResult, staffResult] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("email,full_name")
+        .eq("id", listing.owner_id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("email,role")
+        .in("role", ["staff", "admin"]),
+    ]);
+    const ownerProfile = ownerResult.data;
+    if (staffResult.error) {
+      console.error("Staff notification recipients could not be loaded", staffResult.error);
+    }
+    const receivedRecipients = requestReceivedRecipients(
+      ownerProfile?.email,
+      (staffResult.data ?? []) as StaffNotificationProfile[],
+    );
     try {
       await queueMarketplaceNotifications([
-        {
+        ...receivedRecipients.map((recipient, index) => ({
           requestId: inserted.id,
           listingId: listing.id,
-          templateKey: "request_received",
-          dedupeKey: `request-received:${inserted.id}`,
-          recipient: ownerProfile?.email,
+          templateKey: "request_received" as const,
+          dedupeKey: `request-received:${inserted.id}:${index + 1}`,
+          recipient: recipient.email,
           payload: {
             bike_title: listing.title,
             listing_slug: listing.slug,
@@ -99,8 +117,9 @@ export async function POST(request: Request) {
             intent: inserted.intent,
             starts_at: inserted.starts_at,
             ends_at: inserted.ends_at,
+            request_path: recipient.requestPath,
           },
-        },
+        })),
         {
           requestId: inserted.id,
           listingId: listing.id,

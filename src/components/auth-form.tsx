@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
+import { FieldError } from "@/components/forms/field-error";
+import { useFieldErrors } from "@/components/forms/use-field-errors";
 import { getSupabaseBrowser } from "@/lib/supabase/browser";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useSocialAuth } from "@/hooks/use-social-auth";
@@ -24,6 +26,8 @@ export default function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const fieldErrors = useFieldErrors(formRef);
   const next = useMemo(() => safeNext(searchParams.get("next")), [searchParams]);
 
   async function signInWithProvider(provider: SocialAuthProvider) {
@@ -107,10 +111,10 @@ export default function AuthForm() {
 
       <div className="my-6 flex items-center gap-3"><span className="h-px flex-1 bg-slate-200"/><span className="text-xs font-semibold uppercase tracking-[.16em] text-slate-400">or use email</span><span className="h-px flex-1 bg-slate-200"/></div>
 
-      <form onSubmit={submit}>
-        {mode === "signup" && <label className="field-label">Full name<input name="full_name" required autoComplete="name" className="market-input" placeholder="Your full name" /></label>}
-        <label className={`${mode === "signup" ? "mt-4" : ""} field-label`}>Email<input name="email" required type="email" autoComplete="email" className="market-input" placeholder="you@example.com" /></label>
-        <label className="field-label mt-4">Password<input name="password" required type="password" minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="market-input" placeholder="At least 8 characters" /></label>
+      <form ref={formRef} onSubmit={submit}>
+        {mode === "signup" && <label className="field-label">Full name<input name="full_name" required maxLength={120} data-trim-length="true" autoComplete="name" className="market-input" placeholder="Your full name" /><FieldError message={fieldErrors.full_name} /></label>}
+        <label className={`${mode === "signup" ? "mt-4" : ""} field-label`}>Email<input name="email" required type="email" maxLength={320} data-trim-length="true" autoComplete="email" className="market-input" placeholder="you@example.com" /><FieldError message={fieldErrors.email} /></label>
+        <label className="field-label mt-4">Password<input name="password" required type="password" minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="market-input" placeholder="At least 8 characters" /><FieldError message={fieldErrors.password} /></label>
         {message && <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm leading-6 text-emerald-800">{message}</p>}
         {error && <p className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm leading-6 text-rose-700">{error}</p>}
         <button disabled={loading} className="btn-primary mt-6 w-full px-6 py-3.5">{loading ? "Please wait…" : mode === "signin" ? "Sign in with email" : "Create account with email"}</button>

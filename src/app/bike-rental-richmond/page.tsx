@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { LocalRentalLanding } from "@/components/marketplace/local-rental-landing";
 
 export const metadata: Metadata = {
-  title: "Bike Rental Richmond",
+  title: {
+    absolute: "Bike Rental Richmond, BC | Wander Bike Rentals",
+  },
   description:
     "Rent a bike directly from Wander Bike Rentals in Steveston, Richmond, or browse separate local-owner listings. Prices and availability are set per bike.",
   alternates: { canonical: "/bike-rental-richmond" },
   openGraph: {
-    title: "Bike Rental Richmond | Wander Bike",
+    title: "Bike Rental Richmond, BC | Wander Bike Rentals",
     description:
       "Browse Richmond bike rentals, reserve a specific bike, pick up locally, and pay in person.",
     url: "https://www.wanderbike.ca/bike-rental-richmond",
@@ -41,7 +43,7 @@ const reasons = [
 export default function BikeRentalRichmondPage() {
   return (
     <LocalRentalLanding
-      title="Bike rental in Richmond, one bike at a time."
+      title="Bike Rental in Richmond"
       introduction="Wander Bike Rentals operates a physical shop in Steveston, Richmond. Choose the exact Wander bike you want, request it online, then confirm pickup with our team and pay in person."
       heroImage="/assets/west-dyke-ride.webp"
       heroImageAlt="Cyclists riding beside the Richmond waterfront"

@@ -71,12 +71,12 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-3 text-sm text-slate-300">
             <li>
               <Link className="hover:text-teal-300" href="/bike-rental-richmond">
-                Bike Rental Richmond
+                Bike Rental in Richmond
               </Link>
             </li>
             <li>
               <Link className="hover:text-teal-300" href="/bike-rental-steveston">
-                Bike Rental Steveston
+                Bike Rental in Steveston
               </Link>
             </li>
             <li>
@@ -122,9 +122,25 @@ export function SiteFooter() {
             <li>
               <Link
                 className="hover:text-teal-300"
+                href="/guides"
+              >
+                Metro Vancouver Cycling Guides
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:text-teal-300"
+                href="/guides/richmond-bc-cycling-guide"
+              >
+                Cycling in Richmond, BC
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:text-teal-300"
                 href="/guides/best-places-to-bike-in-steveston"
               >
-                Steveston Bike Routes
+                Best Places to Bike in Steveston
               </Link>
             </li>
             <li>
@@ -132,7 +148,7 @@ export function SiteFooter() {
                 className="hover:text-teal-300"
                 href="/guides/family-bike-rental-richmond"
               >
-                Family Riding Guide
+                Family Bike Rentals in Richmond, BC
               </Link>
             </li>
           </ul>

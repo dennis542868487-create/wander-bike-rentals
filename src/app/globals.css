@@ -177,6 +177,83 @@ a {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Editorial page controls used by pricing, repair, and local guide pages. */
+.editorial-button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  padding: 0.72rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.editorial-button:hover {
+  transform: translateY(-1px);
+}
+
+.editorial-button-primary {
+  border-color: #0f8f87;
+  background: #0f8f87;
+  color: #fff;
+}
+
+.editorial-button-primary:hover {
+  border-color: #0f766e;
+  background: #0f766e;
+}
+
+.editorial-button-secondary {
+  border-color: #aebcc5;
+  background: #fff;
+  color: #0f172a;
+}
+
+.editorial-button-secondary:hover {
+  border-color: #64748b;
+  background: #f8fafc;
+}
+
+.editorial-button-dark {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: transparent;
+  color: #fff;
+}
+
+.editorial-button-dark:hover {
+  border-color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.editorial-arrow-link {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 650;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.editorial-arrow-link:hover {
+  border-color: #2dd4bf;
+  color: #5eead4;
+}
+
 .field-label {
   display: block;
   color: #334155;
@@ -1205,6 +1282,10 @@ html.wbr-custom-launcher #chatbase-message-bubbles {
   .wbr-launcher {
     right: 16px;
     bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  }
+
+  .wbr-teaser {
+    display: none;
   }
 
   .wbr-fab {

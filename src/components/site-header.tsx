@@ -37,31 +37,103 @@ const serviceLinks: NavLink[] = [
   { href: "/quick-bike-repair-richmond", label: "Quick Repair" },
 ];
 
-const guideLinks: NavLink[] = [
-  { href: "/bike-rental-richmond", label: "Richmond Ride Ideas" },
-  { href: "/bike-rental-steveston", label: "Steveston Ride Ideas" },
+const guideHomeLink: NavLink = {
+  href: "/guides",
+  label: "All Metro Vancouver Guides",
+};
+
+const guideGroups: { label: string; links: NavLink[] }[] = [
   {
-    href: "/guides/best-places-to-bike-in-steveston",
-    label: "Best Bike Routes",
+    label: "Start local",
+    links: [
+      { href: "/guides/richmond-bc-cycling-guide", label: "Richmond" },
+      { href: "/guides/vancouver-bc-cycling-guide", label: "Vancouver" },
+      { href: "/guides/burnaby-bc-cycling-guide", label: "Burnaby" },
+      { href: "/guides/surrey-bc-cycling-guide", label: "Surrey" },
+      { href: "/guides/delta-bc-cycling-guide", label: "Delta" },
+      {
+        href: "/guides/new-westminster-bc-cycling-guide",
+        label: "New Westminster",
+      },
+      { href: "/guides/white-rock-bc-cycling-guide", label: "White Rock" },
+    ],
   },
   {
-    href: "/guides/family-bike-rental-richmond",
-    label: "Things to Do in Richmond",
+    label: "Urban routes",
+    links: [
+      { href: "/guides/coquitlam-bc-cycling-guide", label: "Coquitlam" },
+      { href: "/guides/port-moody-bc-cycling-guide", label: "Port Moody" },
+      {
+        href: "/guides/port-coquitlam-bc-cycling-guide",
+        label: "Port Coquitlam",
+      },
+      {
+        href: "/guides/pitt-meadows-bc-cycling-guide",
+        label: "Pitt Meadows",
+      },
+      {
+        href: "/guides/maple-ridge-bc-cycling-guide",
+        label: "Maple Ridge",
+      },
+    ],
   },
   {
-    href: "/guides/steveston-bike-ride-guide",
-    label: "Things to Do in Steveston Village",
+    label: "North Shore & inlets",
+    links: [
+      {
+        href: "/guides/north-vancouver-city-bc-cycling-guide",
+        label: "City of North Vancouver",
+      },
+      {
+        href: "/guides/north-vancouver-district-bc-cycling-guide",
+        label: "District of North Vancouver",
+      },
+      {
+        href: "/guides/west-vancouver-bc-cycling-guide",
+        label: "West Vancouver",
+      },
+      { href: "/guides/anmore-bc-cycling-guide", label: "Anmore" },
+      { href: "/guides/belcarra-bc-cycling-guide", label: "Belcarra" },
+      { href: "/guides/lions-bay-bc-cycling-guide", label: "Lions Bay" },
+      {
+        href: "/guides/bowen-island-bc-cycling-guide",
+        label: "Bowen Island",
+      },
+    ],
+  },
+  {
+    label: "River & valley",
+    links: [
+      {
+        href: "/guides/langley-city-bc-cycling-guide",
+        label: "City of Langley",
+      },
+      {
+        href: "/guides/langley-township-bc-cycling-guide",
+        label: "Township of Langley",
+      },
+    ],
   },
 ];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   if (href === "/bikes") return pathname === href || pathname.startsWith("/bikes/");
+  if (href === "/guides") return pathname === href;
   return pathname === href;
 }
 
 function groupIsActive(pathname: string, links: NavLink[]) {
   return links.some((link) => isActive(pathname, link.href));
+}
+
+function guidesAreActive(pathname: string) {
+  return (
+    pathname === "/guides" ||
+    pathname.startsWith("/guides/") ||
+    pathname === "/bike-rental-richmond" ||
+    pathname === "/bike-rental-steveston"
+  );
 }
 
 function desktopLinkClass(active: boolean) {
@@ -127,6 +199,169 @@ function DesktopDropdown({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DesktopGuideDropdown({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocusCapture={() => setOpen(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        setOpen(false);
+        (document.activeElement as HTMLElement | null)?.blur();
+      }}
+    >
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className={desktopLinkClass(guidesAreActive(pathname))}
+      >
+        Guides
+        <ChevronDown
+          className={`ml-1 h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+      <div
+        className={[
+          "absolute left-1/2 top-full z-50 w-[min(62rem,calc(100vw-2rem))] -translate-x-1/2 pt-3 transition duration-200",
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
+        ].join(" ")}
+      >
+        <div className="border border-slate-200 bg-white p-5 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
+          <div className="mb-5 flex items-center justify-between gap-6 border-b border-teal-500 pb-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
+                Metro Vancouver
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Choose a city to open its cycling guide.
+              </p>
+            </div>
+            <Link
+              href={guideHomeLink.href}
+              onClick={() => setOpen(false)}
+              className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-slate-950 hover:text-teal-800"
+            >
+              {guideHomeLink.label}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <div className="grid gap-x-8 gap-y-7 md:grid-cols-2 xl:grid-cols-4">
+            {guideGroups.map((group) => (
+              <section key={group.label}>
+                <p className="border-b border-slate-200 pb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                  {group.label}
+                </p>
+                <div>
+                  {group.links.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className={[
+                        "flex items-center justify-between gap-3 border-b border-slate-100 py-2.5 text-sm transition",
+                        isActive(pathname, link.href)
+                          ? "font-bold text-teal-800"
+                          : "text-slate-700 hover:text-teal-800",
+                      ].join(" ")}
+                    >
+                      {link.label}
+                      <span className="text-xs text-teal-600" aria-hidden="true">
+                        →
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileGuideGroup({
+  expanded,
+  pathname,
+  onToggle,
+  onNavigate,
+}: {
+  expanded: boolean;
+  pathname: string;
+  onToggle: () => void;
+  onNavigate: () => void;
+}) {
+  return (
+    <div className="rounded-[1.4rem] border border-slate-200 bg-white p-2">
+      <button
+        type="button"
+        aria-expanded={expanded}
+        onClick={onToggle}
+        className={`${mobileLinkClass(guidesAreActive(pathname))} w-full`}
+      >
+        Guides
+        <ChevronDown
+          className={`h-4 w-4 transition ${expanded ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+      {expanded ? (
+        <div className="mt-1 border-t border-slate-100 px-2 pb-2 pt-3">
+          <Link
+            href={guideHomeLink.href}
+            onClick={onNavigate}
+            className="flex items-center justify-between border-b border-teal-500 px-2 pb-3 text-sm font-bold text-slate-950"
+          >
+            {guideHomeLink.label}
+            <span aria-hidden="true">→</span>
+          </Link>
+          {guideGroups.map((group) => (
+            <section key={group.label} className="mt-5">
+              <p className="px-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal-700">
+                {group.label}
+              </p>
+              <div className="mt-1">
+                {group.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={onNavigate}
+                    className={[
+                      "flex items-center justify-between border-b border-slate-100 px-2 py-3 text-sm",
+                      isActive(pathname, link.href)
+                        ? "font-bold text-teal-800"
+                        : "text-slate-700",
+                    ].join(" ")}
+                  >
+                    {link.label}
+                    <span className="text-xs text-teal-600" aria-hidden="true">
+                      →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -230,11 +465,7 @@ export default function SiteHeader() {
             >
               List Your Bike
             </Link>
-            <DesktopDropdown
-              label="Guides"
-              links={guideLinks}
-              pathname={pathname}
-            />
+            <DesktopGuideDropdown pathname={pathname} />
             <Link
               href="/location"
               className={desktopLinkClass(isActive(pathname, "/location"))}
@@ -342,10 +573,7 @@ export default function SiteHeader() {
             <Link href="/" className={mobileLinkClass(isActive(pathname, "/"))}>
               Home
             </Link>
-            {[
-              { label: "Our Services", links: serviceLinks },
-              { label: "Guides", links: guideLinks },
-            ].map((group) => {
+            {[{ label: "Our Services", links: serviceLinks }].map((group) => {
               const expanded = openGroup === group.label;
               return (
                 <div
@@ -387,6 +615,16 @@ export default function SiteHeader() {
                 </div>
               );
             })}
+            <MobileGuideGroup
+              expanded={openGroup === "Guides"}
+              pathname={pathname}
+              onToggle={() =>
+                setOpenGroup((current) =>
+                  current === "Guides" ? null : "Guides",
+                )
+              }
+              onNavigate={closeMenu}
+            />
             {[
               { href: "/bikes", label: "Find a Bike" },
               { href: "/list-your-bike", label: "List Your Bike" },

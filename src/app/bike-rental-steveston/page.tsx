@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { LocalRentalLanding } from "@/components/marketplace/local-rental-landing";
 
 export const metadata: Metadata = {
-  title: "Bike Rental Steveston",
+  title: {
+    absolute: "Bike Rental Steveston, Richmond | Wander Bike Rentals",
+  },
   description:
     "Rent a bike from the Wander Bike Rentals shop in Steveston, Richmond. Browse individual Wander bikes, reserve online, and pay at local pickup.",
   alternates: { canonical: "/bike-rental-steveston" },
   openGraph: {
-    title: "Bike Rental Steveston | Wander Bike",
+    title: "Bike Rental Steveston, Richmond | Wander Bike Rentals",
     description:
       "Choose a bike for Steveston Village, Garry Point, and nearby dyke routes.",
     url: "https://www.wanderbike.ca/bike-rental-steveston",
@@ -41,7 +43,7 @@ const reasons = [
 export default function BikeRentalStevestonPage() {
   return (
     <LocalRentalLanding
-      title="Find a bike for Steveston."
+      title="Bike Rental in Steveston"
       introduction="Wander Bike Rentals continues to serve riders from its Steveston shop. Choose a specific Wander bike for the waterfront, request it online, and confirm pickup directly with our team."
       heroImage="/assets/fishermans-wharf.webp"
       heroImageAlt="The Steveston waterfront near Fisherman’s Wharf"

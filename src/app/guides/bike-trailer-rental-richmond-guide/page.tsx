@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { EditorialGuideBand } from "@/components/editorial-guide-band";
 
 export const metadata: Metadata = {
-  title: "Bike Trailer Rental Guide",
+  title: {
+    absolute: "Bike Trailer Rental Richmond: Family Guide | Wander Bike",
+  },
   description:
     "A practical guide for families deciding whether a bike trailer is the right fit for their Richmond or Steveston ride.",
   alternates: {
     canonical: "/guides/bike-trailer-rental-richmond-guide",
   },
   openGraph: {
-    title: "Bike Trailer Rental Guide",
+    title: "Bike Trailer Rental Richmond: Family Guide | Wander Bike",
     description:
       "A practical guide for families deciding whether a bike trailer is the right fit for their Richmond or Steveston ride.",
     url: "https://www.wanderbike.ca/guides/bike-trailer-rental-richmond-guide",
@@ -48,114 +53,133 @@ const guidePoints = [
 
 export default function BikeTrailerRentalRichmondGuidePage() {
   return (
-    <main className="pb-20 text-slate-900">
-      <section className="hero relative isolate overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_16%_14%,rgba(20,184,166,0.34),transparent_44%),radial-gradient(circle_at_84%_80%,rgba(14,165,233,0.22),transparent_48%),linear-gradient(135deg,#0f172a_0%,#052e2b_52%,#0b3b39_100%)]" />
-        <div className="hero-grad-anim absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:46px_46px] [mask-image:radial-gradient(circle_at_50%_40%,#000,transparent_75%)]" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
-          <div className="space-y-6">
-            <div className="hero-anim hero-d1 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-teal-100 shadow-sm backdrop-blur">
-              Family trailer guide
-            </div>
-            <div className="space-y-4">
-              <h1 className="hero-anim hero-d2 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.05]">
-                A simple bike trailer guide for easier family rides.
-              </h1>
-              <p className="hero-anim hero-d3 max-w-2xl text-lg leading-8 text-slate-100/90">
-                A practical guide for parents deciding whether a trailer will make the ride smoother and more comfortable for the whole group.
-              </p>
-            </div>
-            <p className="hero-anim hero-d3 max-w-2xl text-base leading-8 text-slate-200/85">
-              Riding with younger children? This guide helps you decide whether a trailer is the better choice before you visit.
+    <main className="bg-white text-slate-900">
+      <section className="border-b border-slate-200">
+        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-24">
+          <div>
+            <h1 className="max-w-3xl text-5xl font-bold tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-7xl lg:leading-[1.02]">
+              Bike Trailer Rental Guide
+            </h1>
+            <div className="mt-7 h-1 w-16 bg-teal-600" />
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+              A practical guide for parents deciding whether a trailer will
+              make the ride smoother and more comfortable for the whole group.
             </p>
-            <div className="hero-anim hero-d4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
+              Riding with younger children? Use this page to decide whether a
+              trailer is the better choice before you visit.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/bike-trailer-rental-richmond"
-                className="btn-brand px-6 py-3.5 text-sm"
+                className="editorial-button editorial-button-primary"
               >
                 Trailer Rentals
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
                 href="/location"
-                className="btn-secondary px-6 py-3.5 text-sm"
+                className="editorial-button editorial-button-secondary"
               >
                 Location
               </Link>
               <a
                 href="tel:+17789521389"
-                className="btn-secondary px-6 py-3.5 text-sm"
+                className="editorial-button editorial-button-secondary"
               >
                 Call Now
               </a>
             </div>
           </div>
 
-          <div className="hero-anim hero-d4 rounded-[2rem] border border-white/55 bg-white/95 p-7 shadow-[0_24px_60px_rgba(15,23,42,0.28)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Guide overview</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-950">Choose the setup that makes the family ride easier</h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
+          <div className="border-y border-teal-300 py-7 lg:border-y-0 lg:border-l lg:py-3 lg:pl-12">
+            <h2 className="text-2xl font-bold tracking-[-0.035em] text-slate-950 sm:text-3xl">
+              Choose the setup that makes the family ride easier
+            </h2>
+            <div className="mt-5 space-y-4 text-base leading-7 text-slate-600">
               <p>
-                A trailer can be the better fit when the ride needs to stay comfortable, flexible, and easier for younger children who are not ready for the full route.
+                A trailer can be the better fit when the ride needs to stay
+                comfortable and flexible for a child who is not ready for the
+                full route.
               </p>
               <p>
-                The easiest plan is usually a simple Steveston or waterfront ride where the route stays flat and the family can stop whenever it helps.
+                The easiest plan is usually a simple Steveston or waterfront
+                ride where the family can stop whenever it helps.
               </p>
             </div>
-            <div className="mt-6 rounded-[1.5rem] border border-teal-100 bg-[linear-gradient(180deg,#f0fdfa_0%,#ecfeff_100%)] p-5 text-sm leading-7 text-teal-950 shadow-sm">
-              If the outing depends on having a trailer, calling ahead is still the best way to confirm the details before you come by.
-            </div>
+            <p className="mt-6 border-l-2 border-teal-600 bg-teal-50 px-5 py-4 text-sm leading-6 text-teal-950">
+              If the outing depends on having a trailer, call ahead to confirm
+              the details before you come by.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">When a trailer makes sense</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Simple trailer tips for easier family rides</h2>
+            <h2 className="text-4xl font-bold tracking-[-0.05em] text-slate-950 sm:text-5xl">
+              Simple trailer tips for easier family rides
+            </h2>
           </div>
-          <p className="max-w-xl text-sm leading-7 text-slate-600">
-            Use this page if you want to decide whether a trailer suits the ride, the child, and the kind of family outing you are planning.
+          <p className="border-l border-teal-300 pl-6 text-base leading-7 text-slate-600">
+            Decide whether a trailer suits the ride, the child, and the kind of
+            family outing you are planning.
           </p>
         </div>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {guidePoints.map((item) => (
-            <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
-              <h3 className="text-lg font-semibold text-slate-950">{item.title}</h3>
-              <p className="mt-4 text-sm leading-7 text-slate-600">{item.text}</p>
-            </div>
-          ))}
+        <div className="mt-12 grid gap-12 lg:grid-cols-[0.58fr_1.42fr] lg:items-start">
+          <figure className="border border-slate-200 bg-slate-50">
+            <Image
+              src="/assets/trailer-bike.jpg"
+              alt="A child bike trailer ready for a family ride"
+              width={1500}
+              height={2000}
+              sizes="(min-width: 1024px) 34vw, 100vw"
+              className="h-auto w-full object-contain"
+            />
+          </figure>
+          <ol className="border-t border-teal-300">
+            {guidePoints.map((item, index) => (
+              <li
+                key={item.title}
+                className="grid gap-4 border-b border-teal-200 py-6 sm:grid-cols-[4.5rem_1fr] sm:gap-7"
+              >
+                <span className="text-4xl font-light tracking-[-0.06em] text-teal-700 sm:text-5xl">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="text-xl font-bold tracking-[-0.025em] text-slate-950">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-base leading-7 text-slate-600">
+                    {item.text}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
-        <div className="rounded-[2rem] border border-slate-200 bg-slate-950 px-8 py-10 text-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Related pages</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight">Use the guide first, then confirm the trailer details you need</h2>
-              <p className="mt-4 text-base leading-8 text-slate-300">
-                If a trailer matters for the ride, use this page to plan the outing first, then contact the shop to confirm the setup.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/bike-trailer-rental-richmond"
-                className="btn-outline-light px-4 py-2 text-sm"
-              >
-                Trailer Rentals
-              </Link>
-              <Link
-                href="/guides/family-bike-rental-richmond"
-                className="btn-outline-light px-4 py-2 text-sm"
-              >
-                Family Ride Guide
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <EditorialGuideBand
+        heading="Use the guide first, then confirm the trailer details you need"
+        description="If a trailer matters for the ride, plan the outing first, then contact the shop to confirm the setup."
+        links={[
+          {
+            href: "/bike-trailer-rental-richmond",
+            label: "Bike Trailer Rentals",
+          },
+          {
+            href: "/guides/family-bike-rental-richmond",
+            label: "Family Bike Rentals in Richmond, BC",
+          },
+          {
+            href: "/guides/richmond-bc-cycling-guide",
+            label: "Cycling in Richmond, BC",
+          },
+        ]}
+      />
     </main>
   );
 }

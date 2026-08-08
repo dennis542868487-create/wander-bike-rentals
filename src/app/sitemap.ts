@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getMetroGuides } from "@/lib/guides/master-guide-data";
 import { getPublicListings } from "@/lib/marketplace/data";
 import { getOptionalSupabasePublicConfig } from "@/lib/supabase/config";
 
@@ -26,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/quick-bike-repair-richmond",
     "/location",
     "/faq",
+    "/guides",
     "/policies/marketplace",
     "/policies/privacy",
     "/policies/local-exchange",
@@ -34,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/guides/family-bike-rental-richmond",
     "/guides/steveston-bike-ride-guide",
     "/guides/bike-trailer-rental-richmond-guide",
+    ...getMetroGuides().map((guide) => guide.url),
   ];
   const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${baseUrl}${route}`,

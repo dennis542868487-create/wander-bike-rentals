@@ -34,12 +34,20 @@ export default function Reveal() {
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0 },
     );
 
     targets.forEach((target) => {
       const rect = target.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.92) {
+      const isTallSection = rect.height > window.innerHeight * 1.5;
+      const isAlreadyVisible =
+        rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
+
+      // A percentage threshold can never be reached by sections that are much
+      // taller than the viewport (for example, the 160-guide directory).
+      // Render those sections immediately instead of leaving their content
+      // permanently transparent.
+      if (isTallSection || isAlreadyVisible) {
         target.classList.add("is-visible");
       } else {
         observer.observe(target);

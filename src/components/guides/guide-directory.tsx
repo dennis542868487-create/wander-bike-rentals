@@ -76,7 +76,7 @@ export function GuideDirectory({ guides }: { guides: GuideDirectoryItem[] }) {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search a city, town, district, or region"
-            className="min-h-13 w-full border border-slate-300 bg-white py-3 pl-12 pr-11 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-teal-600 focus:ring-4 focus:ring-teal-600/10"
+            className="guide-directory-search min-h-13 w-full border border-slate-300 bg-white py-3 pl-12 pr-11 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-teal-600 focus:ring-4 focus:ring-teal-600/10"
           />
           {query ? (
             <button

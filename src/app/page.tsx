@@ -120,17 +120,10 @@ export default async function HomePage() {
           </div>
 
           <div className="motion-rise motion-rise-delay-1 lg:pl-5">
-            <div className="relative isolate overflow-hidden rounded-[2rem] border border-white/25 bg-slate-950/75 p-5 text-white shadow-[0_28px_80px_rgba(2,6,23,0.42)] backdrop-blur-2xl sm:p-7">
-              <div
-                className="pointer-events-none absolute -right-24 -top-28 -z-10 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl"
-                aria-hidden="true"
-              />
-
+            <div className="relative border-y border-r border-white/20 border-l-2 border-l-teal-300/70 bg-slate-950/72 p-5 text-white shadow-[0_24px_70px_rgba(2,6,23,0.34)] backdrop-blur-2xl sm:p-7">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal-200/30 bg-teal-300/15 text-teal-100">
-                    <Store className="h-5 w-5" aria-hidden="true" />
-                  </span>
+                  <Store className="h-6 w-6 shrink-0 text-teal-200" aria-hidden="true" />
                   <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-200/80">
                       Local bike snapshot
@@ -140,7 +133,7 @@ export default async function HomePage() {
                     </p>
                   </div>
                 </div>
-                <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-200/25 bg-emerald-300/10 px-3 py-1.5 text-xs font-bold text-emerald-100">
+                <span className="inline-flex shrink-0 items-center gap-2 border-l border-white/20 py-1 pl-3 text-xs font-bold text-emerald-100">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden="true" />
                   Open today
                 </span>
@@ -155,7 +148,7 @@ export default async function HomePage() {
                 directly with Wander or the community owner.
               </p>
 
-              <div className="mt-6 overflow-hidden rounded-2xl border border-white/15 bg-white/[0.07]">
+              <div className="mt-6 border-y border-white/15 bg-white/[0.06]">
                 <a
                   href={WANDER_SHOP_DIRECTIONS_URL}
                   target="_blank"
@@ -227,7 +220,8 @@ export default async function HomePage() {
                 href={WANDER_SHOP_DIRECTIONS_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="btn-secondary group mt-5 min-h-12 w-full px-5 py-3 text-sm shadow-[0_12px_28px_rgba(2,6,23,0.28)] hover:-translate-y-0.5 hover:bg-teal-50"
+                className="btn-secondary group mt-5 min-h-12 w-full px-5 py-3 text-sm shadow-[0_12px_28px_rgba(2,6,23,0.24)] hover:-translate-y-0.5 hover:bg-teal-50"
+                style={{ borderRadius: 0 }}
               >
                 <MapPin className="h-4 w-4" aria-hidden="true" />
                 Go to Store

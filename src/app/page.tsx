@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import {
   ArrowRight,
+  Clock3,
   MapPin,
+  PhoneCall,
   ShieldCheck,
   Store,
   UsersRound,
@@ -117,73 +119,123 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="motion-rise motion-rise-delay-1 grid gap-5 lg:pl-5">
-            <div className="glass-panel overflow-hidden p-5 text-slate-900 sm:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">
-                    Local bike snapshot
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold text-slate-950 sm:text-2xl">
-                    The shop stays. The marketplace is new.
-                  </h2>
+          <div className="motion-rise motion-rise-delay-1 lg:pl-5">
+            <div className="relative isolate overflow-hidden rounded-[2rem] border border-white/25 bg-slate-950/75 p-5 text-white shadow-[0_28px_80px_rgba(2,6,23,0.42)] backdrop-blur-2xl sm:p-7">
+              <div
+                className="pointer-events-none absolute -right-24 -top-28 -z-10 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl"
+                aria-hidden="true"
+              />
+
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal-200/30 bg-teal-300/15 text-teal-100">
+                    <Store className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-200/80">
+                      Local bike snapshot
+                    </p>
+                    <p className="mt-1 truncate text-sm text-slate-300">
+                      Steveston, Richmond
+                    </p>
+                  </div>
                 </div>
-                <span className="shrink-0 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+                <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-200/25 bg-emerald-300/10 px-3 py-1.5 text-xs font-bold text-emerald-100">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden="true" />
                   Open today
                 </span>
               </div>
 
-              <div className="mt-5 space-y-3 text-sm text-slate-600 sm:mt-7 sm:space-y-4">
-                <div className="rounded-2xl bg-[#f0fdf9] p-3 sm:p-4">
-                  <p className="font-semibold text-slate-950">Wander Bike Rentals</p>
-                  <p className="mt-1">
-                    12071 First Ave #101, Richmond, BC V7E 3M1
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="rounded-2xl bg-[#f0fdf9] p-3 sm:p-4">
-                    <p className="font-semibold text-slate-950">Phone</p>
-                    <p className="mt-1">(778) 952-1389</p>
-                  </div>
-                  <div className="rounded-2xl bg-[#f0fdf9] p-3 sm:p-4">
-                    <p className="font-semibold text-slate-950">Hours shown</p>
-                    <p className="mt-1">9:00 AM to 10:00 PM</p>
-                  </div>
-                </div>
-                <div className="rounded-2xl bg-teal-50 p-3 text-teal-950 sm:p-4">
-                  <p className="font-semibold">How the new platform works</p>
-                  <p className="mt-2 leading-6 text-teal-900/80 sm:leading-7">
-                    Choose an exact bike, send a rental or purchase request,
-                    then confirm pickup and payment directly with Wander or the
-                    community owner.
-                  </p>
-                </div>
+              <h2 className="mt-6 max-w-md text-2xl font-semibold leading-tight tracking-[-0.025em] sm:text-[2rem]">
+                The shop stays.
+                <span className="block text-teal-200">The marketplace is new.</span>
+              </h2>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                Choose an exact bike online, then confirm pickup and payment
+                directly with Wander or the community owner.
+              </p>
+
+              <div className="mt-6 overflow-hidden rounded-2xl border border-white/15 bg-white/[0.07]">
                 <a
                   href={WANDER_SHOP_DIRECTIONS_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn-primary w-full px-5 py-3"
+                  className="group flex items-center gap-3 px-4 py-4 transition hover:bg-white/10"
                 >
-                  <MapPin className="h-4 w-4" aria-hidden="true" />
-                  Go to Store
+                  <MapPin className="h-5 w-5 shrink-0 text-teal-200" aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-white">
+                      Wander Bike Rentals
+                    </span>
+                    <span className="mt-1 block text-sm leading-5 text-slate-300">
+                      12071 First Ave #101, Richmond, BC V7E 3M1
+                    </span>
+                  </span>
+                  <ArrowRight
+                    className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-white"
+                    aria-hidden="true"
+                  />
                 </a>
-              </div>
-            </div>
 
-            <div className="hidden gap-4 sm:grid sm:grid-cols-3">
-              {[
-                ["Wander Bikes", "Shop managed"],
-                ["Community Bikes", "Owner listed"],
-                ["Payment", "In person"],
-              ].map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-3xl border border-white/40 bg-white/85 p-5 shadow-[0_14px_34px_rgba(15,23,42,0.18)] backdrop-blur"
-                >
-                  <p className="text-sm font-semibold text-slate-950">{label}</p>
-                  <p className="mt-2 text-sm font-bold text-teal-700">{value}</p>
+                <div className="grid grid-cols-2 border-t border-white/15">
+                  <a
+                    href="tel:+17789521389"
+                    className="flex items-center gap-3 border-r border-white/15 px-4 py-4 transition hover:bg-white/10"
+                  >
+                    <PhoneCall className="h-4 w-4 shrink-0 text-teal-200" aria-hidden="true" />
+                    <span>
+                      <span className="block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Call
+                      </span>
+                      <span className="mt-1 block text-sm font-semibold text-white">
+                        (778) 952-1389
+                      </span>
+                    </span>
+                  </a>
+                  <div className="flex items-center gap-3 px-4 py-4">
+                    <Clock3 className="h-4 w-4 shrink-0 text-teal-200" aria-hidden="true" />
+                    <span>
+                      <span className="block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        Hours
+                      </span>
+                      <span className="mt-1 block text-sm font-semibold text-white">
+                        9 AM–10 PM
+                      </span>
+                    </span>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              <dl className="mt-5 grid grid-cols-3 divide-x divide-white/15 border-y border-white/15 py-4">
+                {[
+                  ["Wander bikes", "Shop managed"],
+                  ["Community", "Owner listed"],
+                  ["Payment", "In person"],
+                ].map(([label, value]) => (
+                  <div key={label} className="min-w-0 px-2 first:pl-0 last:pr-0 sm:px-4">
+                    <dt className="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-slate-400">
+                      {label}
+                    </dt>
+                    <dd className="mt-1.5 text-xs font-semibold text-teal-100 sm:text-sm">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <a
+                href={WANDER_SHOP_DIRECTIONS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary group mt-5 min-h-12 w-full px-5 py-3 text-sm shadow-[0_12px_28px_rgba(2,6,23,0.28)] hover:-translate-y-0.5 hover:bg-teal-50"
+              >
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                Go to Store
+                <ArrowRight
+                  className="h-4 w-4 transition group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </a>
             </div>
           </div>
         </div>

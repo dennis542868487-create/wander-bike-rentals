@@ -24,6 +24,13 @@ test("home presents the two marketplace actions and no commerce checkout", async
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Find a Bike", exact: true }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: "List Your Bike", exact: true }).first()).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "The shop stays. The marketplace is new.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Go to Store" }).first()).toBeVisible();
   await expect(page.getByText("No cart. No shipping. No platform payment.")).toBeVisible();
   await expect(
     page.getByRole("heading", {

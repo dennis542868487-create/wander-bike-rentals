@@ -1,9 +1,17 @@
 "use client";
 
-import { LayoutDashboard, ListPlus, Navigation, Search } from "lucide-react";
+import {
+  LayoutDashboard,
+  ListPlus,
+  LoaderCircle,
+  MapPinned,
+  Search,
+  Store,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthSession } from "@/hooks/use-auth-session";
+import { useNearestTrail } from "@/hooks/use-nearest-trail";
 import {
   isSiteAdminEmail,
   isWanderOperatorEmail,
@@ -12,16 +20,19 @@ import { WANDER_SHOP_DIRECTIONS_URL } from "@/lib/marketplace/wander-shop";
 
 function actionClass(active: boolean) {
   return [
-    "flex min-h-13 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 text-center text-[0.64rem] font-bold leading-none transition",
+    "flex min-h-[3.7rem] min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 py-1 text-center !text-[0.61rem] font-bold !leading-[1.05] transition",
     active
-      ? "bg-[var(--brand-soft)] text-[var(--brand-strong)]"
-      : "text-slate-600 active:bg-slate-100",
+      ? "bg-teal-300 !text-slate-950 shadow-[0_6px_18px_rgba(45,212,191,0.28)]"
+      : "!text-white hover:bg-white/10 active:bg-white/15",
   ].join(" ");
 }
 
 export function MobileActionBar() {
   const pathname = usePathname();
   const { session } = useAuthSession();
+  const { findNearestTrail, state: trailState } = useNearestTrail({
+    useFallbackOnError: true,
+  });
 
   if (
     pathname.startsWith("/auth") ||
@@ -43,10 +54,13 @@ export function MobileActionBar() {
 
   return (
     <>
-      <div className="h-[5.4rem] md:hidden" aria-hidden="true" />
+      <div
+        className="h-[calc(4.9rem+env(safe-area-inset-bottom))] md:hidden"
+        aria-hidden="true"
+      />
       <nav
         aria-label="Mobile quick actions"
-        className="mobile-action-bar fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 gap-1 border-t border-slate-200 bg-white/95 px-2 pt-2 shadow-[0_-10px_30px_rgba(15,23,42,0.1)] backdrop-blur-xl md:hidden"
+        className="mobile-action-bar fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 gap-1 border-t border-teal-300/70 bg-[#052e2b]/95 px-1.5 pt-1 shadow-[0_-12px_34px_rgba(15,23,42,0.3)] backdrop-blur-xl md:hidden"
       >
         <Link
           href="/bikes"
@@ -54,18 +68,18 @@ export function MobileActionBar() {
             pathname === "/bikes" || pathname.startsWith("/bikes/"),
           )}
         >
-          <Search className="h-5 w-5" aria-hidden="true" />
+          <Search className="h-5 w-5 shrink-0" aria-hidden="true" />
           Find a Bike
         </Link>
         <Link
           href="/list-your-bike"
           className={actionClass(pathname.startsWith("/list-your-bike"))}
         >
-          <ListPlus className="h-5 w-5" aria-hidden="true" />
+          <ListPlus className="h-5 w-5 shrink-0" aria-hidden="true" />
           List Your Bike
         </Link>
         <Link href={dashboardHref} className={actionClass(false)}>
-          <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+          <LayoutDashboard className="h-5 w-5 shrink-0" aria-hidden="true" />
           Dashboard
         </Link>
         <a
@@ -74,9 +88,26 @@ export function MobileActionBar() {
           rel="noreferrer"
           className={actionClass(false)}
         >
-          <Navigation className="h-5 w-5" aria-hidden="true" />
+          <Store className="h-5 w-5 shrink-0" aria-hidden="true" />
           Go to Store
         </a>
+        <button
+          type="button"
+          onClick={findNearestTrail}
+          disabled={trailState.status === "locating"}
+          aria-busy={trailState.status === "locating"}
+          className={`${actionClass(false)} disabled:cursor-wait disabled:opacity-70`}
+        >
+          {trailState.status === "locating" ? (
+            <LoaderCircle
+              className="h-5 w-5 shrink-0 animate-spin"
+              aria-hidden="true"
+            />
+          ) : (
+            <MapPinned className="h-5 w-5 shrink-0" aria-hidden="true" />
+          )}
+          {trailState.status === "locating" ? "Locating…" : "Nearest Trail"}
+        </button>
       </nav>
     </>
   );

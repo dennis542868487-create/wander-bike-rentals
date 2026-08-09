@@ -8,8 +8,8 @@ export default function GuidesNotFound() {
         This cycling guide is not published yet.
       </h1>
       <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-slate-600">
-        This release covers Richmond and the 21 Metro Vancouver destinations in
-        the current guide master file.
+        Browse 160 published cycling guides for cities and communities across
+        British Columbia, or search for a nearby destination.
       </p>
       <Link
         href="/guides"

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   Bike,
+  BookOpen,
   HandCoins,
   MapPin,
   MessageSquareText,
@@ -16,7 +17,7 @@ import { getPublicListings } from "@/lib/marketplace/data";
 export const dynamic = "force-dynamic";
 
 const pageDescription =
-  "Browse used bikes and local bike rentals in Richmond, BC, or list your idle bike for free on Wander Bike’s bicycle-only marketplace for local riders today.";
+  "Browse used bikes and local rentals in Richmond, list a bike free, and connect a local marketplace request with Wander’s 160 B.C. cycling guides.";
 
 export const metadata: Metadata = {
   title: {
@@ -63,6 +64,11 @@ const marketplaceFaqs = [
     question: "Do I need to deliver the bike?",
     answer:
       "No. Community Bikes use local pickup. Only a general pickup area is public, and the exact meetup details are shared after a request is accepted.",
+  },
+  {
+    question: "Is the marketplace available in every city with a cycling guide?",
+    answer:
+      "No. Wander’s 160 B.C. cycling guides are province-wide planning resources. Community Bike listings and Wander-managed rentals currently focus on Richmond and Steveston; always check the individual listing’s pickup area.",
   },
 ] as const;
 
@@ -161,7 +167,8 @@ export default async function AboutMarketplacePage() {
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg sm:leading-8">
               Find second-hand bikes to buy, browse local rentals, or list an
               idle bike for free. Every listing on Wander is for a bicycle or
-              bike trailer—nothing else.
+              bike trailer—nothing else. Planning a trip elsewhere in B.C.?
+              Use the guide library to research the ride first.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link href="/bikes/community" className="btn-primary w-full px-6 sm:w-auto">
@@ -171,6 +178,9 @@ export default async function AboutMarketplacePage() {
               <Link href="/list-your-bike" className="btn-secondary w-full px-6 sm:w-auto">
                 List your bike free
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link href="/guides" className="btn-secondary w-full px-6 sm:w-auto">
+                Explore B.C. guides
               </Link>
             </div>
           </div>
@@ -211,7 +221,7 @@ export default async function AboutMarketplacePage() {
       </section>
 
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-3 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:grid-cols-2 sm:px-6 sm:py-8 lg:grid-cols-4 lg:px-8">
           {[
             [
               Bike,
@@ -220,6 +230,7 @@ export default async function AboutMarketplacePage() {
             ],
             [HandCoins, "Free to list", "Post your bike with no listing fee."],
             [MapPin, "Local Richmond exchanges", "Meet in Steveston or elsewhere in Richmond."],
+            [BookOpen, "160 B.C. guides", "Plan province-wide; check each bike’s local pickup area."],
           ].map(([Icon, title, text]) => (
             <div key={title as string} className="flex items-start gap-3 sm:px-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--teal-soft)] text-[var(--teal)]">
@@ -358,12 +369,19 @@ export default async function AboutMarketplacePage() {
                 locally after the owner accepts. Exact meetup details stay
                 private until then.
               </p>
+              <p>
+                Wander&apos;s cycling guides are a separate planning layer: browse
+                160 B.C. destinations, compare route character, and check
+                official sources. A guide does not indicate that a marketplace
+                bike is available in that city.
+              </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm font-bold text-[var(--teal)]">
               <Link href="/bikes/community" className="underline decoration-teal-300 underline-offset-4">Find a bike</Link>
               <Link href="/list-your-bike" className="underline decoration-teal-300 underline-offset-4">List your bike</Link>
               <Link href="/how-it-works" className="underline decoration-teal-300 underline-offset-4">How it works</Link>
               <Link href="/policies/safety" className="underline decoration-teal-300 underline-offset-4">Safety tips</Link>
+              <Link href="/guides" className="underline decoration-teal-300 underline-offset-4">B.C. cycling guides</Link>
             </div>
           </div>
 
@@ -456,6 +474,9 @@ export default async function AboutMarketplacePage() {
               </Link>
               <Link href="/bikes/community" className="btn-secondary w-full px-6 sm:w-auto">
                 Explore Community Bikes
+              </Link>
+              <Link href="/guides" className="btn-secondary w-full px-6 sm:w-auto">
+                Plan a B.C. ride
               </Link>
             </div>
             <Store className="absolute -bottom-10 -right-6 h-40 w-40 text-teal-700/[0.06]" aria-hidden="true" />

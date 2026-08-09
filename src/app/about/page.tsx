@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   Bike,
+  BookOpen,
   CalendarDays,
   CheckCircle2,
   MapPin,
@@ -15,9 +16,9 @@ import Link from "next/link";
 import { WANDER_SHOP_DIRECTIONS_URL } from "@/lib/marketplace/wander-shop";
 import { wanderBusinessEntity } from "@/lib/seo/wander-business";
 
-const pageTitle = "About Wander Bike | Steveston Bike Rental Shop";
+const pageTitle = "About Wander Bike | Rentals, Marketplace & B.C. Guides";
 const pageDescription =
-  "Wander Bike Rentals is one of Richmond’s largest and most dependable local used bike rental and sales shops, based in Steveston with quick repairs.";
+  "Meet Wander Bike: a Steveston rental, sales, and repair shop with a local bicycle marketplace and 160 cycling guides across British Columbia.";
 
 export const metadata: Metadata = {
   title: { absolute: pageTitle },
@@ -61,12 +62,17 @@ const aboutFaqs = [
   {
     question: "What is Wander Bike building?",
     answer:
-      "Wander is building a bicycle-sharing marketplace where shops and local owners can make bikes available to other riders. The long-term goal is to help people find a suitable bike where they are instead of transporting their own bike everywhere.",
+      "Wander is building a bicycle-sharing marketplace where shops and local owners can make bikes available to other riders. Alongside it, Wander publishes province-wide cycling guides so riders can understand a destination before finding a bike there.",
   },
   {
     question: "Is the sharing platform available everywhere now?",
     answer:
-      "Not yet. Wander currently operates locally from Steveston and serves Richmond-area riders. The broader bike-sharing network is the company’s long-term direction, not a claim about current coverage.",
+      "Not yet. Rentals and marketplace exchanges currently operate locally from Steveston and serve Richmond-area riders. The 160 British Columbia cycling guides are available province-wide as planning resources, but they do not represent rental coverage in every city.",
+  },
+  {
+    question: "What are the British Columbia cycling guides?",
+    answer:
+      "They are 160 destination pages covering cities, towns, villages, districts, and other B.C. communities. Each guide includes ride ideas, planning notes, a research-depth label, and links to the official sources used.",
   },
 ] as const;
 
@@ -80,7 +86,7 @@ const aboutSchema = {
       name: pageTitle,
       description: pageDescription,
       datePublished: "2026-08-02",
-      dateModified: "2026-08-04",
+      dateModified: "2026-08-09",
       mainEntity: { "@id": "https://www.wanderbike.ca/#business" },
       isPartOf: {
         "@type": "WebSite",
@@ -147,6 +153,13 @@ const services = [
     href: "/about-marketplace",
     linkLabel: "About the marketplace",
   },
+  {
+    icon: BookOpen,
+    title: "B.C. cycling guides",
+    text: "Plan rides across 160 British Columbia destinations with terrain notes, local ideas, research labels, and official source links.",
+    href: "/guides",
+    linkLabel: "Explore all B.C. guides",
+  },
 ] as const;
 
 export default function AboutPage() {
@@ -176,14 +189,14 @@ export default function AboutPage() {
               Opened in Steveston · April 2026
             </p>
             <h1 className="mt-5 text-[2.75rem] font-extrabold leading-[0.98] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
-              A local bike shop with a bigger sharing mission.
+              A local bike shop with a bigger riding mission.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-xl sm:leading-8">
               Based in Steveston, Wander Bike Rentals is one of Richmond&apos;s
               largest and most dependable used bike rental and sales shops. We
-              are building toward a simple idea: wherever people go, a useful
-              bike should be easier to find locally—without bringing their own
-              bike everywhere.
+              We pair a real local shop and community marketplace with 160 B.C.
+              cycling guides, building toward a simple idea: understand the
+              ride, then find a useful bike near the destination.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
@@ -199,17 +212,21 @@ export default function AboutPage() {
                 Find a Bike
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
+              <Link href="/guides" className="btn-outline-light w-full px-6 sm:w-auto">
+                Explore B.C. Guides
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
       <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-7 sm:grid-cols-3 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-7 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
           {[
             [Store, "A real local shop", "12071 First Ave #101, Steveston"],
             [CalendarDays, "Open every day", "9:00 AM–10:00 PM"],
             [UsersRound, "Local first", "Serving Richmond-area riders today"],
+            [BookOpen, "160 B.C. guides", "Ride planning across 27 regions"],
           ].map(([Icon, title, text]) => (
             <div key={title as string} className="flex items-start gap-3 sm:px-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--teal-soft)] text-[var(--teal)]">
@@ -272,6 +289,12 @@ export default function AboutPage() {
                 separately listed by local owners. Keeping those collections
                 clear is part of building trust as the platform grows.
               </p>
+              <p>
+                The same question—what does someone need for a good local
+                ride?—led to our B.C. guide library. The guides expand Wander&apos;s
+                planning help across the province while rentals and marketplace
+                exchanges remain clearly local.
+              </p>
             </div>
           </div>
         </div>
@@ -283,9 +306,9 @@ export default function AboutPage() {
             What Wander does today
           </p>
           <h2 className="display-heading mx-auto mt-3 max-w-3xl text-center text-4xl sm:text-5xl">
-            Shop services and a local bike marketplace
+            Shop services, a local marketplace, and B.C. ride guides
           </h2>
-          <div className="mt-9 grid gap-5 lg:grid-cols-3">
+          <div className="mt-9 grid gap-5 md:grid-cols-2">
             {services.map((service) => (
               <article
                 key={service.title}
@@ -378,7 +401,8 @@ export default function AboutPage() {
               <p className="mt-4 leading-7 text-slate-300">
                 Wander currently serves Richmond-area riders through one
                 physical shop, Wander-managed rentals, and Community Bikes
-                listed by local owners. Pickup and payment are arranged locally.
+                listed by local owners. Pickup and payment are arranged locally,
+                while 160 B.C. guides help anyone plan a ride across the province.
               </p>
             </article>
             <article className="rounded-[1.75rem] border border-teal-300/30 bg-teal-300/[0.08] p-6 sm:p-8">
@@ -415,6 +439,7 @@ export default function AboutPage() {
               ["Current service area", "Steveston and the Richmond, BC area"],
               ["Shop services", "Bike rentals, local bike sales, and quick bike repair"],
               ["Online platform", "Separate Wander Bikes and Community Bikes collections for local rental or sale requests"],
+              ["Guide library", "160 published cycling guides across 27 British Columbia regions"],
               ["Long-term mission", "Make shared bicycles easier to find near a rider’s destination"],
             ].map(([term, detail]) => (
               <div key={term} className="grid gap-1 p-5 sm:grid-cols-[12rem_1fr] sm:gap-5 sm:p-6">
@@ -463,8 +488,8 @@ export default function AboutPage() {
                 Visit Wander Bike in Steveston.
               </h2>
               <p className="mt-3 max-w-2xl leading-7 text-teal-50">
-                Rent a bike, ask about a quick repair, or explore the local
-                marketplace we are building from here.
+                Rent a bike, ask about a quick repair, explore the local
+                marketplace, or plan your next B.C. ride.
               </p>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-0">
@@ -479,6 +504,9 @@ export default function AboutPage() {
               <Link href="/about-marketplace" className="btn-secondary w-full px-6 sm:w-auto">
                 Explore the platform
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link href="/guides" className="btn-secondary w-full px-6 sm:w-auto">
+                Browse B.C. guides
               </Link>
             </div>
           </div>

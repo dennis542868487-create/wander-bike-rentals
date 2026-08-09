@@ -124,7 +124,7 @@ export function SiteFooter() {
                 className="hover:text-teal-300"
                 href="/guides"
               >
-                Metro Vancouver Cycling Guides
+                British Columbia Cycling Guides
               </Link>
             </li>
             <li>

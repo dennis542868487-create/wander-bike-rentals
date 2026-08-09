@@ -6,9 +6,10 @@ import { GuideCopy } from "@/components/guides/guide-copy";
 import { NearestTrailButton } from "@/components/guides/nearest-trail-button";
 import {
   GUIDE_RESEARCH_DATE,
-  getMetroGuideBySlug,
-  getMetroGuides,
+  getGuideBySlug,
+  getGuides,
   type GuideBlock,
+  type GuideResearchDepth,
 } from "@/lib/guides/master-guide-data";
 
 type GuidePageProps = {
@@ -39,14 +40,14 @@ const richmondLocalPages = [
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getMetroGuides().map((guide) => ({ slug: guide.slug }));
+  return getGuides().map((guide) => ({ slug: guide.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: GuidePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const guide = getMetroGuideBySlug(slug);
+  const guide = getGuideBySlug(slug);
 
   if (!guide) notFound();
 
@@ -65,10 +66,11 @@ export async function generateMetadata({
   };
 }
 
-function researchDepthLabel(depth: "A+" | "A" | "B") {
+function researchDepthLabel(depth: GuideResearchDepth) {
   if (depth === "A+") return "Deep destination-specific research";
   if (depth === "A") return "Strong destination-specific research";
-  return "Good regional and local research";
+  if (depth === "B") return "Good regional and local research";
+  return "Regional research basis; verify routes locally";
 }
 
 function findRideSectionId(blocks: GuideBlock[]) {
@@ -107,20 +109,30 @@ function GuideTableOfContents({
   );
 }
 
-export default async function MetroGuidePage({ params }: GuidePageProps) {
+export default async function CyclingGuidePage({ params }: GuidePageProps) {
   const { slug } = await params;
-  const guide = getMetroGuideBySlug(slug);
+  const guide = getGuideBySlug(slug);
   if (!guide) notFound();
 
-  const guides = getMetroGuides();
+  const guides = getGuides();
   const toc = guide.blocks.filter(
     (block) => block.type === "heading" && block.level === 2,
   );
   const rideSectionId = findRideSectionId(guide.blocks);
-  const currentIndex = guides.findIndex((item) => item.slug === guide.slug);
-  const relatedGuides = Array.from({ length: 4 }, (_, offset) =>
-    guides[(currentIndex + offset + 1) % guides.length],
+  const regionalGuides = guides.filter((item) => item.region === guide.region);
+  const currentRegionIndex = regionalGuides.findIndex(
+    (item) => item.slug === guide.slug,
   );
+  const rotatedRegionalGuides = [
+    ...regionalGuides.slice(currentRegionIndex + 1),
+    ...regionalGuides.slice(0, currentRegionIndex),
+  ];
+  const relatedGuides = [
+    ...rotatedRegionalGuides,
+    ...guides.filter((item) => item.region !== guide.region),
+  ].slice(0, 4);
+  const relatedRegionLabel =
+    regionalGuides.length > 1 ? guide.region : "British Columbia";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -156,7 +168,7 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
                 className="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-900"
               >
                 <span aria-hidden="true">←</span>
-                All Metro Vancouver guides
+                All British Columbia guides
               </Link>
               <h1 className="mt-7 max-w-4xl text-[2.55rem] font-bold leading-[1.02] tracking-[-0.055em] sm:text-6xl lg:text-7xl lg:leading-[1.02] lg:tracking-[-0.06em]">
                 {guide.title}
@@ -316,7 +328,7 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center lg:py-16">
           <div>
             <h2 className="text-3xl font-bold tracking-[-0.04em] sm:text-4xl">
-              Keep exploring Metro Vancouver
+              Keep exploring {relatedRegionLabel}
             </h2>
             <p className="mt-4 max-w-xl leading-7 text-slate-300">
               Compare terrain, route character and planning notes before you
@@ -324,7 +336,7 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
             </p>
           </div>
           <nav
-            aria-label="More Metro Vancouver cycling guides"
+            aria-label={`More ${relatedRegionLabel} cycling guides`}
             className="grid gap-x-8 md:grid-cols-2"
           >
             {relatedGuides.map((item) => (

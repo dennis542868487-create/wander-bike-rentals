@@ -41,7 +41,7 @@ const serviceLinks: NavLink[] = [
 
 const guideHomeLink: NavLink = {
   href: "/guides",
-  label: "All Metro Vancouver Guides",
+  label: "All 160 B.C. Guides",
 };
 
 const practicalGuideLinks: NavLink[] = [
@@ -57,69 +57,48 @@ const guideGroups: { label: string; links: NavLink[] }[] = [
     links: [
       { href: "/guides/richmond-bc-cycling-guide", label: "Richmond" },
       { href: "/guides/vancouver-bc-cycling-guide", label: "Vancouver" },
-      { href: "/guides/burnaby-bc-cycling-guide", label: "Burnaby" },
-      { href: "/guides/surrey-bc-cycling-guide", label: "Surrey" },
-      { href: "/guides/delta-bc-cycling-guide", label: "Delta" },
-      {
-        href: "/guides/new-westminster-bc-cycling-guide",
-        label: "New Westminster",
-      },
-      { href: "/guides/white-rock-bc-cycling-guide", label: "White Rock" },
     ],
   },
   {
-    label: "Urban routes",
+    label: "Across B.C.",
     links: [
-      { href: "/guides/coquitlam-bc-cycling-guide", label: "Coquitlam" },
-      { href: "/guides/port-moody-bc-cycling-guide", label: "Port Moody" },
+      { href: "/guides/victoria-bc-cycling-guide", label: "Victoria" },
+      { href: "/guides/kelowna-bc-cycling-guide", label: "Kelowna" },
+      { href: "/guides/whistler-bc-cycling-guide", label: "Whistler" },
+      { href: "/guides/tofino-bc-cycling-guide", label: "Tofino" },
+      { href: "/guides/kamloops-bc-cycling-guide", label: "Kamloops" },
       {
-        href: "/guides/port-coquitlam-bc-cycling-guide",
-        label: "Port Coquitlam",
-      },
-      {
-        href: "/guides/pitt-meadows-bc-cycling-guide",
-        label: "Pitt Meadows",
-      },
-      {
-        href: "/guides/maple-ridge-bc-cycling-guide",
-        label: "Maple Ridge",
+        href: "/guides/prince-george-bc-cycling-guide",
+        label: "Prince George",
       },
     ],
   },
   {
-    label: "North Shore & inlets",
+    label: "Browse by region",
     links: [
       {
-        href: "/guides/north-vancouver-city-bc-cycling-guide",
-        label: "City of North Vancouver",
+        href: "/guides#region-metro-vancouver",
+        label: "Metro Vancouver",
       },
       {
-        href: "/guides/north-vancouver-district-bc-cycling-guide",
-        label: "District of North Vancouver",
+        href: "/guides#region-capital",
+        label: "Capital Region",
       },
       {
-        href: "/guides/west-vancouver-bc-cycling-guide",
-        label: "West Vancouver",
-      },
-      { href: "/guides/anmore-bc-cycling-guide", label: "Anmore" },
-      { href: "/guides/belcarra-bc-cycling-guide", label: "Belcarra" },
-      { href: "/guides/lions-bay-bc-cycling-guide", label: "Lions Bay" },
-      {
-        href: "/guides/bowen-island-bc-cycling-guide",
-        label: "Bowen Island",
-      },
-    ],
-  },
-  {
-    label: "River & valley",
-    links: [
-      {
-        href: "/guides/langley-city-bc-cycling-guide",
-        label: "City of Langley",
+        href: "/guides#region-thompson-nicola",
+        label: "Thompson-Nicola",
       },
       {
-        href: "/guides/langley-township-bc-cycling-guide",
-        label: "Township of Langley",
+        href: "/guides#region-central-kootenay",
+        label: "Central Kootenay",
+      },
+      {
+        href: "/guides#region-bulkley-nechako",
+        label: "Bulkley-Nechako",
+      },
+      {
+        href: "/guides#region-east-kootenay",
+        label: "East Kootenay",
       },
     ],
   },
@@ -247,7 +226,7 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
       </button>
       <div
         className={[
-          "absolute left-1/2 top-full z-50 w-[min(62rem,calc(100vw-2rem))] -translate-x-1/2 pt-3 transition duration-200",
+          "absolute left-1/2 top-full z-50 w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2 pt-3 transition duration-200",
           open
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0",
@@ -257,10 +236,10 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
           <div className="mb-5 flex items-center justify-between gap-6 border-b border-teal-500 pb-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
-                Metro Vancouver
+                British Columbia
               </p>
               <p className="mt-1 text-sm text-slate-500">
-                Choose a city to open its cycling guide.
+                Search 160 city and community cycling guides across B.C.
               </p>
             </div>
             <Link
@@ -272,7 +251,7 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
               <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <div className="grid gap-x-8 gap-y-7 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-x-8 gap-y-7 md:grid-cols-3">
             {guideGroups.map((group) => (
               <section key={group.label}>
                 <p className="border-b border-slate-200 pb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">

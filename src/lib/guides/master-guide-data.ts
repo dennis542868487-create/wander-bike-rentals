@@ -5,7 +5,7 @@ import path from "node:path";
 
 export const GUIDE_RESEARCH_DATE = "8 August 2026";
 
-export type GuideResearchDepth = "A+" | "A" | "B";
+export type GuideResearchDepth = "A+" | "A" | "B" | "C";
 
 export type GuideSource = {
   id: string;
@@ -31,10 +31,10 @@ export type GuideBlock =
       items: string[];
     };
 
-export type MetroGuide = {
+export type CyclingGuide = {
   name: string;
   classification: string;
-  region: "Metro Vancouver";
+  region: string;
   depth: GuideResearchDepth;
   url: string;
   slug: string;
@@ -240,30 +240,35 @@ function parseMarkdownBody(section: string) {
   };
 }
 
-function parseMetroIndex() {
+function parseGuideIndex() {
   const indexStart = masterGuide.indexOf("## Master destination index");
   const indexEnd = masterGuide.indexOf(
     "# Richmond Cycling Guide Hub — Flagship publish-ready copy",
   );
   const index = masterGuide.slice(indexStart, indexEnd);
   const rowPattern =
-    /^\| (.+?) \| (.+?) \| Metro Vancouver \| (A\+|A|B) \| `(.+?)` \|$/gm;
+    /^\| (.+?) \| (.+?) \| (.+?) \| (A\+|A|B|C|HOLD) \| `(.+?)` \|$/gm;
 
-  return [...index.matchAll(rowPattern)].map((match) => ({
-    name: match[1].trim(),
-    classification: match[2].trim(),
-    region: "Metro Vancouver" as const,
-    depth: match[3] as GuideResearchDepth,
-    url: match[4].trim(),
-    slug: match[4].trim().split("/").filter(Boolean).at(-1) ?? "",
-  }));
+  return [...index.matchAll(rowPattern)]
+    .map((match) => ({
+      name: match[1].trim(),
+      classification: match[2].trim(),
+      region: match[3].trim(),
+      depth: match[4].trim(),
+      url: match[5].trim(),
+      slug: match[5].trim().split("/").filter(Boolean).at(-1) ?? "",
+    }))
+    .filter(
+      (entry): entry is typeof entry & { depth: GuideResearchDepth } =>
+        entry.depth !== "HOLD",
+    );
 }
 
-const metroGuideIndex = parseMetroIndex();
+const guideIndex = parseGuideIndex();
 
 // Each destination targets a distinct local search intent instead of repeating
 // the same generic "best rides and trails" title across the whole directory.
-const metroGuideSeoTitles: Record<string, string> = {
+const curatedGuideSeoTitles: Record<string, string> = {
   Anmore: "Cycling in Anmore, BC: Hilly Road Routes | Wander Bike",
   Belcarra: "Cycling in Belcarra, BC: Scenic Road Rides | Wander Bike",
   "Bowen Island":
@@ -300,7 +305,7 @@ const metroGuideSeoTitles: Record<string, string> = {
     "White Rock Cycling Guide: Waterfront & Hills | Wander Bike",
 };
 
-const metroGuides = metroGuideIndex.map<MetroGuide>((entry) => {
+const guides = guideIndex.map<CyclingGuide>((entry) => {
   const section =
     entry.name === "Richmond"
       ? extractRichmondFlagship()
@@ -315,7 +320,7 @@ const metroGuides = metroGuideIndex.map<MetroGuide>((entry) => {
     ...entry,
     title: body.title,
     seoTitle:
-      metroGuideSeoTitles[entry.name] ||
+      curatedGuideSeoTitles[entry.name] ||
       extractField(section, "SEO title") ||
       `${body.title} | Wander Bike`,
     description: extractField(section, "Meta description"),
@@ -326,14 +331,14 @@ const metroGuides = metroGuideIndex.map<MetroGuide>((entry) => {
   };
 });
 
-export function getMetroGuides() {
-  return metroGuides;
+export function getGuides() {
+  return guides;
 }
 
-export function getMetroGuideBySlug(slug: string) {
-  return metroGuides.find((guide) => guide.slug === slug);
+export function getGuideBySlug(slug: string) {
+  return guides.find((guide) => guide.slug === slug);
 }
 
-export function getMetroGuideSlugs() {
-  return metroGuides.map((guide) => guide.slug);
+export function getGuideSlugs() {
+  return guides.map((guide) => guide.slug);
 }

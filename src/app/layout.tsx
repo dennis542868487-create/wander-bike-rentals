@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | Wander Bike Rentals",
   },
   description:
-    "Physical bike rentals, local bike sales, and quick repair in Steveston, Richmond, plus a separate Community Bike marketplace.",
+    "Bike rentals, local sales, and quick repair in Steveston, a Community Bike marketplace, and 160 cycling guides across British Columbia.",
   alternates: { canonical: "/" },
   icons: {
     icon: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Wander Bike Rentals | Steveston, Richmond",
     description:
-      "Rent or buy from the Wander shop, get quick repair help, or browse Community Bikes listed separately by local owners.",
+      "Rent or buy from the Wander shop, browse Community Bikes, or plan a ride with 160 British Columbia cycling guides.",
     url: "https://www.wanderbike.ca",
     siteName: "Wander Bike Rentals",
     locale: "en_CA",

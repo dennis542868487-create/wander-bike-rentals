@@ -11,3 +11,15 @@ export function buildNearestTrailDirectionsUrl(
   url.searchParams.set("dir_action", "navigate");
   return url.toString();
 }
+
+export function buildNearestTrailSearchUrl(cityName?: string) {
+  const url = new URL("https://www.google.com/maps/search/");
+  url.searchParams.set("api", "1");
+  url.searchParams.set(
+    "query",
+    cityName
+      ? `bike trails near ${cityName}, British Columbia`
+      : "bike trails near me",
+  );
+  return url.toString();
+}

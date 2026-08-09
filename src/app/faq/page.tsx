@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Bike Rental & Marketplace FAQ",
+  title: "Bike Rental, Marketplace & B.C. Cycling Guide FAQ",
   description:
-    "Answers about the Wander Bike Rentals shop in Steveston, individual rental prices, repairs, Community Bikes, local pickup, and offline payment.",
+    "Answers about Wander Bike Rentals in Steveston, Community Bikes, local pickup, offline payment, and 160 British Columbia cycling guides.",
   alternates: { canonical: "/faq" },
 };
 
@@ -87,7 +87,30 @@ const marketplaceFaqs = [
   ],
 ] as const;
 
-const faqs = [...shopFaqs, ...marketplaceFaqs];
+const guideFaqs = [
+  [
+    "How many British Columbia cycling guides does Wander publish?",
+    "Wander publishes 160 cycling guides covering cities, towns, villages, districts, and other local-government destinations across 27 British Columbia regions.",
+  ],
+  [
+    "Does a city guide mean Wander rents bikes in that city?",
+    "No. The guide library is a province-wide ride-planning resource. Wander-managed rentals and the Community Bike marketplace currently operate locally in Richmond and Steveston unless a listing says otherwise.",
+  ],
+  [
+    "How current are the cycling guides?",
+    "The province-wide research pass was completed on August 8, 2026. Every destination page links to the official sources used, but closures, construction, wildfire conditions, ferry service, and trail rules can change. Check current notices before each ride.",
+  ],
+  [
+    "What do the A+, A, B, and C research labels mean?",
+    "A+ and A guides have the strongest destination-specific research. B guides have good regional and local support. C guides use a regional research basis and need extra local verification before relying on an exact route.",
+  ],
+  [
+    "How does Navigate to Nearest Trail work?",
+    "Choose Nearest Trail in the mobile action bar or on a city guide, allow location access, and Wander prepares bicycle directions to a nearby trail in Google Maps. If location is unavailable, you can use a Google Maps trail search instead.",
+  ],
+] as const;
+
+const faqs = [...shopFaqs, ...marketplaceFaqs, ...guideFaqs];
 
 const faqSchema = {
   "@context": "https://schema.org",
@@ -118,15 +141,15 @@ export default function FaqPage() {
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:min-h-[38rem] lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:px-8 lg:py-20">
           <div className="faq-hero-copy motion-rise">
             <div className="inline-flex rounded-full border border-white/80 bg-white/38 px-4 py-2 text-sm font-semibold text-teal-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(13,148,136,0.08)] backdrop-blur-xl">
-              Shop + marketplace questions
+              Shop + marketplace + guide questions
             </div>
             <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.03] tracking-[-0.045em] text-slate-950 sm:mt-7 sm:text-6xl">
               Quick answers before you call, visit, or send a request.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-700 sm:mt-6 sm:text-lg sm:leading-8">
               Start with the physical Wander shop, then check how individual
-              Wander Bikes, Community Bikes, local pickup, and offline payment
-              work on the new platform.
+              Wander Bikes, Community Bikes, local pickup, offline payment, and
+              the province-wide cycling guide library work.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="tel:+17789521389" className="btn-brand w-full px-7 py-3.5 text-sm sm:w-auto">
@@ -145,7 +168,7 @@ export default function FaqPage() {
               FAQ overview
             </p>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-              The shop is still here. The way you find a bike is broader.
+              One local shop, one marketplace, and a province-wide guide library.
             </h2>
             <div className="mt-5 space-y-3 text-sm leading-7 text-slate-600 sm:mt-7 sm:space-y-4 sm:text-base sm:leading-8">
               <p>
@@ -155,6 +178,11 @@ export default function FaqPage() {
               <p>
                 The marketplace adds a separate Community Bikes collection
                 where local owners can list a bike for rent, sale, or both.
+              </p>
+              <p>
+                The guide library now covers 160 B.C. destinations. It helps
+                plan a ride, but it does not mean Wander rents bikes in every
+                listed city.
               </p>
             </div>
             <div className="liquid-glass-note mt-5 rounded-2xl p-4 text-sm leading-7 text-teal-950 sm:mt-7 sm:p-5">
@@ -177,6 +205,12 @@ export default function FaqPage() {
             description:
               "Listings, reservation requests, pickup privacy, and offline transactions.",
             items: marketplaceFaqs,
+          },
+          {
+            title: "British Columbia cycling guides",
+            description:
+              "Province-wide coverage, research labels, current-condition checks, and nearest-trail navigation.",
+            items: guideFaqs,
           },
         ].map((group, index) => (
           <section key={group.title} className={index === 0 ? "" : "mt-14"}>
@@ -211,6 +245,9 @@ export default function FaqPage() {
           </Link>
           <Link href="/list-your-bike" className="btn-secondary">
             List Your Bike
+          </Link>
+          <Link href="/guides" className="btn-secondary">
+            Explore B.C. Guides
           </Link>
           <Link href="/location" className="btn-quiet">
             Wander location

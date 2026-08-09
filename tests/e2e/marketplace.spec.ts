@@ -11,7 +11,7 @@ test("home presents the two marketplace actions and no commerce checkout", async
     "content-security-policy":
       "base-uri 'self'; frame-ancestors 'none'; object-src 'none'",
     "permissions-policy":
-      "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+      "camera=(), microphone=(), geolocation=(self), browsing-topics=()",
     "referrer-policy": "strict-origin-when-cross-origin",
     "x-content-type-options": "nosniff",
     "x-frame-options": "DENY",

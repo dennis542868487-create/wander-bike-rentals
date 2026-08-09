@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import {
   GUIDE_RESEARCH_DATE,
   getMetroGuides,
@@ -74,7 +74,7 @@ function GuideDirectory({ guides }: { guides: MetroGuide[] }) {
   const byName = guideMap(guides);
 
   return (
-    <div className="grid gap-x-10 gap-y-12 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-x-10 gap-y-9 sm:gap-y-12 md:grid-cols-2 xl:grid-cols-4">
       {guideGroups.map((group) => (
         <section key={group.title}>
           <h3 className="border-b border-teal-500 pb-3 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
@@ -131,7 +131,7 @@ function HeroGuideIndex({ guides }: { guides: MetroGuide[] }) {
           <li key={name} className="border-b border-teal-100 last:border-b-0">
             <Link
               href={guide.url}
-              className="group grid min-h-14 grid-cols-[3rem_1fr] items-center gap-4 py-2 sm:min-h-16 sm:grid-cols-[4rem_1fr]"
+              className="group grid min-h-12 grid-cols-[3rem_1fr] items-center gap-4 py-2 sm:min-h-16 sm:grid-cols-[4rem_1fr]"
             >
               <span className="text-2xl font-semibold tracking-[-0.04em] text-teal-700 sm:text-3xl">
                 {String(index + 1).padStart(2, "0")}
@@ -154,9 +154,9 @@ export default function GuidesPage() {
   return (
     <main className="bg-white text-slate-950">
       <section className="border-b border-slate-200">
-        <div className="mx-auto grid max-w-7xl gap-14 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-14 lg:py-24">
           <div>
-            <h1 className="max-w-4xl text-5xl font-bold tracking-[-0.06em] text-slate-950 sm:text-6xl lg:text-7xl lg:leading-[1.02]">
+            <h1 className="max-w-4xl text-[2.55rem] font-bold leading-[1.03] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl lg:leading-[1.02] lg:tracking-[-0.06em]">
               Cycling guides for Richmond &amp; Metro Vancouver
             </h1>
             <div className="mt-7 h-1 w-16 bg-teal-600" />
@@ -193,7 +193,7 @@ export default function GuidesPage() {
               <p className="text-6xl font-light tracking-[-0.07em] text-teal-700">
                 21
               </p>
-              <h2 className="mt-3 max-w-xl text-4xl font-bold tracking-[-0.05em] sm:text-5xl">
+              <h2 className="mt-3 max-w-xl text-3xl font-bold tracking-[-0.05em] sm:text-5xl">
                 Metro Vancouver cycling guides
               </h2>
             </div>
@@ -211,6 +211,41 @@ export default function GuidesPage() {
           </div>
           <div className="mt-12 border-t border-slate-200 pt-10">
             <GuideDirectory guides={guides} />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-slate-950 text-white">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center lg:py-16">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
+              Ride essential guide
+            </p>
+            <h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-[-0.045em] sm:text-4xl">
+              Find a public washroom near you
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+              Use FindWashroom.com to locate covered washrooms by distance,
+              check practical details, and open directions when you need a stop
+              during a ride.
+            </p>
+            <Link
+              href="/guides/find-public-washroom-near-you"
+              className="editorial-button editorial-button-dark mt-7"
+            >
+              Read the washroom guide
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="border-y border-teal-400/60 py-6 lg:border-y-0 lg:border-l lg:py-4 lg:pl-12">
+            <MapPin className="h-7 w-7 text-teal-300" aria-hidden="true" />
+            <p className="mt-4 text-5xl font-semibold tracking-[-0.06em] text-white">
+              13
+            </p>
+            <p className="mt-2 max-w-xs text-sm leading-6 text-slate-300">
+              Canadian provinces and territories covered, with expansion into
+              the United States underway.
+            </p>
           </div>
         </div>
       </section>

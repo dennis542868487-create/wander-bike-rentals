@@ -71,12 +71,12 @@ function NumberedRideList({ items }: { items: string[] }) {
       {items.map((item, index) => (
         <li
           key={item}
-          className="grid gap-3 border-b border-teal-200 py-6 sm:grid-cols-[4rem_1fr] sm:gap-6"
+          className="grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-4 border-b border-teal-200 py-5 sm:grid-cols-[4rem_1fr] sm:gap-6 sm:py-6"
         >
-          <span className="text-4xl font-light tracking-[-0.06em] text-teal-700 sm:text-5xl">
+          <span className="text-3xl font-light tracking-[-0.06em] text-teal-700 sm:text-5xl">
             {String(index + 1).padStart(2, "0")}
           </span>
-          <p className="max-w-3xl text-base leading-7 text-slate-600">
+          <p className="max-w-3xl text-[0.98rem] leading-7 text-slate-600 sm:text-base">
             <InlineGuideText text={item} />
           </p>
         </li>
@@ -87,7 +87,7 @@ function NumberedRideList({ items }: { items: string[] }) {
 function StandardList({ ordered, items }: { ordered: boolean; items: string[] }) {
   const List = ordered ? "ol" : "ul";
   return (
-    <List className="mt-5 space-y-3 border-l border-teal-300 pl-5 text-base leading-7 text-slate-600">
+    <List className="mt-5 space-y-3 border-l border-teal-300 pl-4 text-[0.98rem] leading-7 text-slate-600 sm:pl-5 sm:text-base">
       {items.map((item, index) => (
         <li key={item} className="relative pl-5">
           <span
@@ -108,15 +108,15 @@ function RouteHeading({ heading }: { heading: string }) {
   if (!match) return null;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-[5rem_1fr_auto] sm:items-baseline sm:gap-7">
-      <span className="text-5xl font-light tracking-[-0.07em] text-teal-700 sm:text-6xl">
+    <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-start gap-x-4 gap-y-2 sm:grid-cols-[5rem_1fr_auto] sm:items-baseline sm:gap-7">
+      <span className="text-4xl font-light tracking-[-0.07em] text-teal-700 sm:text-6xl">
         {String(Number(match[1])).padStart(2, "0")}
       </span>
-      <h3 className="text-2xl font-bold tracking-[-0.035em] text-slate-950 sm:text-3xl">
+      <h3 className="text-xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-3xl">
         {match[2]}
       </h3>
       {match[3] ? (
-        <span className="text-xl font-semibold text-teal-700 sm:text-2xl">
+        <span className="col-start-2 text-base font-semibold text-teal-700 sm:col-start-auto sm:text-2xl">
           {match[3]}
         </span>
       ) : null}
@@ -148,11 +148,11 @@ export function GuideCopy({ blocks }: { blocks: GuideBlock[] }) {
             className={[
               "scroll-mt-32",
               isClosure
-                ? "my-12 border-y border-teal-300 bg-teal-50 px-5 py-8 sm:px-8"
+                ? "my-9 border-y border-teal-300 bg-teal-50 px-4 py-7 sm:my-12 sm:px-8 sm:py-8"
                 : isRoute
-                  ? "border-t border-teal-200 py-9 first:border-t-0"
+                  ? "border-t border-teal-200 py-8 first:border-t-0 sm:py-9"
                   : heading
-                    ? "py-9 first:pt-0"
+                    ? "py-8 first:pt-0 sm:py-9"
                     : "pb-5",
             ].join(" ")}
           >
@@ -160,11 +160,11 @@ export function GuideCopy({ blocks }: { blocks: GuideBlock[] }) {
               isRoute ? (
                 <RouteHeading heading={heading.text} />
               ) : heading.level === 2 ? (
-                <h2 className="max-w-4xl text-3xl font-bold tracking-[-0.045em] text-slate-950 sm:text-4xl">
+                <h2 className="max-w-4xl text-[1.7rem] font-bold leading-tight tracking-[-0.045em] text-slate-950 sm:text-4xl">
                   {heading.text}
                 </h2>
               ) : (
-                <h3 className="max-w-3xl text-2xl font-bold tracking-[-0.035em] text-slate-950 sm:text-3xl">
+                <h3 className="max-w-3xl text-xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-3xl">
                   {heading.text}
                 </h3>
               )
@@ -176,7 +176,7 @@ export function GuideCopy({ blocks }: { blocks: GuideBlock[] }) {
                   return (
                     <p
                       key={`${groupIndex}-p-${blockIndex}`}
-                      className="mt-5 max-w-4xl text-[1.02rem] leading-8 text-slate-600"
+                      className="mt-4 max-w-4xl text-base leading-7 text-slate-600 sm:mt-5 sm:text-[1.02rem] sm:leading-8"
                     >
                       <InlineGuideText text={block.text} />
                     </p>

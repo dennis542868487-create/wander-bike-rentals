@@ -138,6 +138,14 @@ export function SiteFooter() {
             <li>
               <Link
                 className="hover:text-teal-300"
+                href="/guides/find-public-washroom-near-you"
+              >
+                Find a Public Washroom
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:text-teal-300"
                 href="/guides/best-places-to-bike-in-steveston"
               >
                 Best Places to Bike in Steveston

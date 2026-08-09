@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import { notFound } from "next/navigation";
 import { GuideCopy } from "@/components/guides/guide-copy";
+import { NearestTrailButton } from "@/components/guides/nearest-trail-button";
 import {
   GUIDE_RESEARCH_DATE,
   getMetroGuideBySlug,
@@ -79,6 +80,33 @@ function findRideSectionId(blocks: GuideBlock[]) {
   return match?.type === "heading" ? match.id : undefined;
 }
 
+function GuideTableOfContents({
+  guideName,
+  toc,
+}: {
+  guideName: string;
+  toc: GuideBlock[];
+}) {
+  return (
+    <nav aria-label={`${guideName} guide sections`}>
+      <ul>
+        {toc.map((item) =>
+          item.type === "heading" ? (
+            <li key={item.id} className="border-b border-slate-200">
+              <a
+                href={`#${item.id}`}
+                className="block py-3 text-sm font-medium leading-5 text-slate-600 hover:text-teal-800"
+              >
+                {item.text}
+              </a>
+            </li>
+          ) : null,
+        )}
+      </ul>
+    </nav>
+  );
+}
+
 export default async function MetroGuidePage({ params }: GuidePageProps) {
   const { slug } = await params;
   const guide = getMetroGuideBySlug(slug);
@@ -121,7 +149,7 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
 
       <article>
         <header className="border-b border-slate-200">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.45fr_0.55fr] lg:items-center lg:py-24">
+          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 sm:py-20 lg:grid-cols-[1.45fr_0.55fr] lg:items-center lg:gap-12 lg:py-24">
             <div>
               <Link
                 href="/guides"
@@ -130,18 +158,18 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
                 <span aria-hidden="true">←</span>
                 All Metro Vancouver guides
               </Link>
-              <h1 className="mt-7 max-w-4xl text-5xl font-bold tracking-[-0.06em] sm:text-6xl lg:text-7xl lg:leading-[1.02]">
+              <h1 className="mt-7 max-w-4xl text-[2.55rem] font-bold leading-[1.02] tracking-[-0.055em] sm:text-6xl lg:text-7xl lg:leading-[1.02] lg:tracking-[-0.06em]">
                 {guide.title}
               </h1>
               <div className="mt-7 h-1 w-16 bg-teal-600" />
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
+              <p className="mt-7 max-w-3xl text-base leading-7 text-slate-600 sm:text-xl sm:leading-8">
                 {guide.lead}
               </p>
-              <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
+              <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">
                 {rideSectionId ? (
                   <a
                     href={`#${rideSectionId}`}
-                    className="inline-flex items-center gap-2 border-b border-teal-600 pb-1 text-sm font-bold text-slate-950 hover:text-teal-800"
+                    className="inline-flex min-h-10 items-center justify-between gap-2 border-b border-teal-600 pb-1 text-sm font-bold text-slate-950 hover:text-teal-800 sm:min-h-0 sm:justify-start"
                   >
                     Explore ride ideas
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -149,11 +177,12 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
                 ) : null}
                 <a
                   href="#official-sources"
-                  className="inline-flex items-center gap-2 border-b border-teal-600 pb-1 text-sm font-bold text-slate-950 hover:text-teal-800"
+                  className="inline-flex min-h-10 items-center justify-between gap-2 border-b border-teal-600 pb-1 text-sm font-bold text-slate-950 hover:text-teal-800 sm:min-h-0 sm:justify-start"
                 >
                   Official sources
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
+                <NearestTrailButton cityName={guide.name} />
               </div>
             </div>
 
@@ -184,30 +213,33 @@ export default async function MetroGuidePage({ params }: GuidePageProps) {
           </div>
         </header>
 
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16 lg:py-20">
-          <aside className="lg:sticky lg:top-32 lg:h-fit">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16 lg:py-20">
+          <details className="group border-y border-teal-300 lg:hidden">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-sm font-bold text-slate-950 marker:content-none">
+              <span>
+                On this page
+                <span className="ml-2 font-medium text-slate-500">
+                  {toc.length} sections
+                </span>
+              </span>
+              <ChevronDown
+                className="h-4 w-4 shrink-0 text-teal-700 transition group-open:rotate-180"
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="border-t border-teal-100 pb-3">
+              <GuideTableOfContents guideName={guide.name} toc={toc} />
+            </div>
+          </details>
+
+          <aside className="hidden lg:sticky lg:top-32 lg:block lg:h-fit">
             <p className="border-b border-teal-500 pb-3 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
               On this page
             </p>
-            <nav aria-label={`${guide.name} guide sections`}>
-              <ul>
-                {toc.map((item) =>
-                  item.type === "heading" ? (
-                    <li key={item.id} className="border-b border-slate-200">
-                      <a
-                        href={`#${item.id}`}
-                        className="block py-3 text-sm font-medium leading-5 text-slate-600 hover:text-teal-800"
-                      >
-                        {item.text}
-                      </a>
-                    </li>
-                  ) : null,
-                )}
-              </ul>
-            </nav>
+            <GuideTableOfContents guideName={guide.name} toc={toc} />
           </aside>
 
-          <div className="min-w-0 border-l border-teal-200 pl-5 sm:pl-8 lg:pl-12">
+          <div className="min-w-0 lg:border-l lg:border-teal-200 lg:pl-12">
             <GuideCopy blocks={guide.blocks} />
 
             <section

@@ -28,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/location",
     "/faq",
     "/guides",
+    "/guides/find-public-washroom-near-you",
     "/policies/marketplace",
     "/policies/privacy",
     "/policies/local-exchange",

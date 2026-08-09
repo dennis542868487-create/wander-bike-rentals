@@ -28,6 +28,8 @@ type NavLink = {
 };
 
 const serviceLinks: NavLink[] = [
+  { href: "/bike-rental-richmond", label: "Bike Rental in Richmond" },
+  { href: "/bike-rental-steveston", label: "Bike Rental in Steveston" },
   { href: "/about", label: "About Wander Bike" },
   { href: "/about-marketplace", label: "About Marketplace" },
   { href: "/pricing", label: "Pricing" },
@@ -41,6 +43,13 @@ const guideHomeLink: NavLink = {
   href: "/guides",
   label: "All Metro Vancouver Guides",
 };
+
+const practicalGuideLinks: NavLink[] = [
+  {
+    href: "/guides/find-public-washroom-near-you",
+    label: "Find a Public Washroom",
+  },
+];
 
 const guideGroups: { label: string; links: NavLink[] }[] = [
   {
@@ -292,6 +301,22 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
               </section>
             ))}
           </div>
+          <div className="mt-5 flex items-center justify-between gap-6 border-t border-slate-200 pt-4">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-teal-700">
+              Ride essentials
+            </p>
+            {practicalGuideLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-slate-950 hover:text-teal-800"
+              >
+                {link.label}
+                <span aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -333,6 +358,31 @@ function MobileGuideGroup({
             {guideHomeLink.label}
             <span aria-hidden="true">→</span>
           </Link>
+          <section className="mt-5">
+            <p className="px-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal-700">
+              Ride essentials
+            </p>
+            <div className="mt-1">
+              {practicalGuideLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={onNavigate}
+                  className={[
+                    "flex items-center justify-between border-b border-slate-100 px-2 py-3 text-sm",
+                    isActive(pathname, link.href)
+                      ? "font-bold text-teal-800"
+                      : "text-slate-700",
+                  ].join(" ")}
+                >
+                  {link.label}
+                  <span className="text-xs text-teal-600" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
           {guideGroups.map((group) => (
             <section key={group.label} className="mt-5">
               <p className="px-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-teal-700">

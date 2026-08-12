@@ -29,6 +29,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  outputFileTracingIncludes: {
+    "/*": [
+      "src/app/**/*.tsx",
+      "content/guides/**/*.md",
+    ],
+  },
   images: {
     remotePatterns: [
       {

@@ -5,6 +5,10 @@ import {
   websitePageDefinitions,
 } from "@/lib/website-cms/config";
 import { validateWebsiteContent } from "@/lib/website-cms/schemas";
+import {
+  primaryNavigation,
+  primarySiteNavigation,
+} from "@/lib/site-navigation";
 
 describe("website CMS", () => {
   it("keeps Website pages separate from Marketplace operations", () => {
@@ -15,6 +19,20 @@ describe("website CMS", () => {
     expect(labels).not.toContain("Listings");
     expect(labels).not.toContain("Requests");
     expect(labels).not.toContain("Inventory");
+  });
+
+  it("keeps the public Header top-level order in one shared source", () => {
+    expect(primarySiteNavigation.map((item) => item.label)).toEqual([
+      "Home",
+      "Our Services",
+      "Find a Bike",
+      "List Your Bike",
+      "Guides",
+      "Location",
+      "FAQ",
+    ]);
+    expect(primaryNavigation.findBike.workspace).toBe("marketplace");
+    expect(primaryNavigation.listBike.workspace).toBe("marketplace");
   });
 
   it("merges stored values over locked defaults and ignores unknown keys", () => {

@@ -1,13 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function refreshSupabaseSession(request: NextRequest) {
+export async function refreshSupabaseSession(
+  request: NextRequest,
+  requestHeaders?: Headers,
+) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !publishableKey) return NextResponse.next({ request });
+  if (!url || !publishableKey) {
+    return NextResponse.next({
+      request: requestHeaders ? { headers: requestHeaders } : request,
+    });
+  }
 
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next({
+    request: requestHeaders ? { headers: requestHeaders } : request,
+  });
   const supabase = createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
@@ -17,7 +26,9 @@ export async function refreshSupabaseSession(request: NextRequest) {
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
-        response = NextResponse.next({ request });
+        response = NextResponse.next({
+          request: requestHeaders ? { headers: requestHeaders } : request,
+        });
         for (const { name, value, options } of cookiesToSet) {
           response.cookies.set(name, value, options);
         }

@@ -4,6 +4,11 @@ import {
   getWebsitePageDefinition,
   websitePageDefinitions,
 } from "@/lib/website-cms/config";
+import {
+  websiteCmsNavigation,
+  websiteCmsOtherPages,
+  getGenericWebsitePageDefinition,
+} from "@/lib/website-cms/generic-pages";
 import { getWebsitePageForAdmin } from "@/lib/website-cms/server";
 import { isLocalWebsiteCmsDemo } from "@/lib/website-cms/demo";
 
@@ -20,7 +25,9 @@ export default async function WebsiteManagerPage({
 }) {
   const requestedSlug = (await searchParams).page ?? "home";
   const pageDefinition =
-    getWebsitePageDefinition(requestedSlug) ?? websitePageDefinitions[0];
+    getWebsitePageDefinition(requestedSlug) ??
+    getGenericWebsitePageDefinition(requestedSlug) ??
+    websitePageDefinitions[0];
   const document = await getWebsitePageForAdmin(pageDefinition.slug);
   if (!document) return null;
   const demoMode = await isLocalWebsiteCmsDemo();
@@ -29,13 +36,8 @@ export default async function WebsiteManagerPage({
     <WebsiteManager
       key={pageDefinition.slug}
       demoMode={demoMode}
-      pages={websitePageDefinitions.map((page) => ({
-        slug: page.slug,
-        label: page.label,
-        path: page.path,
-        description: page.description,
-        editable: page.editable,
-      }))}
+      navigation={websiteCmsNavigation}
+      otherPages={websiteCmsOtherPages}
       pageDefinition={pageDefinition}
       initialDocument={document}
     />

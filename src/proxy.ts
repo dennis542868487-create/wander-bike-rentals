@@ -24,7 +24,13 @@ export async function proxy(request: NextRequest) {
     });
     return response;
   }
-  return refreshSupabaseSession(request);
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-wander-pathname", request.nextUrl.pathname);
+  const preview = request.nextUrl.searchParams.get("websitePreview");
+  if (preview) requestHeaders.set("x-wander-website-preview", preview);
+
+  return refreshSupabaseSession(request, requestHeaders);
 }
 
 export const config = {

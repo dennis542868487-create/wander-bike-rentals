@@ -5,9 +5,11 @@ import {
   mergeWebsiteContent,
   type WebsiteContent,
 } from "@/lib/website-cms/config";
+import type { WebsitePageDefinition } from "@/lib/website-cms/definitions";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getCurrentAdmin } from "@/lib/supabase/auth";
 import { isLocalWebsiteCmsDemo } from "@/lib/website-cms/demo";
+import { getGenericWebsitePageDefinition } from "@/lib/website-cms/generic-pages";
 
 type WebsitePageRow = {
   slug: string;
@@ -18,6 +20,13 @@ type WebsitePageRow = {
   draft_updated_at: string | null;
   published_at: string | null;
 };
+
+type WebsiteDefinitionResolver = (
+  slug: string,
+) => WebsitePageDefinition | null;
+
+const coreDefinitionResolver: WebsiteDefinitionResolver =
+  getWebsitePageDefinition;
 
 export type WebsitePageDocument = {
   slug: string;
@@ -32,8 +41,18 @@ export type WebsitePageDocument = {
 
 let warnedAboutMissingCms = false;
 
-function fallbackDocument(slug: string): WebsitePageDocument | null {
-  const definition = getWebsitePageDefinition(slug);
+function resolveDefinition(
+  slug: string,
+  resolver?: WebsiteDefinitionResolver,
+) {
+  return (resolver ?? coreDefinitionResolver)(slug);
+}
+
+function fallbackDocument(
+  slug: string,
+  resolver?: WebsiteDefinitionResolver,
+): WebsitePageDocument | null {
+  const definition = resolveDefinition(slug, resolver);
   if (!definition) return null;
 
   return {
@@ -48,8 +67,11 @@ function fallbackDocument(slug: string): WebsitePageDocument | null {
   };
 }
 
-function mapRow(row: WebsitePageRow): WebsitePageDocument | null {
-  const definition = getWebsitePageDefinition(row.slug);
+function mapRow(
+  row: WebsitePageRow,
+  resolver?: WebsiteDefinitionResolver,
+): WebsitePageDocument | null {
+  const definition = resolveDefinition(row.slug, resolver);
   if (!definition) return null;
 
   return {
@@ -67,7 +89,10 @@ function mapRow(row: WebsitePageRow): WebsitePageDocument | null {
   };
 }
 
-async function queryWebsitePage(slug: string) {
+async function queryWebsitePage(
+  slug: string,
+  resolver?: WebsiteDefinitionResolver,
+) {
   try {
     const { data, error } = await getSupabaseAdmin()
       .from("website_pages")
@@ -78,7 +103,7 @@ async function queryWebsitePage(slug: string) {
       .maybeSingle<WebsitePageRow>();
 
     if (error) throw error;
-    return data ? mapRow(data) : fallbackDocument(slug);
+    return data ? mapRow(data, resolver) : fallbackDocument(slug, resolver);
   } catch (error) {
     if (!warnedAboutMissingCms && process.env.NODE_ENV !== "test") {
       warnedAboutMissingCms = true;
@@ -87,21 +112,30 @@ async function queryWebsitePage(slug: string) {
         error,
       );
     }
-    return fallbackDocument(slug);
+    return fallbackDocument(slug, resolver);
   }
 }
 
 export async function getWebsitePageForAdmin(slug: string) {
-  return queryWebsitePage(slug);
+  return queryWebsitePage(slug, (candidate) =>
+    getWebsitePageDefinition(candidate) ??
+    getGenericWebsitePageDefinition(candidate),
+  );
 }
 
 export async function getPublishedWebsiteContent(slug: string) {
-  const document = await queryWebsitePage(slug);
+  const document = await queryWebsitePage(slug, (candidate) =>
+    getWebsitePageDefinition(candidate) ??
+    getGenericWebsitePageDefinition(candidate),
+  );
   return document?.publishedContent ?? {};
 }
 
 export async function getDraftWebsiteContent(slug: string) {
-  const document = await queryWebsitePage(slug);
+  const document = await queryWebsitePage(slug, (candidate) =>
+    getWebsitePageDefinition(candidate) ??
+    getGenericWebsitePageDefinition(candidate),
+  );
   return document?.draftContent ?? {};
 }
 

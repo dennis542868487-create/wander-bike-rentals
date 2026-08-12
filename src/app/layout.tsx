@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import ChatbaseWidget from "@/components/chatbase-widget";
 import { EnglishValidationMessages } from "@/components/forms/english-validation";
 import { MobileActionBar } from "@/components/mobile-action-bar";
@@ -8,6 +9,9 @@ import { PublicOnly } from "@/components/public-only";
 import Reveal from "@/components/reveal";
 import SiteHeader from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { GenericContentRuntime } from "@/components/website-cms/generic-content-runtime";
+import { getGenericWebsitePageDefinitionByPath } from "@/lib/website-cms/generic-pages";
+import { getWebsitePageRenderState } from "@/lib/website-cms/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,9 +52,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get("x-wander-pathname") ?? "/";
+  const genericDefinition = getGenericWebsitePageDefinitionByPath(pathname);
+  const state = genericDefinition
+    ? await getWebsitePageRenderState(
+        genericDefinition.slug,
+        Promise.resolve({
+          websitePreview:
+            requestHeaders.get("x-wander-website-preview") ?? undefined,
+        }),
+      )
+    : null;
+
   return (
     <html
       lang="en"
@@ -64,7 +81,17 @@ export default function RootLayout({
           <PublicOnly>
             <SiteHeader />
           </PublicOnly>
-          {children}
+          {genericDefinition && state ? (
+            <GenericContentRuntime
+              initialContent={state.content}
+              renderBindings={genericDefinition.renderBindings ?? []}
+              previewMode={state.previewMode}
+            >
+              {children}
+            </GenericContentRuntime>
+          ) : (
+            children
+          )}
           <PublicOnly>
             <SiteFooter />
             <MobileActionBar />

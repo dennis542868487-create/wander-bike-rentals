@@ -1,5 +1,3 @@
-import "server-only";
-
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -48,7 +46,7 @@ export type CyclingGuide = {
 };
 
 const MASTER_GUIDE_PATH = path.join(
-  process.cwd(),
+  /* turbopackIgnore: true */ process.cwd(),
   "content/guides/wanderbike_bc_cycling_guides_master.md",
 );
 

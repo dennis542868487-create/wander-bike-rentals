@@ -2,12 +2,20 @@ export type WebsiteContent = Record<string, string>;
 
 export type WebsiteFieldKind = "text" | "textarea" | "link" | "image";
 
+export type WebsiteFieldRenderBinding = {
+  mode: "exact" | "ordered";
+  value?: string;
+  occurrence?: number;
+  sourceKey?: string;
+};
+
 export type WebsiteFieldDefinition = {
   key: string;
   label: string;
   kind: WebsiteFieldKind;
   maxLength: number;
   help?: string;
+  render?: WebsiteFieldRenderBinding;
 };
 
 export type WebsiteSectionDefinition = {
@@ -25,6 +33,8 @@ export type WebsitePageDefinition = {
   editable: boolean;
   sections: WebsiteSectionDefinition[];
   defaults: WebsiteContent;
+  source?: "component" | "generic-text";
+  renderBindings?: WebsiteFieldRenderBinding[];
 };
 
 export const textField = (
@@ -45,6 +55,21 @@ export const textareaField = (
   kind: "textarea",
   maxLength,
   help,
+});
+
+export const editableTextField = (
+  key: string,
+  label: string,
+  maxLength: number,
+  render: WebsiteFieldRenderBinding,
+  help?: string,
+): WebsiteFieldDefinition => ({
+  key,
+  label,
+  kind: "textarea",
+  maxLength,
+  help,
+  render,
 });
 
 export const linkField = (

@@ -4,6 +4,7 @@ import {
   mergeWebsiteContent,
   type WebsiteContent,
 } from "@/lib/website-cms/config";
+import type { WebsitePageDefinition } from "@/lib/website-cms/definitions";
 
 const contentRecordSchema = z.record(
   z.string().min(1).max(120),
@@ -44,8 +45,9 @@ export type WebsiteContentValidation =
 export function validateWebsiteContent(
   slug: string,
   rawContent: unknown,
+  suppliedDefinition?: WebsitePageDefinition | null,
 ): WebsiteContentValidation {
-  const definition = getWebsitePageDefinition(slug);
+  const definition = suppliedDefinition ?? getWebsitePageDefinition(slug);
   if (!definition || !definition.editable) {
     return { success: false, error: "This website page is not editable." };
   }

@@ -150,3 +150,57 @@ None.
 - P3: a future data pass could add more curated route summary cards while keeping the full public 80+ route layer intact.
 
 final result: passed
+
+## Website-manager navigation alignment — 12 August 2026
+
+- Source visual truth: `design/qa/website-manager-navigation-source-sidebar.png` and `design/qa/website-manager-navigation-source-header.png`.
+- Implementation evidence: `design/qa/website-manager-navigation-implementation-1366x768.png` and `design/qa/website-manager-guides-search-implementation-1366x768.png`.
+- Viewport: 1366 × 768 CSS px at 1× capture density. The two supplied source crops are 479 × 746 px and 1208 × 108 px and were used as focused-region references rather than scaled full-view mocks.
+- State: local Website manager, Home selected; first capture has Our Services expanded; second capture has `Burnaby` entered in the page search and the matching Guide visible.
+
+**Full-view comparison evidence**
+
+- The Website manager now presents the same seven top-level destinations, in the same order, as the public Header: Home, Our Services, Find a Bike, List Your Bike, Guides, Location and FAQ.
+- Find a Bike and List Your Bike are visibly labelled `Market` and route to the Marketplace workspace. They are represented in the Website navigation tree without being treated as editable Website content.
+- Pages absent from the public Header, such as How it works, are separated below `Other website pages` instead of being presented as top-level navigation.
+
+**Focused-region comparison evidence**
+
+- Our Services expands to the actual Header children, including Bike Rental in Richmond, Bike Rental in Steveston, About Wander Bike, About Marketplace, Pricing, Adult Bikes, Kids Bikes, Bike Trailers and Quick Repair.
+- Guides expands into curated Guide pages plus all 160 destination Guides grouped by region. The search state shows Burnaby resolving to one editable page without scrolling through the complete tree.
+- A destination Guide was opened in the editor; the right inspector exposed its 18 text fields and editing the Guide title updated the iframe preview immediately. The test value was restored before capture.
+
+**Required fidelity surfaces**
+
+- Fonts and typography: Geist remains consistent with the existing manager and public Header. Top-level labels, uppercase section labels, nested page labels and the Marketplace tag remain readable at the 1366 px desktop viewport.
+- Spacing and layout rhythm: 40 px navigation rows, 36 px nested rows, a compact search field, group indentation and persistent bottom collapse control retain the selected manager's density. The sidebar stays independently scrollable for the 160-page tree.
+- Colors and visual tokens: the existing white/cool-grey shell, cyan selected state, teal Marketplace tag and slate nested text are preserved.
+- Image quality and asset fidelity: this change introduces no new raster or generated assets. The Wander logo, public-page imagery and live iframe keep their existing source quality.
+- Copy and content: navigation labels are shared with the public Header source. All published Guide names come from the same Guide data used by the public directory; no duplicate hard-coded city list was introduced.
+- Icons and controls: the existing Lucide stroke family remains consistent. Groups use semantic buttons with `aria-expanded`; editable pages use links; Marketplace destinations use workspace links; search has an accessible label.
+- Responsiveness and accessibility: the page search, nested groups and editor navigation were exercised in the in-app browser. Keyboard-semantic controls are preserved, active state is announced through link state, and the fixed CMS shell prevents the long Guide tree from shifting the preview or inspector.
+
+**Comparison history**
+
+1. P1 — the CMS showed an obsolete flat list that disagreed with the Header information architecture. Fix: introduced a shared public-navigation source and rendered its exact top-level order in the CMS. Post-fix evidence: `design/qa/website-manager-navigation-implementation-1366x768.png`.
+2. P1 — the first nested implementation exposed only curated Guide examples. Fix: added all 160 destination Guides, grouped them by their real region and added page search. Post-fix evidence: `design/qa/website-manager-guides-search-implementation-1366x768.png`.
+3. P1 — generic Guide content initially appeared in the inspector but did not change the live iframe. Fix: added the locked generic-content runtime and immediate preview messaging. Post-fix browser evidence: editing `Cycling in Burnaby, BC` produced the exact temporary heading inside the iframe, then the test text was restored.
+
+**Primary interactions tested**
+
+- Expanded and collapsed Our Services and Guides.
+- Searched all Website pages for `Burnaby` and opened the result.
+- Confirmed all 160 destination Guide definitions exist in the Website page tree through unit coverage.
+- Edited and restored a Guide title while observing the live iframe.
+- Confirmed Find a Bike and List Your Bike route to Marketplace instead of opening Website-content inspectors.
+- Checked browser console after navigation and edit; there were no application errors. The local database mismatch continues to produce the known persistence warning and correctly uses local demo defaults.
+
+**Findings**
+
+- No remaining P0, P1 or P2 findings.
+
+**Follow-up polish**
+
+- P3: localized admin labels can be added later; this pass preserves the existing English product vocabulary and exactly matches the public Header labels.
+
+final result: passed

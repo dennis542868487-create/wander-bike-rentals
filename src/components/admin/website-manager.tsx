@@ -2,7 +2,11 @@
 
 import {
   ArrowLeft,
+  Bike,
+  BookOpen,
+  ChevronDown,
   CircleHelp,
+  ExternalLink,
   FileText,
   Globe2,
   Home,
@@ -14,6 +18,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Pencil,
+  Search,
   Send,
   Smartphone,
   Store,
@@ -38,14 +43,10 @@ import type {
   WebsiteSectionDefinition,
 } from "@/lib/website-cms/config";
 import type { WebsitePageDocument } from "@/lib/website-cms/server";
-
-type PageSummary = {
-  slug: string;
-  label: string;
-  path: string;
-  description: string;
-  editable: boolean;
-};
+import type {
+  CmsSiteNavigationItem,
+  SiteNavigationLink,
+} from "@/lib/site-navigation";
 
 type PreviewDevice = "desktop" | "mobile";
 type SaveState = "idle" | "saving" | "saved" | "publishing" | "error";
@@ -54,6 +55,10 @@ const AUTOSAVE_DELAY_MS = 700;
 
 const PAGE_ICONS: Record<string, typeof Home> = {
   home: Home,
+  services: Store,
+  "find-bike": Search,
+  "list-bike": Bike,
+  guides: BookOpen,
   about: FileText,
   pricing: FileText,
   "how-it-works": List,
@@ -203,12 +208,14 @@ function InspectorField({
 }
 
 export function WebsiteManager({
-  pages,
+  navigation,
+  otherPages,
   pageDefinition,
   initialDocument,
   demoMode = false,
 }: {
-  pages: PageSummary[];
+  navigation: CmsSiteNavigationItem[];
+  otherPages: SiteNavigationLink[];
   pageDefinition: WebsitePageDefinition;
   initialDocument: WebsitePageDocument;
   demoMode?: boolean;
@@ -229,6 +236,17 @@ export function WebsiteManager({
   const [previewReady, setPreviewReady] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [navigationQuery, setNavigationQuery] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
+    const activeGroup = navigation.find(
+      (item) =>
+        item.kind === "group" &&
+        item.sections.some((section) =>
+          section.links.some((link) => link.cmsSlug === pageDefinition.slug),
+        ),
+    );
+    return new Set(activeGroup ? [activeGroup.id] : []);
+  });
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const contentRef = useRef(initialDocument.draftContent);
   const savedContentRef = useRef(initialDocument.draftContent);
@@ -263,6 +281,20 @@ export function WebsiteManager({
       window.location.origin,
     );
   }, [content, visibleSection?.id]);
+
+  const sendPreviewSnapshot = useCallback(
+    (nextContent: typeof content) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        {
+          type: websiteCmsMessages.update,
+          content: nextContent,
+          selectedSection: visibleSection?.id ?? null,
+        },
+        window.location.origin,
+      );
+    },
+    [visibleSection?.id],
+  );
 
   useEffect(() => {
     contentRef.current = content;
@@ -398,7 +430,12 @@ export function WebsiteManager({
   }, [content, isDirty, persistDraft]);
 
   const updateField = (fieldKey: string, value: string) => {
-    setContent((current) => ({ ...current, [fieldKey]: value }));
+    setContent((current) => {
+      const next = { ...current, [fieldKey]: value };
+      contentRef.current = next;
+      sendPreviewSnapshot(next);
+      return next;
+    });
     setSaveState("idle");
     setMessage(null);
   };
@@ -488,6 +525,53 @@ export function WebsiteManager({
     setMobileSidebarOpen(false);
   };
 
+  const normalizedNavigationQuery = navigationQuery.trim().toLowerCase();
+  const filteredNavigation = useMemo(
+    () =>
+      navigation
+        .map((item) => {
+          if (!normalizedNavigationQuery) return item;
+          if (item.kind !== "group") {
+            return item.label.toLowerCase().includes(normalizedNavigationQuery)
+              ? item
+              : null;
+          }
+          const sections = item.sections
+            .map((section) => ({
+              ...section,
+              links: section.links.filter((link) =>
+                link.label.toLowerCase().includes(normalizedNavigationQuery),
+              ),
+            }))
+            .filter((section) => section.links.length > 0);
+          return sections.length > 0 ||
+            item.label.toLowerCase().includes(normalizedNavigationQuery)
+            ? { ...item, sections }
+            : null;
+        })
+        .filter((item): item is CmsSiteNavigationItem => Boolean(item)),
+    [navigation, normalizedNavigationQuery],
+  );
+
+  const filteredOtherPages = useMemo(
+    () =>
+      otherPages.filter(
+        (page) =>
+          !normalizedNavigationQuery ||
+          page.label.toLowerCase().includes(normalizedNavigationQuery),
+      ),
+    [normalizedNavigationQuery, otherPages],
+  );
+
+  const toggleNavigationGroup = (id: string) => {
+    setExpandedGroups((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const busy = saveState === "publishing";
   const statusLabel =
     saveState === "saving"
@@ -503,7 +587,7 @@ export function WebsiteManager({
       <aside
         className={[
           "z-40 shrink-0 border-r border-slate-200 bg-white transition-[width] duration-200",
-          sidebarCollapsed ? "w-[4.5rem]" : "w-[15rem]",
+          sidebarCollapsed ? "w-[4.5rem]" : "w-[17rem]",
           mobileSidebarOpen
             ? "fixed inset-y-0 left-0 block shadow-2xl md:relative"
             : "hidden md:block",
@@ -556,20 +640,152 @@ export function WebsiteManager({
           {!sidebarCollapsed ? (
             <div className="cms-sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-5">
               <p className="px-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-slate-500">
-                Pages
+                Site navigation
               </p>
+              <label className="relative mt-3 block px-1">
+                <span className="sr-only">Search website pages</span>
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  value={navigationQuery}
+                  onChange={(event) => setNavigationQuery(event.target.value)}
+                  placeholder="Search all pages"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-600 focus:bg-white focus:ring-2 focus:ring-cyan-600/10"
+                />
+              </label>
               <div className="mt-2 space-y-1">
-                {pages.map((page) => {
-                  const Icon = PAGE_ICONS[page.slug] ?? FileText;
-                  const active = page.slug === pageDefinition.slug;
+                {filteredNavigation.map((item) => {
+                  const Icon = PAGE_ICONS[item.id] ?? FileText;
+                  if (item.kind === "group") {
+                    const active = item.sections.some((section) =>
+                      section.links.some(
+                        (link) => link.cmsSlug === pageDefinition.slug,
+                      ),
+                    );
+                    const expanded =
+                      Boolean(normalizedNavigationQuery) ||
+                      expandedGroups.has(item.id);
+                    return (
+                      <div key={item.id}>
+                        <button
+                          type="button"
+                          aria-expanded={expanded}
+                          onClick={() => toggleNavigationGroup(item.id)}
+                          className={[
+                            "flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm transition",
+                            active
+                              ? "bg-cyan-50 font-bold text-cyan-800"
+                              : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+                          ].join(" ")}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                          <span className="min-w-0 flex-1 truncate">
+                            {item.label}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`}
+                            aria-hidden="true"
+                          />
+                        </button>
+                        {expanded ? (
+                          <div className="ml-5 border-l border-slate-200 pb-1 pl-2 pt-1">
+                            {item.sections.map((section, sectionIndex) => (
+                              <div
+                                key={`${item.id}-${section.label ?? sectionIndex}`}
+                                className={sectionIndex > 0 ? "mt-3" : ""}
+                              >
+                                {section.label ? (
+                                  <p className="px-2 pb-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-slate-400">
+                                    {section.label}
+                                  </p>
+                                ) : null}
+                                {section.links.map((link) => {
+                                  const childActive =
+                                    link.cmsSlug === pageDefinition.slug;
+                                  if (link.cmsSlug) {
+                                    return (
+                                      <Link
+                                        key={`${link.href}-${link.label}`}
+                                        href={`/admin/website?page=${encodeURIComponent(link.cmsSlug)}`}
+                                        prefetch={false}
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          void openPage(link.cmsSlug!);
+                                        }}
+                                        className={[
+                                          "flex min-h-9 items-center gap-2 rounded-md px-2 text-[0.8rem] transition",
+                                          childActive
+                                            ? "bg-cyan-50 font-bold text-cyan-800"
+                                            : "font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-950",
+                                        ].join(" ")}
+                                      >
+                                        <FileText
+                                          className="h-3.5 w-3.5 shrink-0"
+                                          aria-hidden="true"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate">
+                                          {link.label}
+                                        </span>
+                                      </Link>
+                                    );
+                                  }
+                                  return (
+                                    <a
+                                      key={`${link.href}-${link.label}`}
+                                      href={link.href}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="flex min-h-9 items-center gap-2 rounded-md px-2 text-[0.8rem] font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-950"
+                                    >
+                                      <ExternalLink
+                                        className="h-3.5 w-3.5 shrink-0"
+                                        aria-hidden="true"
+                                      />
+                                      <span className="min-w-0 flex-1 truncate">
+                                        {link.label}
+                                      </span>
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  }
+
+                  if (item.kind === "workspace") {
+                    return (
+                      <Link
+                        key={item.id}
+                        href="/admin"
+                        className="flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+                        title="Managed in the Marketplace workspace"
+                      >
+                        <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span className="min-w-0 flex-1 truncate">
+                          {item.label}
+                        </span>
+                        <span className="text-[0.58rem] font-bold uppercase tracking-wide text-teal-700">
+                          Market
+                        </span>
+                      </Link>
+                    );
+                  }
+
+                  const active = item.cmsSlug === pageDefinition.slug;
                   return (
                     <Link
-                      key={page.slug}
-                      href={`/admin/website?page=${encodeURIComponent(page.slug)}`}
+                      key={item.id}
+                      href={`/admin/website?page=${encodeURIComponent(item.cmsSlug)}`}
                       prefetch={false}
                       onClick={(event) => {
                         event.preventDefault();
-                        void openPage(page.slug);
+                        void openPage(item.cmsSlug);
                       }}
                       className={[
                         "flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm transition",
@@ -580,12 +796,45 @@ export function WebsiteManager({
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                       <span className="min-w-0 flex-1 truncate">
-                        {page.label}
+                        {item.label}
                       </span>
                     </Link>
                   );
                 })}
               </div>
+
+              {filteredOtherPages.length > 0 ? (
+                <>
+                  <p className="mb-2 mt-6 px-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-slate-500">
+                    Other website pages
+                  </p>
+                  <div className="space-y-1">
+                    {filteredOtherPages.map((page) => {
+                      const active = page.cmsSlug === pageDefinition.slug;
+                      return (
+                        <Link
+                          key={page.href}
+                          href={`/admin/website?page=${encodeURIComponent(page.cmsSlug ?? "home")}`}
+                          prefetch={false}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            void openPage(page.cmsSlug ?? "home");
+                          }}
+                          className={[
+                            "flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm transition",
+                            active
+                              ? "bg-cyan-50 font-bold text-cyan-800"
+                              : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+                          ].join(" ")}
+                        >
+                          <List className="h-4 w-4" aria-hidden="true" />
+                          {page.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : null}
 
               <p className="mb-2 mt-7 px-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-slate-500">
                 Sections

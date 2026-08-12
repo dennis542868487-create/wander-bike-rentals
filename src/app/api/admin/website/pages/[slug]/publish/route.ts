@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/http/security";
 import { getWebsitePageDefinition } from "@/lib/website-cms/config";
+import { getGenericWebsitePageDefinition } from "@/lib/website-cms/generic-pages";
 import { validateWebsiteContent } from "@/lib/website-cms/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/supabase/auth";
@@ -21,7 +22,8 @@ export async function POST(
     }
 
     const { slug } = await context.params;
-    const definition = getWebsitePageDefinition(slug);
+    const definition =
+      getWebsitePageDefinition(slug) ?? getGenericWebsitePageDefinition(slug);
     if (!definition || !definition.editable) {
       return NextResponse.json(
         { error: "This website page is not editable." },
@@ -37,7 +39,11 @@ export async function POST(
       .single();
     if (draftError || !draft) throw draftError ?? new Error("Draft not found.");
 
-    const validated = validateWebsiteContent(slug, draft.draft_content);
+    const validated = validateWebsiteContent(
+      slug,
+      draft.draft_content,
+      definition,
+    );
     if (!validated.success) {
       return NextResponse.json({ error: validated.error }, { status: 400 });
     }

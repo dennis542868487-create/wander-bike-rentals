@@ -21,92 +21,16 @@ import {
   PLATFORM_DASHBOARD_LABEL,
   WANDER_DASHBOARD_LABEL,
 } from "@/lib/marketplace/workspace-labels";
+import {
+  guideGroups,
+  guideHomeLink,
+  practicalGuideLinks,
+  primaryNavigation,
+  serviceLinks,
+  type SiteNavigationLink,
+} from "@/lib/site-navigation";
 
-type NavLink = {
-  href: string;
-  label: string;
-};
-
-const serviceLinks: NavLink[] = [
-  { href: "/bike-rental-richmond", label: "Bike Rental in Richmond" },
-  { href: "/bike-rental-steveston", label: "Bike Rental in Steveston" },
-  { href: "/about", label: "About Wander Bike" },
-  { href: "/about-marketplace", label: "About Marketplace" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/adult-bike-rental-richmond", label: "Adult Bikes" },
-  { href: "/kids-bike-rental-richmond", label: "Kids Bikes" },
-  { href: "/bike-trailer-rental-richmond", label: "Bike Trailers" },
-  { href: "/quick-bike-repair-richmond", label: "Quick Repair" },
-];
-
-const guideHomeLink: NavLink = {
-  href: "/guides",
-  label: "All 160 B.C. Guides",
-};
-
-const practicalGuideLinks: NavLink[] = [
-  {
-    href: "/guides/metro-vancouver-route-map",
-    label: "Metro Vancouver Route Map",
-  },
-  {
-    href: "/guides/find-public-washroom-near-you",
-    label: "Find a Public Washroom",
-  },
-];
-
-const guideGroups: { label: string; links: NavLink[] }[] = [
-  {
-    label: "Start local",
-    links: [
-      { href: "/guides/richmond-bc-cycling-guide", label: "Richmond" },
-      { href: "/guides/vancouver-bc-cycling-guide", label: "Vancouver" },
-    ],
-  },
-  {
-    label: "Across B.C.",
-    links: [
-      { href: "/guides/victoria-bc-cycling-guide", label: "Victoria" },
-      { href: "/guides/kelowna-bc-cycling-guide", label: "Kelowna" },
-      { href: "/guides/whistler-bc-cycling-guide", label: "Whistler" },
-      { href: "/guides/tofino-bc-cycling-guide", label: "Tofino" },
-      { href: "/guides/kamloops-bc-cycling-guide", label: "Kamloops" },
-      {
-        href: "/guides/prince-george-bc-cycling-guide",
-        label: "Prince George",
-      },
-    ],
-  },
-  {
-    label: "Browse by region",
-    links: [
-      {
-        href: "/guides#region-metro-vancouver",
-        label: "Metro Vancouver",
-      },
-      {
-        href: "/guides#region-capital",
-        label: "Capital Region",
-      },
-      {
-        href: "/guides#region-thompson-nicola",
-        label: "Thompson-Nicola",
-      },
-      {
-        href: "/guides#region-central-kootenay",
-        label: "Central Kootenay",
-      },
-      {
-        href: "/guides#region-bulkley-nechako",
-        label: "Bulkley-Nechako",
-      },
-      {
-        href: "/guides#region-east-kootenay",
-        label: "East Kootenay",
-      },
-    ],
-  },
-];
+type NavLink = SiteNavigationLink;
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -222,7 +146,7 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
         onClick={() => setOpen(true)}
         className={desktopLinkClass(guidesAreActive(pathname))}
       >
-        Guides
+        {primaryNavigation.guides.label}
         <ChevronDown
           className={`ml-1 h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`}
           aria-hidden="true"
@@ -480,38 +404,51 @@ export default function SiteHeader() {
             aria-label="Primary"
             className="hidden items-center gap-0.5 xl:flex 2xl:gap-1"
           >
-            <Link href="/" className={desktopLinkClass(isActive(pathname, "/"))}>
-              Home
+            <Link
+              href={primaryNavigation.home.href}
+              className={desktopLinkClass(
+                isActive(pathname, primaryNavigation.home.href),
+              )}
+            >
+              {primaryNavigation.home.label}
             </Link>
             <DesktopDropdown
-              label="Our Services"
+              label={primaryNavigation.services.label}
               links={serviceLinks}
               pathname={pathname}
             />
             <Link
-              href="/bikes"
-              className={desktopLinkClass(isActive(pathname, "/bikes"))}
+              href={primaryNavigation.findBike.href}
+              className={desktopLinkClass(
+                isActive(pathname, primaryNavigation.findBike.href),
+              )}
             >
-              Find a Bike
+              {primaryNavigation.findBike.label}
             </Link>
             <Link
-              href="/list-your-bike"
-              className={desktopLinkClass(isActive(pathname, "/list-your-bike"))}
+              href={primaryNavigation.listBike.href}
+              className={desktopLinkClass(
+                isActive(pathname, primaryNavigation.listBike.href),
+              )}
             >
-              List Your Bike
+              {primaryNavigation.listBike.label}
             </Link>
             <DesktopGuideDropdown pathname={pathname} />
             <Link
-              href="/location"
-              className={desktopLinkClass(isActive(pathname, "/location"))}
+              href={primaryNavigation.location.href}
+              className={desktopLinkClass(
+                isActive(pathname, primaryNavigation.location.href),
+              )}
             >
-              Location
+              {primaryNavigation.location.label}
             </Link>
             <Link
-              href="/faq"
-              className={desktopLinkClass(isActive(pathname, "/faq"))}
+              href={primaryNavigation.faq.href}
+              className={desktopLinkClass(
+                isActive(pathname, primaryNavigation.faq.href),
+              )}
             >
-              FAQ
+              {primaryNavigation.faq.label}
             </Link>
             <div className="group relative ml-2">
               <Link
@@ -605,10 +542,20 @@ export default function SiteHeader() {
           ].join(" ")}
         >
           <nav aria-label="Mobile primary" className="space-y-2 pb-2">
-            <Link href="/" className={mobileLinkClass(isActive(pathname, "/"))}>
-              Home
+            <Link
+              href={primaryNavigation.home.href}
+              className={mobileLinkClass(
+                isActive(pathname, primaryNavigation.home.href),
+              )}
+            >
+              {primaryNavigation.home.label}
             </Link>
-            {[{ label: "Our Services", links: serviceLinks }].map((group) => {
+            {[
+              {
+                label: primaryNavigation.services.label,
+                links: serviceLinks,
+              },
+            ].map((group) => {
               const expanded = openGroup === group.label;
               return (
                 <div
@@ -650,22 +597,32 @@ export default function SiteHeader() {
                 </div>
               );
             })}
+            {[
+              primaryNavigation.findBike,
+              primaryNavigation.listBike,
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={closeMenu}
+                className={mobileLinkClass(isActive(pathname, link.href))}
+              >
+                {link.label}
+              </Link>
+            ))}
             <MobileGuideGroup
-              expanded={openGroup === "Guides"}
+              expanded={openGroup === primaryNavigation.guides.label}
               pathname={pathname}
               onToggle={() =>
                 setOpenGroup((current) =>
-                  current === "Guides" ? null : "Guides",
+                  current === primaryNavigation.guides.label
+                    ? null
+                    : primaryNavigation.guides.label,
                 )
               }
               onNavigate={closeMenu}
             />
-            {[
-              { href: "/bikes", label: "Find a Bike" },
-              { href: "/list-your-bike", label: "List Your Bike" },
-              { href: "/location", label: "Location" },
-              { href: "/faq", label: "FAQ" },
-            ].map((link) => (
+            {[primaryNavigation.location, primaryNavigation.faq].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

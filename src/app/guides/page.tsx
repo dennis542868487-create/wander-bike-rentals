@@ -216,8 +216,28 @@ export default function GuidesPage() {
       </section>
 
       <section className="border-b border-white/10 bg-slate-950 text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-2 lg:py-16">
-          <div className="border-b border-white/15 pb-9 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-12">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-3 lg:py-16">
+          <div className="border-b border-white/15 pb-9 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
+            <Route className="h-7 w-7 text-teal-300" aria-hidden="true" />
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
+              Plan on the map
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-[-0.045em] sm:text-4xl">
+              Explore Metro Vancouver routes
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">
+              Browse an interactive route map, filter selected rides, and open
+              the matching city guide.
+            </p>
+            <Link
+              href="/guides/metro-vancouver-route-map"
+              className="editorial-button editorial-button-dark mt-7"
+            >
+              Open the route map
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="border-b border-white/15 pb-9 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
             <MapPin className="h-7 w-7 text-teal-300" aria-hidden="true" />
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
               Ride essential
@@ -237,7 +257,7 @@ export default function GuidesPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <div className="lg:pl-2">
+          <div>
             <Route className="h-7 w-7 text-teal-300" aria-hidden="true" />
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
               Use your location

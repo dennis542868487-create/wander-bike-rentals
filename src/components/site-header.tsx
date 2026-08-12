@@ -46,6 +46,10 @@ const guideHomeLink: NavLink = {
 
 const practicalGuideLinks: NavLink[] = [
   {
+    href: "/guides/metro-vancouver-route-map",
+    label: "Metro Vancouver Route Map",
+  },
+  {
     href: "/guides/find-public-washroom-near-you",
     label: "Find a Public Washroom",
   },
@@ -280,21 +284,23 @@ function DesktopGuideDropdown({ pathname }: { pathname: string }) {
               </section>
             ))}
           </div>
-          <div className="mt-5 flex items-center justify-between gap-6 border-t border-slate-200 pt-4">
+          <div className="mt-5 grid gap-3 border-t border-slate-200 pt-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-teal-700">
               Ride essentials
             </p>
-            {practicalGuideLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-slate-950 hover:text-teal-800"
-              >
-                {link.label}
-                <span aria-hidden="true">→</span>
-              </Link>
-            ))}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              {practicalGuideLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-slate-950 hover:text-teal-800"
+                >
+                  {link.label}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

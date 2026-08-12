@@ -130,6 +130,14 @@ export function SiteFooter() {
             <li>
               <Link
                 className="hover:text-teal-300"
+                href="/guides/metro-vancouver-route-map"
+              >
+                Metro Vancouver Route Map
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="hover:text-teal-300"
                 href="/guides/richmond-bc-cycling-guide"
               >
                 Cycling in Richmond, BC

@@ -56,6 +56,8 @@ export function WebsiteContentRuntime({
   useEffect(() => {
     if (!previewMode) return;
 
+    document.documentElement.dataset.websitePreview = "true";
+
     const receiveUpdate = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       const message = event.data as {
@@ -79,8 +81,12 @@ export function WebsiteContentRuntime({
       if (target?.closest("a, button, form")) event.preventDefault();
     };
     document.addEventListener("click", keepNavigationInPreview);
-    window.parent.postMessage({ type: CMS_READY_MESSAGE }, window.location.origin);
+    window.parent.postMessage(
+      { type: CMS_READY_MESSAGE },
+      window.location.origin,
+    );
     return () => {
+      delete document.documentElement.dataset.websitePreview;
       window.removeEventListener("message", receiveUpdate);
       document.removeEventListener("click", keepNavigationInPreview);
     };
@@ -101,7 +107,9 @@ export function WebsiteContentRuntime({
 function useContentRuntime() {
   const value = useContext(ContentRuntimeContext);
   if (!value) {
-    throw new Error("CMS content must be rendered inside WebsiteContentRuntime.");
+    throw new Error(
+      "CMS content must be rendered inside WebsiteContentRuntime.",
+    );
   }
   return value;
 }
@@ -112,8 +120,12 @@ function selectSection(
 ) {
   event.preventDefault();
   event.stopPropagation();
+  const target = event.target as HTMLElement | null;
+  const fieldKey = target
+    ?.closest<HTMLElement>("[data-cms-field]")
+    ?.getAttribute("data-cms-field");
   window.parent.postMessage(
-    { type: CMS_SELECT_MESSAGE, sectionId },
+    { type: CMS_SELECT_MESSAGE, sectionId, fieldKey: fieldKey || null },
     window.location.origin,
   );
 }
@@ -193,9 +205,16 @@ export function CmsText({
   fallback: string;
   className?: string;
 }) {
-  const { content } = useContentRuntime();
+  const { content, previewMode } = useContentRuntime();
   const Component = as;
-  return <Component className={className}>{content[field] ?? fallback}</Component>;
+  return (
+    <Component
+      className={className}
+      data-cms-field={previewMode ? field : undefined}
+    >
+      {content[field] ?? fallback}
+    </Component>
+  );
 }
 
 export function CmsLink({
@@ -219,15 +238,17 @@ export function CmsLink({
   rel?: string;
   showLabel?: boolean;
 }) {
-  const { content } = useContentRuntime();
+  const { content, previewMode } = useContentRuntime();
   return (
     <Link
       href={content[hrefField] ?? fallbackHref}
+      data-cms-field={previewMode ? labelField : undefined}
+      data-cms-link-field={previewMode ? hrefField : undefined}
       className={className}
       target={target}
       rel={rel}
     >
-      {showLabel ? content[labelField] ?? fallbackLabel : null}
+      {showLabel ? (content[labelField] ?? fallbackLabel) : null}
       {children}
     </Link>
   );
@@ -245,13 +266,14 @@ export function CmsImage({
   fallbackSrc: string;
   fallbackAlt: string;
 }) {
-  const { content } = useContentRuntime();
+  const { content, previewMode } = useContentRuntime();
   return (
     <Image
       {...props}
       unoptimized
       src={content[srcField] ?? fallbackSrc}
       alt={content[altField] ?? fallbackAlt}
+      data-cms-field={previewMode ? srcField : undefined}
     />
   );
 }

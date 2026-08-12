@@ -14,7 +14,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Pencil,
-  Save,
   Send,
   Smartphone,
   Store,
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -49,6 +49,8 @@ type PageSummary = {
 
 type PreviewDevice = "desktop" | "mobile";
 type SaveState = "idle" | "saving" | "saved" | "publishing" | "error";
+
+const AUTOSAVE_DELAY_MS = 700;
 
 const PAGE_ICONS: Record<string, typeof Home> = {
   home: Home,
@@ -211,6 +213,7 @@ export function WebsiteManager({
   initialDocument: WebsitePageDocument;
   demoMode?: boolean;
 }) {
+  const router = useRouter();
   const [content, setContent] = useState(initialDocument.draftContent);
   const [savedContent, setSavedContent] = useState(
     initialDocument.draftContent,
@@ -227,6 +230,11 @@ export function WebsiteManager({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const contentRef = useRef(initialDocument.draftContent);
+  const savedContentRef = useRef(initialDocument.draftContent);
+  const saveQueueRef = useRef<Promise<boolean>>(Promise.resolve(true));
+  const savingRequestsRef = useRef(0);
+  const publishingRef = useRef(false);
 
   const selectedSection = useMemo(
     () =>
@@ -257,9 +265,17 @@ export function WebsiteManager({
   }, [content, visibleSection?.id]);
 
   useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
+
+  useEffect(() => {
     const receivePreviewMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
-      const data = event.data as { type?: string; sectionId?: unknown };
+      const data = event.data as {
+        type?: string;
+        sectionId?: unknown;
+        fieldKey?: unknown;
+      };
       if (data.type === websiteCmsMessages.ready) {
         setPreviewReady(true);
         window.setTimeout(sendPreviewUpdate, 0);
@@ -273,17 +289,35 @@ export function WebsiteManager({
         );
         if (section) {
           setSelectedSectionId(section.id);
-          setSelectedFieldKey(null);
+          setSelectedFieldKey(
+            typeof data.fieldKey === "string" &&
+              section.fields.some((field) => field.key === data.fieldKey)
+              ? data.fieldKey
+              : null,
+          );
         }
       }
     };
     window.addEventListener("message", receivePreviewMessage);
     return () => window.removeEventListener("message", receivePreviewMessage);
-  }, [pageDefinition.sections, sendPreviewUpdate]);
+  }, [pageDefinition, sendPreviewUpdate]);
 
   useEffect(() => {
     if (previewReady) sendPreviewUpdate();
   }, [previewReady, sendPreviewUpdate]);
+
+  useEffect(() => {
+    if (!selectedFieldKey) return;
+    const frame = window.requestAnimationFrame(() => {
+      const selector = `[data-inspector-field="${CSS.escape(selectedFieldKey)}"]`;
+      const field = document.querySelector<HTMLElement>(selector);
+      field?.scrollIntoView({ block: "center", behavior: "auto" });
+      field
+        ?.querySelector<HTMLElement>("input, textarea, button")
+        ?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedFieldKey]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -294,58 +328,98 @@ export function WebsiteManager({
     return () => window.removeEventListener("beforeunload", warn);
   }, [isDirty]);
 
+  const persistDraft = useCallback(
+    (nextContent: typeof content) => {
+      const snapshot = { ...nextContent };
+      const snapshotJson = JSON.stringify(snapshot);
+      if (snapshotJson === JSON.stringify(savedContentRef.current)) {
+        return Promise.resolve(true);
+      }
+
+      const performSave = async () => {
+        savingRequestsRef.current += 1;
+        if (!publishingRef.current) setSaveState("saving");
+        setMessage(null);
+
+        if (demoMode) {
+          savedContentRef.current = snapshot;
+          setSavedContent(snapshot);
+          savingRequestsRef.current -= 1;
+          if (!publishingRef.current && savingRequestsRef.current === 0) {
+            setSaveState("saved");
+          }
+          return true;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/admin/website/pages/${pageDefinition.slug}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content: snapshot }),
+            },
+          );
+          const body = (await response.json()) as { error?: string };
+          if (!response.ok) {
+            throw new Error(body.error || "Could not save changes.");
+          }
+
+          savedContentRef.current = snapshot;
+          setSavedContent(snapshot);
+          savingRequestsRef.current -= 1;
+          if (!publishingRef.current && savingRequestsRef.current === 0) {
+            setSaveState("saved");
+          }
+          return true;
+        } catch (error) {
+          savingRequestsRef.current -= 1;
+          if (!publishingRef.current) setSaveState("error");
+          setMessage(
+            error instanceof Error ? error.message : "Could not save changes.",
+          );
+          return false;
+        }
+      };
+
+      const queuedSave = saveQueueRef.current.then(performSave, performSave);
+      saveQueueRef.current = queuedSave;
+      return queuedSave;
+    },
+    [demoMode, pageDefinition.slug],
+  );
+
+  useEffect(() => {
+    if (!isDirty || publishingRef.current) return;
+    const timer = window.setTimeout(() => {
+      void persistDraft(contentRef.current);
+    }, AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [content, isDirty, persistDraft]);
+
   const updateField = (fieldKey: string, value: string) => {
     setContent((current) => ({ ...current, [fieldKey]: value }));
     setSaveState("idle");
     setMessage(null);
   };
 
-  const saveDraft = async () => {
-    setSaveState("saving");
-    setMessage(null);
-    if (demoMode) {
-      setSavedContent(content);
-      setSaveState("saved");
-      setMessage("Draft saved for this local preview.");
-      return;
-    }
-    try {
-      const response = await fetch(
-        `/api/admin/website/pages/${pageDefinition.slug}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
-        },
-      );
-      const body = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(body.error || "Could not save draft.");
-      setSavedContent(content);
-      setSaveState("saved");
-      setMessage("Draft saved.");
-    } catch (error) {
-      setSaveState("error");
-      setMessage(
-        error instanceof Error ? error.message : "Could not save draft.",
-      );
-    }
-  };
-
   const publish = async () => {
-    if (isDirty) {
-      setMessage("Save the draft before publishing.");
-      setSaveState("error");
-      return;
-    }
+    publishingRef.current = true;
     setSaveState("publishing");
     setMessage(null);
     if (demoMode) {
+      savedContentRef.current = contentRef.current;
+      setSavedContent(contentRef.current);
       setPublishedAt(new Date().toISOString());
       setSaveState("saved");
       setMessage(`${pageDefinition.label} published in this local preview.`);
+      publishingRef.current = false;
       return;
     }
     try {
+      const saved = await persistDraft(contentRef.current);
+      if (!saved) throw new Error("Could not save the latest changes.");
+
       const response = await fetch(
         `/api/admin/website/pages/${pageDefinition.slug}/publish`,
         { method: "POST" },
@@ -354,7 +428,8 @@ export function WebsiteManager({
         error?: string;
         page?: { publishedAt?: string };
       };
-      if (!response.ok) throw new Error(body.error || "Could not publish page.");
+      if (!response.ok)
+        throw new Error(body.error || "Could not publish page.");
       setPublishedAt(body.page?.publishedAt ?? new Date().toISOString());
       setSaveState("saved");
       setMessage(`${pageDefinition.label} published.`);
@@ -363,7 +438,19 @@ export function WebsiteManager({
       setMessage(
         error instanceof Error ? error.message : "Could not publish page.",
       );
+    } finally {
+      publishingRef.current = false;
     }
+  };
+
+  const openPage = async (slug: string) => {
+    const destination = `/admin/website?page=${encodeURIComponent(slug)}`;
+    if (slug === pageDefinition.slug) return;
+    if (isDirty) {
+      const saved = await persistDraft(contentRef.current);
+      if (!saved) return;
+    }
+    router.push(destination);
   };
 
   const uploadImage = async (field: WebsiteFieldDefinition, file: File) => {
@@ -392,7 +479,7 @@ export function WebsiteManager({
       throw new Error(error);
     }
     updateField(field.key, body.image.url);
-    setMessage("Image replaced. Save the draft when you are ready.");
+    setMessage("Image replaced. Saving automatically…");
   };
 
   const chooseSection = (section: WebsiteSectionDefinition) => {
@@ -401,14 +488,14 @@ export function WebsiteManager({
     setMobileSidebarOpen(false);
   };
 
-  const busy = saveState === "saving" || saveState === "publishing";
+  const busy = saveState === "publishing";
   const statusLabel =
     saveState === "saving"
       ? "Saving…"
       : saveState === "publishing"
         ? "Publishing…"
         : isDirty
-          ? "Unsaved changes"
+          ? "Saving automatically…"
           : "All changes saved";
 
   return (
@@ -446,7 +533,10 @@ export function WebsiteManager({
             </button>
           </div>
 
-          <nav aria-label="Admin workspaces" className="border-b border-slate-200 p-2">
+          <nav
+            aria-label="Admin workspaces"
+            className="border-b border-slate-200 p-2"
+          >
             <Link
               href="/admin/website"
               className="flex min-h-11 items-center gap-3 rounded-lg bg-cyan-50 px-3 text-sm font-bold text-cyan-800"
@@ -464,7 +554,7 @@ export function WebsiteManager({
           </nav>
 
           {!sidebarCollapsed ? (
-            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-5">
+            <div className="cms-sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-5">
               <p className="px-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-slate-500">
                 Pages
               </p>
@@ -476,15 +566,10 @@ export function WebsiteManager({
                     <Link
                       key={page.slug}
                       href={`/admin/website?page=${encodeURIComponent(page.slug)}`}
+                      prefetch={false}
                       onClick={(event) => {
-                        if (
-                          isDirty &&
-                          !window.confirm(
-                            "You have unsaved changes. Leave this page without saving?",
-                          )
-                        ) {
-                          event.preventDefault();
-                        }
+                        event.preventDefault();
+                        void openPage(page.slug);
                       }}
                       className={[
                         "flex min-h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-sm transition",
@@ -494,7 +579,9 @@ export function WebsiteManager({
                       ].join(" ")}
                     >
                       <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      <span className="min-w-0 flex-1 truncate">{page.label}</span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {page.label}
+                      </span>
                     </Link>
                   );
                 })}
@@ -616,6 +703,11 @@ export function WebsiteManager({
             </div>
             <Link
               href="/admin/website"
+              prefetch={false}
+              onClick={(event) => {
+                event.preventDefault();
+                void openPage("home");
+              }}
               className="hidden min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 xl:flex"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -623,26 +715,15 @@ export function WebsiteManager({
             </Link>
             <button
               type="button"
-              onClick={saveDraft}
-              disabled={!isDirty || busy}
-              className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800 transition hover:border-teal-600 disabled:cursor-not-allowed disabled:opacity-45 sm:px-4"
-            >
-              {saveState === "saving" ? (
-                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Save className="h-4 w-4" aria-hidden="true" />
-              )}
-              <span className="hidden sm:inline">Save draft</span>
-              <span className="sm:hidden">Save</span>
-            </button>
-            <button
-              type="button"
               onClick={publish}
-              disabled={busy || isDirty}
+              disabled={busy}
               className="flex min-h-10 items-center gap-2 rounded-lg bg-[#0798aa] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#087f91] disabled:cursor-not-allowed disabled:opacity-45"
             >
               {saveState === "publishing" ? (
-                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <LoaderCircle
+                  className="h-4 w-4 animate-spin"
+                  aria-hidden="true"
+                />
               ) : (
                 <Send className="h-4 w-4" aria-hidden="true" />
               )}
@@ -726,7 +807,10 @@ export function WebsiteManager({
                     {visibleSection?.label}
                   </h2>
                 </div>
-                <Pencil className="mt-1 h-4 w-4 text-cyan-700" aria-hidden="true" />
+                <Pencil
+                  className="mt-1 h-4 w-4 text-cyan-700"
+                  aria-hidden="true"
+                />
               </div>
               <p className="mt-2 text-xs leading-5 text-slate-500">
                 {visibleSection?.description}
@@ -737,6 +821,7 @@ export function WebsiteManager({
               {visibleSection?.fields.map((field) => (
                 <div
                   key={field.key}
+                  data-inspector-field={field.key}
                   onFocus={() => setSelectedFieldKey(field.key)}
                   className={
                     selectedFieldKey === field.key
@@ -792,7 +877,9 @@ export function WebsiteManager({
             <Pencil className="h-4 w-4" aria-hidden="true" />
             Edit {visibleSection?.label}
           </button>
-          <span className="truncate">Published {formatTimestamp(publishedAt)}</span>
+          <span className="truncate">
+            Published {formatTimestamp(publishedAt)}
+          </span>
         </div>
       </div>
     </div>

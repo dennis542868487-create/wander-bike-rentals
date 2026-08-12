@@ -23,17 +23,17 @@ export type {
 } from "@/lib/website-cms/definitions";
 
 export const homeContentDefaults: WebsiteContent = {
-  "hero.badge": "Wander Bike Rentals • Steveston, Richmond",
-  "hero.heading": "Easy local bike rentals,",
-  "hero.highlight": "now with a community marketplace.",
+  "hero.badge": "Wander Bike Rentals • Steveston waterfront",
+  "hero.heading": "Steveston bike rentals,",
+  "hero.highlight": "now with a local marketplace.",
   "hero.body":
-    "Rent or buy a bike managed by our Steveston shop, or browse a separate collection listed by local owners. Every bike has its own photos, price, and request page.",
+    "Wander Bike Rentals still operates its physical shop in Steveston. Rent or buy a Wander bike, or browse a separate collection listed by local owners.",
   "hero.primaryLabel": "Find a Bike",
   "hero.primaryHref": "/bikes",
   "hero.secondaryLabel": "List Your Bike",
   "hero.secondaryHref": "/list-your-bike",
-  "hero.imageSrc": "/assets/bikes-row.jpg",
-  "hero.imageAlt": "Rows of rental bikes inside Wander Bike Rentals",
+  "hero.imageSrc": "/assets/fishermans-wharf.webp",
+  "hero.imageAlt": "Steveston Fisherman’s Wharf waterfront",
 
   "collections.eyebrow": "Find a bike",
   "collections.heading": "Two collections, clearly separated.",
@@ -79,8 +79,7 @@ export const homeContentDefaults: WebsiteContent = {
   "explore.body":
     "Start with the area or bike type you have in mind, then move into the live Wander and Community collections to see the exact bike.",
   "explore.imageSrc": "/assets/west-dyke-trail.jpg",
-  "explore.imageAlt":
-    "A waterfront bike route in Richmond, British Columbia",
+  "explore.imageAlt": "A waterfront bike route in Richmond, British Columbia",
 
   "gallery.eyebrow": "Gallery",
   "gallery.heading": "See our shop bikes and gear",
@@ -90,8 +89,7 @@ export const homeContentDefaults: WebsiteContent = {
   "gallery.image1Alt": "Rows of Wander rental bikes ready for riders",
   "gallery.image1Label": "Wander bike lineup",
   "gallery.image2Src": "/assets/trailer-bike.jpg",
-  "gallery.image2Alt":
-    "Bike with a family trailer inside Wander Bike Rentals",
+  "gallery.image2Alt": "Bike with a family trailer inside Wander Bike Rentals",
   "gallery.image2Label": "Trailer and family setup",
   "gallery.image3Src": "/assets/helmets.jpg",
   "gallery.image3Alt": "Helmet selection at Wander Bike Rentals",
@@ -169,19 +167,11 @@ const homeSections: WebsiteSectionDefinition[] = [
       image("collections.wanderImageSrc", "Wander card image"),
       text("collections.wanderImageAlt", "Wander image alt text", 160),
       text("collections.communityTitle", "Community card title", 60),
-      textarea(
-        "collections.communityBody",
-        "Community card description",
-        240,
-      ),
+      textarea("collections.communityBody", "Community card description", 240),
       text("collections.communityLabel", "Community card link text", 40),
       link("collections.communityHref", "Community card link"),
       image("collections.communityImageSrc", "Community card image"),
-      text(
-        "collections.communityImageAlt",
-        "Community image alt text",
-        160,
-      ),
+      text("collections.communityImageAlt", "Community image alt text", 160),
     ],
   },
   {

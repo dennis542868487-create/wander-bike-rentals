@@ -1028,10 +1028,21 @@ a {
 
 /* CMS previews stay fully visible even while live content updates interrupt page-entry animations. */
 [data-website-preview="true"] .cms-preview-section,
-[data-website-preview="true"] .cms-preview-section .motion-rise {
+[data-website-preview="true"] .cms-preview-section .motion-rise,
+[data-website-preview="true"] [data-reveal],
+[data-website-preview="true"] [data-reveal-cascade] > *,
+[data-website-preview="true"] .is-visible [data-reveal-cascade] > * {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
+  transition-delay: 0ms !important;
+}
+
+.cms-sidebar-scroll {
+  contain: layout paint;
+  scrollbar-gutter: stable;
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .guide-directory-search::-webkit-search-cancel-button {

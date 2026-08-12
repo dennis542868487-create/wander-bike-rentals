@@ -11,10 +11,16 @@ import {
   UsersRound,
   Wrench,
 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { WANDER_SHOP_DIRECTIONS_URL } from "@/lib/marketplace/wander-shop";
+import {
+  CmsImage,
+  CmsLink,
+  CmsSection,
+  CmsText,
+  WebsiteContentRuntime,
+} from "@/components/website-cms/content-runtime";
 import { wanderBusinessEntity } from "@/lib/seo/wander-business";
+import { aboutContentDefaults } from "@/lib/website-cms/pages/about";
+import { getWebsitePageRenderState } from "@/lib/website-cms/server";
 
 const pageTitle = "About Wander Bike | Rentals, Marketplace & B.C. Guides";
 const pageDescription =
@@ -134,47 +140,46 @@ const aboutSchema = {
 const services = [
   {
     icon: Bike,
-    title: "Bike rentals",
-    text: "Choose a specific Wander bike with its own photos and price. Rentals include a helmet, basket, and lock.",
-    href: "/bikes/wander",
-    linkLabel: "Browse Wander Bikes",
   },
   {
     icon: Wrench,
-    title: "Quick bike repair",
-    text: "Bring common problems such as flat tires, brake adjustment, gear tuning, wheel rubbing, or chain issues to our Steveston shop.",
-    href: "/quick-bike-repair-richmond",
-    linkLabel: "See quick repair services",
   },
   {
     icon: UsersRound,
-    title: "Community marketplace",
-    text: "Local owners can list an idle bike for rent or sale, helping more bikes spend time on the road instead of in storage.",
-    href: "/about-marketplace",
-    linkLabel: "About the marketplace",
   },
   {
     icon: BookOpen,
-    title: "B.C. cycling guides",
-    text: "Plan rides across 160 British Columbia destinations with terrain notes, local ideas, research labels, and official source links.",
-    href: "/guides",
-    linkLabel: "Explore all B.C. guides",
   },
 ] as const;
 
-export default function AboutPage() {
+export default async function AboutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ websitePreview?: string }>;
+}) {
+  const { content, previewMode } = await getWebsitePageRenderState(
+    "about",
+    searchParams,
+  );
+
   return (
-    <main className="bg-[var(--background)]">
+    <WebsiteContentRuntime initialContent={content} previewMode={previewMode}>
+    <main
+      data-website-preview={previewMode ? "true" : undefined}
+      className="bg-[var(--background)]"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
       />
 
-      <section className="relative overflow-hidden bg-[var(--navy)] text-white">
+      <CmsSection sectionId="hero" label="Hero" className="relative overflow-hidden bg-[var(--navy)] text-white">
         <div className="absolute inset-0 lg:left-[52%]">
-          <Image
-            src="/assets/bikes-row.jpg"
-            alt="Bicycles ready at Wander Bike Rentals in Steveston"
+          <CmsImage
+            srcField="hero.imageSrc"
+            altField="hero.imageAlt"
+            fallbackSrc={aboutContentDefaults["hero.imageSrc"]}
+            fallbackAlt={aboutContentDefaults["hero.imageAlt"]}
             fill
             priority
             sizes="(min-width: 1024px) 48vw, 100vw"
@@ -186,332 +191,224 @@ export default function AboutPage() {
           <div className="motion-rise max-w-3xl lg:pr-8">
             <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-teal-200 sm:text-sm">
               <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              Opened in Steveston · April 2026
+              <CmsText field="hero.eyebrow" fallback={aboutContentDefaults["hero.eyebrow"]} />
             </p>
-            <h1 className="mt-5 text-[2.75rem] font-extrabold leading-[0.98] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
-              A local bike shop with a bigger riding mission.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-xl sm:leading-8">
-              Based in Steveston, Wander Bike Rentals is one of Richmond&apos;s
-              largest and most dependable used bike rental and sales shops. We
-              We pair a real local shop and community marketplace with 160 B.C.
-              cycling guides, building toward a simple idea: understand the
-              ride, then find a useful bike near the destination.
-            </p>
+            <CmsText as="h1" field="hero.heading" fallback={aboutContentDefaults["hero.heading"]} className="mt-5 text-[2.75rem] font-extrabold leading-[0.98] tracking-[-0.05em] sm:text-6xl lg:text-7xl" />
+            <CmsText as="p" field="hero.body" fallback={aboutContentDefaults["hero.body"]} className="mt-6 max-w-2xl text-base leading-7 text-slate-200 sm:text-xl sm:leading-8" />
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={WANDER_SHOP_DIRECTIONS_URL}
+              <CmsLink
+                labelField="hero.primaryLabel"
+                hrefField="hero.primaryHref"
+                fallbackLabel={aboutContentDefaults["hero.primaryLabel"]}
+                fallbackHref={aboutContentDefaults["hero.primaryHref"]}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-brand w-full px-6 sm:w-auto"
               >
                 <MapPin className="h-4 w-4" aria-hidden="true" />
-                Go to Store
-              </a>
-              <Link href="/bikes" className="btn-outline-light w-full px-6 sm:w-auto">
-                Find a Bike
+              </CmsLink>
+              <CmsLink labelField="hero.secondaryLabel" hrefField="hero.secondaryHref" fallbackLabel={aboutContentDefaults["hero.secondaryLabel"]} fallbackHref={aboutContentDefaults["hero.secondaryHref"]} className="btn-outline-light w-full px-6 sm:w-auto">
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="/guides" className="btn-outline-light w-full px-6 sm:w-auto">
-                Explore B.C. Guides
-              </Link>
+              </CmsLink>
+              <CmsLink labelField="hero.tertiaryLabel" hrefField="hero.tertiaryHref" fallbackLabel={aboutContentDefaults["hero.tertiaryLabel"]} fallbackHref={aboutContentDefaults["hero.tertiaryHref"]} className="btn-outline-light w-full px-6 sm:w-auto" />
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="border-b border-slate-200 bg-white">
+      <CmsSection sectionId="snapshot" label="Shop snapshot" className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-5 px-4 py-7 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {[
-            [Store, "A real local shop", "12071 First Ave #101, Steveston"],
-            [CalendarDays, "Open every day", "9:00 AM–10:00 PM"],
-            [UsersRound, "Local first", "Serving Richmond-area riders today"],
-            [BookOpen, "160 B.C. guides", "Ride planning across 27 regions"],
-          ].map(([Icon, title, text]) => (
-            <div key={title as string} className="flex items-start gap-3 sm:px-3">
+          {[Store, CalendarDays, UsersRound, BookOpen].map((Icon, index) => (
+            <div key={index} className="flex items-start gap-3 sm:px-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--teal-soft)] text-[var(--teal)]">
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <span>
                 <strong className="block text-sm text-[var(--navy)]">
-                  {title as string}
+                  <CmsText field={`snapshot.item${index + 1}Title`} fallback={aboutContentDefaults[`snapshot.item${index + 1}Title`]} />
                 </strong>
                 <span className="mt-1 block text-xs leading-5 text-slate-500">
-                  {text as string}
+                  <CmsText field={`snapshot.item${index + 1}Body`} fallback={aboutContentDefaults[`snapshot.item${index + 1}Body`]} />
                 </span>
               </span>
             </div>
           ))}
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-white">
+      <CmsSection sectionId="story" label="Our story" className="bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
           <div className="relative min-h-[22rem] overflow-hidden rounded-[2rem] bg-slate-100 sm:min-h-[32rem]">
-            <Image
-              src="/assets/quick-repair-hero.jpg"
-              alt="Quick bike repair service at Wander Bike Rentals"
+            <CmsImage
+              srcField="story.imageSrc"
+              altField="story.imageAlt"
+              fallbackSrc={aboutContentDefaults["story.imageSrc"]}
+              fallbackAlt={aboutContentDefaults["story.imageAlt"]}
               fill
               sizes="(min-width: 1024px) 44vw, 100vw"
               className="object-cover"
             />
             <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/70 bg-white/90 p-5 shadow-xl backdrop-blur sm:left-auto sm:w-72">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--teal)]">
-                Our beginning
-              </p>
-              <p className="mt-2 text-xl font-extrabold text-[var(--navy)]">
-                One storefront in Steveston. April 2026.
-              </p>
+              <CmsText as="p" field="story.imageEyebrow" fallback={aboutContentDefaults["story.imageEyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--teal)]" />
+              <CmsText as="p" field="story.imageCaption" fallback={aboutContentDefaults["story.imageCaption"]} className="mt-2 text-xl font-extrabold text-[var(--navy)]" />
             </div>
           </div>
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm">
-              The Wander story
-            </p>
-            <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-              We started by helping people ride right here.
-            </h2>
+            <CmsText as="p" field="story.eyebrow" fallback={aboutContentDefaults["story.eyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm" />
+            <CmsText as="h2" field="story.heading" fallback={aboutContentDefaults["story.heading"]} className="display-heading mt-3 text-4xl sm:text-5xl" />
             <div className="mt-6 space-y-4 text-base leading-8 text-slate-600">
-              <p>
-                Wander Bike Rentals opened in April 2026 at 12071 First Ave
-                #101 in Steveston, Richmond. The shop gives visitors and local
-                riders a straightforward place to rent a bike, ask for a quick
-                repair, or learn what is available before heading out.
-              </p>
-              <p>
-                Steveston is where the idea became real: bikes in one physical
-                shop, riders arriving with different needs, and useful bikes
-                sitting idle elsewhere in the community. That led us to build
-                an online marketplace alongside the shop.
-              </p>
-              <p>
-                Wander Bikes are managed by our team. Community Bikes remain
-                separately listed by local owners. Keeping those collections
-                clear is part of building trust as the platform grows.
-              </p>
-              <p>
-                The same question—what does someone need for a good local
-                ride?—led to our B.C. guide library. The guides expand Wander&apos;s
-                planning help across the province while rentals and marketplace
-                exchanges remain clearly local.
-              </p>
+              {[1, 2, 3, 4].map((number) => (
+                <CmsText key={number} as="p" field={`story.body${number}`} fallback={aboutContentDefaults[`story.body${number}`]} />
+              ))}
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-[#f0fdf9]">
+      <CmsSection sectionId="services" label="Services" className="bg-[#f0fdf9]">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-          <p className="text-center text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm">
-            What Wander does today
-          </p>
-          <h2 className="display-heading mx-auto mt-3 max-w-3xl text-center text-4xl sm:text-5xl">
-            Shop services, a local marketplace, and B.C. ride guides
-          </h2>
+          <CmsText as="p" field="services.eyebrow" fallback={aboutContentDefaults["services.eyebrow"]} className="text-center text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm" />
+          <CmsText as="h2" field="services.heading" fallback={aboutContentDefaults["services.heading"]} className="display-heading mx-auto mt-3 max-w-3xl text-center text-4xl sm:text-5xl" />
           <div className="mt-9 grid gap-5 md:grid-cols-2">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <article
-                key={service.title}
+                key={index}
                 className="flex flex-col rounded-[1.75rem] border border-[var(--card-border)] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)] sm:p-7"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--teal-soft)] text-[var(--teal)]">
                   <service.icon className="h-6 w-6" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 text-2xl font-extrabold text-[var(--navy)]">
-                  {service.title}
+                  <CmsText field={`services.item${index + 1}Title`} fallback={aboutContentDefaults[`services.item${index + 1}Title`]} />
                 </h3>
                 <p className="mt-3 flex-1 leading-7 text-slate-600">
-                  {service.text}
+                  <CmsText field={`services.item${index + 1}Body`} fallback={aboutContentDefaults[`services.item${index + 1}Body`]} />
                 </p>
-                <Link
-                  href={service.href}
+                <CmsLink
+                  labelField={`services.item${index + 1}Label`}
+                  hrefField={`services.item${index + 1}Href`}
+                  fallbackLabel={aboutContentDefaults[`services.item${index + 1}Label`]}
+                  fallbackHref={aboutContentDefaults[`services.item${index + 1}Href`]}
                   className="mt-6 inline-flex items-center gap-2 text-sm font-extrabold text-[var(--teal)]"
                 >
-                  {service.linkLabel}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
+                </CmsLink>
               </article>
             ))}
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-white">
+      <CmsSection sectionId="safety" label="Safety details" className="bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm">
-              Rental-ready every day
-            </p>
-            <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-              The small safety details matter.
-            </h2>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
-              Every Wander rental bike is checked daily before it is sent out.
-              We make sure the practical equipment riders expect is present,
-              visible, and ready for the trip.
-            </p>
+            <CmsText as="p" field="safety.eyebrow" fallback={aboutContentDefaults["safety.eyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm" />
+            <CmsText as="h2" field="safety.heading" fallback={aboutContentDefaults["safety.heading"]} className="display-heading mt-3 text-4xl sm:text-5xl" />
+            <CmsText as="p" field="safety.body" fallback={aboutContentDefaults["safety.body"]} className="mt-5 max-w-2xl text-base leading-8 text-slate-600" />
           </div>
           <div className="rounded-[2rem] bg-[var(--navy)] p-6 text-white shadow-[0_22px_55px_rgba(15,23,42,0.18)] sm:p-8">
             <div className="flex items-center gap-3">
               <ShieldCheck className="h-7 w-7 text-teal-200" aria-hidden="true" />
-              <h3 className="text-xl font-extrabold">Daily Wander bike check</h3>
+              <CmsText as="h3" field="safety.cardHeading" fallback={aboutContentDefaults["safety.cardHeading"]} className="text-xl font-extrabold" />
             </div>
             <ul className="mt-6 space-y-4 text-sm leading-6 text-slate-200">
-              {[
-                "Kickstand installed and working",
-                "Bell present and easy to use",
-                "White front reflector and red rear reflector present",
-                "Helmet, basket, and lock included with every rental",
-              ].map((item) => (
-                <li key={item} className="flex gap-3">
+              {[1, 2, 3, 4].map((number) => (
+                <li key={number} className="flex gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-teal-300" aria-hidden="true" />
-                  {item}
+                  <CmsText field={`safety.item${number}`} fallback={aboutContentDefaults[`safety.item${number}`]} />
                 </li>
               ))}
             </ul>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="overflow-hidden bg-[var(--navy)] text-white">
+      <CmsSection sectionId="mission" label="Mission" className="overflow-hidden bg-[var(--navy)] text-white">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-teal-300 sm:text-sm">
-              Where we want to go
-            </p>
-            <h2 className="mt-4 text-4xl font-extrabold tracking-[-0.04em] sm:text-6xl">
-              Find the bike there. Leave yours at home.
-            </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-              Our long-term goal is a bicycle-sharing platform for everyone:
-              local shops and owners making bikes available, and riders finding
-              a suitable bike wherever they are. A weekend away, a visit to a
-              new neighbourhood, or a casual ride should not require carrying
-              your own bicycle with you.
-            </p>
+            <CmsText as="p" field="mission.eyebrow" fallback={aboutContentDefaults["mission.eyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.18em] text-teal-300 sm:text-sm" />
+            <CmsText as="h2" field="mission.heading" fallback={aboutContentDefaults["mission.heading"]} className="mt-4 text-4xl font-extrabold tracking-[-0.04em] sm:text-6xl" />
+            <CmsText as="p" field="mission.body" fallback={aboutContentDefaults["mission.body"]} className="mx-auto mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg" />
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
             <article className="rounded-[1.75rem] border border-white/15 bg-white/[0.06] p-6 sm:p-8">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-teal-300">
-                Today
-              </p>
-              <h3 className="mt-3 text-2xl font-extrabold">
-                Local service from Steveston
-              </h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                Wander currently serves Richmond-area riders through one
-                physical shop, Wander-managed rentals, and Community Bikes
-                listed by local owners. Pickup and payment are arranged locally,
-                while 160 B.C. guides help anyone plan a ride across the province.
-              </p>
+              <CmsText as="p" field="mission.todayEyebrow" fallback={aboutContentDefaults["mission.todayEyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.16em] text-teal-300" />
+              <CmsText as="h3" field="mission.todayHeading" fallback={aboutContentDefaults["mission.todayHeading"]} className="mt-3 text-2xl font-extrabold" />
+              <CmsText as="p" field="mission.todayBody" fallback={aboutContentDefaults["mission.todayBody"]} className="mt-4 leading-7 text-slate-300" />
             </article>
             <article className="rounded-[1.75rem] border border-teal-300/30 bg-teal-300/[0.08] p-6 sm:p-8">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-teal-300">
-                Building toward
-              </p>
-              <h3 className="mt-3 text-2xl font-extrabold">
-                A wider network of shared bikes
-              </h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                We want more idle bikes to become useful local transportation
-                and more riders to access a bike near their destination. That
-                broader network is our direction, not a claim of current
-                worldwide coverage.
-              </p>
+              <CmsText as="p" field="mission.futureEyebrow" fallback={aboutContentDefaults["mission.futureEyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.16em] text-teal-300" />
+              <CmsText as="h3" field="mission.futureHeading" fallback={aboutContentDefaults["mission.futureHeading"]} className="mt-3 text-2xl font-extrabold" />
+              <CmsText as="p" field="mission.futureBody" fallback={aboutContentDefaults["mission.futureBody"]} className="mt-4 leading-7 text-slate-300" />
             </article>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-white">
+      <CmsSection sectionId="facts" label="Company facts" className="bg-white">
         <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm">
-            Wander Bike facts
-          </p>
-          <h2 className="display-heading mt-3 text-4xl sm:text-5xl">
-            Clear information about the shop and platform
-          </h2>
+          <CmsText as="p" field="facts.eyebrow" fallback={aboutContentDefaults["facts.eyebrow"]} className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm" />
+          <CmsText as="h2" field="facts.heading" fallback={aboutContentDefaults["facts.heading"]} className="display-heading mt-3 text-4xl sm:text-5xl" />
           <dl className="mt-8 divide-y divide-slate-200 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-slate-50">
-            {[
-              ["Opened", "April 2026"],
-              ["Physical shop", "12071 First Ave #101, Richmond, BC V7E 3M1"],
-              ["Hours", "Open daily from 9:00 AM to 10:00 PM"],
-              ["Current service area", "Steveston and the Richmond, BC area"],
-              ["Shop services", "Bike rentals, local bike sales, and quick bike repair"],
-              ["Online platform", "Separate Wander Bikes and Community Bikes collections for local rental or sale requests"],
-              ["Guide library", "160 published cycling guides across 27 British Columbia regions"],
-              ["Long-term mission", "Make shared bicycles easier to find near a rider’s destination"],
-            ].map(([term, detail]) => (
-              <div key={term} className="grid gap-1 p-5 sm:grid-cols-[12rem_1fr] sm:gap-5 sm:p-6">
-                <dt className="text-sm font-extrabold text-[var(--navy)]">{term}</dt>
-                <dd className="text-sm leading-6 text-slate-600">{detail}</dd>
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((number) => (
+              <div key={number} className="grid gap-1 p-5 sm:grid-cols-[12rem_1fr] sm:gap-5 sm:p-6">
+                <dt className="text-sm font-extrabold text-[var(--navy)]"><CmsText field={`facts.item${number}Term`} fallback={aboutContentDefaults[`facts.item${number}Term`]} /></dt>
+                <dd className="text-sm leading-6 text-slate-600"><CmsText field={`facts.item${number}Detail`} fallback={aboutContentDefaults[`facts.item${number}Detail`]} /></dd>
               </div>
             ))}
           </dl>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-[#f0fdf9]">
+      <CmsSection sectionId="faq" label="About FAQ" className="bg-[#f0fdf9]">
         <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-          <p className="text-center text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm">
-            About Wander Bike
-          </p>
-          <h2 className="display-heading mt-3 text-center text-4xl sm:text-5xl">
-            Common questions
-          </h2>
+          <CmsText as="p" field="faq.eyebrow" fallback={aboutContentDefaults["faq.eyebrow"]} className="text-center text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm" />
+          <CmsText as="h2" field="faq.heading" fallback={aboutContentDefaults["faq.heading"]} className="display-heading mt-3 text-center text-4xl sm:text-5xl" />
           <div className="mt-8 grid gap-4">
-            {aboutFaqs.map((item) => (
+            {aboutFaqs.map((item, index) => (
               <details
                 key={item.question}
                 className="group rounded-[1.4rem] border border-[var(--card-border)] bg-white p-5 open:shadow-sm sm:p-6"
               >
                 <summary className="cursor-pointer list-none pr-7 text-base font-extrabold text-[var(--navy)] marker:content-none">
-                  {item.question}
+                  <CmsText field={`faq.question${index + 1}`} fallback={aboutContentDefaults[`faq.question${index + 1}`]} />
                 </summary>
                 <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
-                  {item.answer}
+                  <CmsText field={`faq.answer${index + 1}`} fallback={aboutContentDefaults[`faq.answer${index + 1}`]} />
                 </p>
               </details>
             ))}
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-white">
+      <CmsSection sectionId="cta" label="Call to action" className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
           <div className="rounded-[2rem] bg-[var(--teal)] p-7 text-white sm:p-10 lg:flex lg:items-center lg:justify-between lg:gap-8">
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-teal-100">
-                Start local
-              </p>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Visit Wander Bike in Steveston.
-              </h2>
-              <p className="mt-3 max-w-2xl leading-7 text-teal-50">
-                Rent a bike, ask about a quick repair, explore the local
-                marketplace, or plan your next B.C. ride.
-              </p>
+              <CmsText as="p" field="cta.eyebrow" fallback={aboutContentDefaults["cta.eyebrow"]} className="text-sm font-extrabold uppercase tracking-[0.16em] text-teal-100" />
+              <CmsText as="h2" field="cta.heading" fallback={aboutContentDefaults["cta.heading"]} className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl" />
+              <CmsText as="p" field="cta.body" fallback={aboutContentDefaults["cta.body"]} className="mt-3 max-w-2xl leading-7 text-teal-50" />
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-0">
-              <a
-                href={WANDER_SHOP_DIRECTIONS_URL}
+              <CmsLink
+                labelField="cta.primaryLabel"
+                hrefField="cta.primaryHref"
+                fallbackLabel={aboutContentDefaults["cta.primaryLabel"]}
+                fallbackHref={aboutContentDefaults["cta.primaryHref"]}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-primary w-full px-6 sm:w-auto"
-              >
-                Go to Store
-              </a>
-              <Link href="/about-marketplace" className="btn-secondary w-full px-6 sm:w-auto">
-                Explore the platform
+              />
+              <CmsLink labelField="cta.secondaryLabel" hrefField="cta.secondaryHref" fallbackLabel={aboutContentDefaults["cta.secondaryLabel"]} fallbackHref={aboutContentDefaults["cta.secondaryHref"]} className="btn-secondary w-full px-6 sm:w-auto">
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-              <Link href="/guides" className="btn-secondary w-full px-6 sm:w-auto">
-                Browse B.C. guides
-              </Link>
+              </CmsLink>
+              <CmsLink labelField="cta.tertiaryLabel" hrefField="cta.tertiaryHref" fallbackLabel={aboutContentDefaults["cta.tertiaryLabel"]} fallbackHref={aboutContentDefaults["cta.tertiaryHref"]} className="btn-secondary w-full px-6 sm:w-auto" />
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
     </main>
+    </WebsiteContentRuntime>
   );
 }

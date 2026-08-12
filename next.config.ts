@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
-    value: "base-uri 'self'; frame-ancestors 'none'; object-src 'none'",
+    value: "base-uri 'self'; frame-ancestors 'self'; object-src 'none'",
   },
   {
     key: "Permissions-Policy",
@@ -23,11 +23,12 @@ const securityHeaders = [
   },
   {
     key: "X-Frame-Options",
-    value: "DENY",
+    value: "SAMEORIGIN",
   },
 ];
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   images: {
     remotePatterns: [
       {

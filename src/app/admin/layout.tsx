@@ -8,6 +8,7 @@ import {
   PLATFORM_DASHBOARD_LABEL,
 } from "@/lib/marketplace/workspace-labels";
 import { getCurrentAdmin, getCurrentUser } from "@/lib/supabase/auth";
+import { isLocalWebsiteCmsDemo } from "@/lib/website-cms/demo";
 
 export const metadata: Metadata = {
   title: {
@@ -22,6 +23,13 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  if (await isLocalWebsiteCmsDemo()) {
+    return (
+      <AdminShell email="local-preview@wanderbike.ca" role="admin">
+        {children}
+      </AdminShell>
+    );
+  }
   const [user, admin] = await Promise.all([getCurrentUser(), getCurrentAdmin()]);
   if (!user) redirect("/auth?next=/admin");
   if (!admin) {

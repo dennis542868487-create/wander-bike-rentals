@@ -7,6 +7,7 @@ import {
   Mail,
   Menu,
   MessagesSquare,
+  PanelsTopLeft,
   ShieldAlert,
   UserRound,
   Users,
@@ -32,6 +33,11 @@ const items = [
   { href: "/admin/email", label: "Email", icon: Mail },
 ];
 
+const workspaces = [
+  { href: "/admin/website", label: "Website", icon: PanelsTopLeft },
+  { href: "/admin", label: "Marketplace", icon: LayoutDashboard },
+];
+
 function activePath(pathname: string, href: string) {
   return href === "/admin"
     ? pathname === href
@@ -46,26 +52,52 @@ function AdminNavigation({
   onNavigate?: () => void;
 }) {
   return (
-    <nav aria-label={PLATFORM_DASHBOARD_LABEL} className="space-y-1">
-      {items.map((item) => {
-        const active = activePath(pathname, item.href);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-              active
-                ? "bg-teal-600 text-white"
-                : "text-slate-300 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <item.icon className="h-4 w-4" aria-hidden="true" />
-            {item.label}
-          </Link>
-        );
-      })}
+    <nav aria-label={PLATFORM_DASHBOARD_LABEL}>
+      <div className="space-y-1">
+        {workspaces.map((item) => {
+          const active = activePath(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+                active
+                  ? "bg-teal-600 text-white"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <item.icon className="h-4 w-4" aria-hidden="true" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+      <p className="mb-2 mt-6 px-3 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-500">
+        Marketplace tools
+      </p>
+      <div className="space-y-1">
+        {items.map((item) => {
+          const active = activePath(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+                active
+                  ? "bg-teal-600 text-white"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <item.icon className="h-4 w-4" aria-hidden="true" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
@@ -97,6 +129,10 @@ export function AdminShell({
       document.removeEventListener("keydown", closeOnEscape);
     };
   }, [drawerOpen]);
+
+  if (pathname.startsWith("/admin/website")) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f7f9]">
@@ -145,7 +181,7 @@ export function AdminShell({
               className="btn-secondary min-h-10 px-3 py-2 text-sm"
             >
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden md:inline">View marketplace</span>
+              <span className="hidden md:inline">View website</span>
             </Link>
           </div>
         </div>

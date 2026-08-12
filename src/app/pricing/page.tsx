@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import { ArrowRight, Bike } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import {
+  CmsImage,
+  CmsLink,
+  CmsSection,
+  CmsText,
+  WebsiteContentRuntime,
+} from "@/components/website-cms/content-runtime";
+import { pricingContentDefaults } from "@/lib/website-cms/pages/pricing";
+import { getWebsitePageRenderState } from "@/lib/website-cms/server";
 
 export const metadata: Metadata = {
   title: "Wander Bike Rental Pricing",
@@ -18,81 +25,74 @@ export const metadata: Metadata = {
 
 const rentalOptions = [
   {
-    name: "Adult Bike",
-    description:
-      "For solo rides, couples, and relaxed trips around Steveston and Richmond.",
-    href: "/adult-bike-rental-richmond",
-    rates: [
-      ["Per hour", "$12.38"],
-      ["Half day", "$40"],
-      ["Full day · 24 hr", "$64.76"],
-    ],
+    id: "adult",
+    labels: ["Per hour", "Half day", "Full day · 24 hr"],
+    rateKeys: ["rates.adultHourly", "rates.adultHalfDay", "rates.adultFullDay"],
   },
   {
-    name: "Kids Bike",
-    description:
-      "A family-friendly option when you need a bike sized for a younger rider.",
-    href: "/kids-bike-rental-richmond",
-    rates: [
-      ["Per hour", "$9.52"],
-      ["Half day", "$30"],
-      ["Full day · 24 hr", "$50"],
-    ],
+    id: "kids",
+    labels: ["Per hour", "Half day", "Full day · 24 hr"],
+    rateKeys: ["rates.kidsHourly", "rates.kidsHalfDay", "rates.kidsFullDay"],
   },
   {
-    name: "Bike Trailer",
-    description:
-      "A practical family option for rides with younger children.",
-    href: "/bike-trailer-rental-richmond",
-    rates: [
-      ["Per hour", "$9.52"],
-      ["Half day", "$30"],
-      ["Full day · 24 hr", "$50"],
+    id: "trailer",
+    labels: ["Per hour", "Half day", "Full day · 24 hr"],
+    rateKeys: [
+      "rates.trailerHourly",
+      "rates.trailerHalfDay",
+      "rates.trailerFullDay",
     ],
   },
 ] as const;
 
-export default function PricingPage() {
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ websitePreview?: string }>;
+}) {
+  const { content, previewMode } = await getWebsitePageRenderState(
+    "pricing",
+    searchParams,
+  );
+
   return (
-    <main className="bg-white text-slate-900">
-      <section className="border-b border-slate-200 bg-white">
+    <WebsiteContentRuntime initialContent={content} previewMode={previewMode}>
+    <main data-website-preview={previewMode ? "true" : undefined} className="bg-white text-slate-900">
+      <CmsSection sectionId="hero" label="Hero" className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-[90rem] lg:min-h-[39rem] lg:grid-cols-[0.92fr_1.08fr]">
           <div className="motion-rise flex items-center px-5 py-14 sm:px-8 sm:py-20 lg:px-14 xl:px-20">
             <div className="max-w-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
-                Wander Bike Rentals · Steveston shop
-              </p>
-              <h1 className="mt-6 text-[2.8rem] font-bold leading-[0.98] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-[4.3rem]">
-                Wander Bike rental prices.
-              </h1>
-              <p className="mt-7 text-base leading-8 text-slate-600 sm:text-lg">
-                These are the rental rates for adult bikes, kids bikes, and
-                trailers rented directly from Wander Bike Rentals. Bike sale
-                prices are different for every individual bike.
-              </p>
+              <CmsText as="p" field="hero.eyebrow" fallback={pricingContentDefaults["hero.eyebrow"]} className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700" />
+              <CmsText as="h1" field="hero.heading" fallback={pricingContentDefaults["hero.heading"]} className="mt-6 text-[2.8rem] font-bold leading-[0.98] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-[4.3rem]" />
+              <CmsText as="p" field="hero.body" fallback={pricingContentDefaults["hero.body"]} className="mt-7 text-base leading-8 text-slate-600 sm:text-lg" />
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/bikes"
+                <CmsLink
+                  labelField="hero.primaryLabel"
+                  hrefField="hero.primaryHref"
+                  fallbackLabel={pricingContentDefaults["hero.primaryLabel"]}
+                  fallbackHref={pricingContentDefaults["hero.primaryHref"]}
                   className="editorial-button editorial-button-primary w-full sm:w-auto"
                 >
-                  Find a Bike
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-                <a
-                  href="tel:+17789521389"
+                </CmsLink>
+                <CmsLink
+                  labelField="hero.secondaryLabel"
+                  hrefField="hero.secondaryHref"
+                  fallbackLabel={pricingContentDefaults["hero.secondaryLabel"]}
+                  fallbackHref={pricingContentDefaults["hero.secondaryHref"]}
                   className="editorial-button editorial-button-secondary w-full sm:w-auto"
-                >
-                  Call Now
-                </a>
+                />
               </div>
             </div>
           </div>
 
           <div className="motion-rise motion-rise-delay-1 grid min-h-[34rem] grid-rows-[1fr_auto] border-t border-slate-200 bg-[#effcf9] lg:min-h-0 lg:border-l lg:border-t-0">
             <div className="relative min-h-[25rem] overflow-hidden">
-              <Image
-                src="/assets/pricing-steveston-hero.jpg"
-                alt="A bicycle beside the Steveston waterfront"
+              <CmsImage
+                srcField="hero.imageSrc"
+                altField="hero.imageAlt"
+                fallbackSrc={pricingContentDefaults["hero.imageSrc"]}
+                fallbackAlt={pricingContentDefaults["hero.imageAlt"]}
                 fill
                 priority
                 sizes="(min-width: 1024px) 55vw, 100vw"
@@ -100,44 +100,32 @@ export default function PricingPage() {
               />
             </div>
             <div className="border-t border-teal-900/15 px-5 py-7 sm:px-8 lg:px-10">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">
-                Starting hourly rates
-              </p>
+              <CmsText as="p" field="hero.rateEyebrow" fallback={pricingContentDefaults["hero.rateEyebrow"]} className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700" />
               <div className="mt-5 grid grid-cols-1 divide-y divide-teal-900/15 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                 {rentalOptions.map((option) => (
-                  <div key={option.name} className="py-4 sm:px-5 sm:py-0 first:pl-0">
-                    <p className="text-sm font-semibold text-slate-800">{option.name}</p>
+                  <div key={option.id} className="py-4 sm:px-5 sm:py-0 first:pl-0">
+                    <CmsText as="p" field={`rates.${option.id}Name`} fallback={pricingContentDefaults[`rates.${option.id}Name`]} className="text-sm font-semibold text-slate-800" />
                     <p className="mt-1 text-2xl font-bold tracking-tight text-slate-950">
-                      {option.rates[0][1]}
+                      <CmsText field={option.rateKeys[0]} fallback={pricingContentDefaults[option.rateKeys[0]]} />
                       <span className="ml-1 text-xs font-medium text-slate-500">/hour</span>
                     </p>
                   </div>
                 ))}
               </div>
-              <p className="mt-5 max-w-2xl text-xs leading-5 text-slate-600">
-                Rates are shown in CAD. Availability and the exact bike are
-                confirmed through the individual listing or directly with the shop.
-              </p>
+              <CmsText as="p" field="hero.rateNote" fallback={pricingContentDefaults["hero.rateNote"]} className="mt-5 max-w-2xl text-xs leading-5 text-slate-600" />
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-white">
+      <CmsSection sectionId="rates" label="Rental rates" className="bg-white">
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
           <div className="grid gap-6 border-b border-slate-300 pb-8 lg:grid-cols-[1fr_0.78fr] lg:items-end">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
-                Wander shop rentals
-              </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-[-0.035em] text-slate-950 sm:text-4xl">
-                Compare the full rental rates
-              </h2>
+              <CmsText as="p" field="rates.eyebrow" fallback={pricingContentDefaults["rates.eyebrow"]} className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700" />
+              <CmsText as="h2" field="rates.heading" fallback={pricingContentDefaults["rates.heading"]} className="mt-3 text-3xl font-bold tracking-[-0.035em] text-slate-950 sm:text-4xl" />
             </div>
-            <p className="text-sm leading-7 text-slate-600">
-              These prices apply to Wander Bike Rentals’ own rental service.
-              Community owners set their own prices separately.
-            </p>
+            <CmsText as="p" field="rates.body" fallback={pricingContentDefaults["rates.body"]} className="text-sm leading-7 text-slate-600" />
           </div>
 
           <div className="mt-8 overflow-x-auto border-b border-slate-300">
@@ -149,13 +137,13 @@ export default function PricingPage() {
                   </th>
                   {rentalOptions.map((option) => (
                     <th
-                      key={option.name}
+                      key={option.id}
                       scope="col"
                       className="border-l border-slate-200 px-5 py-5"
                     >
                       <span className="flex items-center gap-3 text-sm font-bold uppercase tracking-[0.08em] text-slate-950">
                         <Bike className="h-5 w-5 text-teal-700" aria-hidden="true" />
-                        {option.name}
+                        <CmsText field={`rates.${option.id}Name`} fallback={pricingContentDefaults[`rates.${option.id}Name`]} />
                       </span>
                     </th>
                   ))}
@@ -167,19 +155,19 @@ export default function PricingPage() {
                     Best for
                   </th>
                   {rentalOptions.map((option) => (
-                    <td key={option.name} className="border-l border-slate-200 px-5 py-5 text-sm leading-6 text-slate-600">
-                      {option.description}
+                    <td key={option.id} className="border-l border-slate-200 px-5 py-5 text-sm leading-6 text-slate-600">
+                      <CmsText field={`rates.${option.id}Body`} fallback={pricingContentDefaults[`rates.${option.id}Body`]} />
                     </td>
                   ))}
                 </tr>
-                {rentalOptions[0].rates.map(([label], rateIndex) => (
+                {rentalOptions[0].labels.map((label, rateIndex) => (
                   <tr key={label} className="border-b border-slate-200">
                     <th scope="row" className="px-5 py-5 text-sm font-semibold text-slate-800">
                       {label}
                     </th>
                     {rentalOptions.map((option) => (
-                      <td key={option.name} className="border-l border-slate-200 px-5 py-5 text-xl font-bold text-teal-700">
-                        {option.rates[rateIndex][1]}
+                      <td key={option.id} className="border-l border-slate-200 px-5 py-5 text-xl font-bold text-teal-700">
+                        <CmsText field={option.rateKeys[rateIndex]} fallback={pricingContentDefaults[option.rateKeys[rateIndex]]} />
                       </td>
                     ))}
                   </tr>
@@ -189,11 +177,10 @@ export default function PricingPage() {
                     Details
                   </th>
                   {rentalOptions.map((option) => (
-                    <td key={option.name} className="border-l border-slate-200 px-5 py-5">
-                      <Link href={option.href} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950 hover:text-teal-700">
-                        Rental details
+                    <td key={option.id} className="border-l border-slate-200 px-5 py-5">
+                      <CmsLink labelField="rates.detailsLabel" hrefField={`rates.${option.id}Href`} fallbackLabel={pricingContentDefaults["rates.detailsLabel"]} fallbackHref={pricingContentDefaults[`rates.${option.id}Href`]} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950 hover:text-teal-700">
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </Link>
+                      </CmsLink>
                     </td>
                   ))}
                 </tr>
@@ -201,49 +188,36 @@ export default function PricingPage() {
             </table>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="bg-slate-950 text-white">
+      <CmsSection sectionId="clarity" label="Price clarity" className="bg-slate-950 text-white">
         <div className="mx-auto grid max-w-6xl divide-y divide-white/15 px-5 sm:px-8 lg:grid-cols-2 lg:divide-x lg:divide-y-0">
           <article className="py-12 lg:pr-14">
             <div className="h-0.5 w-10 bg-teal-400" />
-            <h2 className="mt-6 text-2xl font-semibold tracking-tight">Buying a Wander bike?</h2>
-            <p className="mt-4 max-w-xl leading-7 text-slate-300">
-              There is no single Wander sale price. Every bike has a different
-              model, condition, photos, and individual sale price. Open Find a
-              Bike to see the exact amount.
-            </p>
+            <CmsText as="h2" field="clarity.wanderHeading" fallback={pricingContentDefaults["clarity.wanderHeading"]} className="mt-6 text-2xl font-semibold tracking-tight" />
+            <CmsText as="p" field="clarity.wanderBody" fallback={pricingContentDefaults["clarity.wanderBody"]} className="mt-4 max-w-xl leading-7 text-slate-300" />
           </article>
           <article className="py-12 lg:pl-14">
             <div className="h-0.5 w-10 bg-teal-400" />
-            <h2 className="mt-6 text-2xl font-semibold tracking-tight">Browsing Community Bikes?</h2>
-            <p className="mt-4 max-w-xl leading-7 text-slate-300">
-              Community owners choose their own rental and sale prices for each
-              listing. Those prices do not use the Wander shop rental rate table
-              above.
-            </p>
+            <CmsText as="h2" field="clarity.communityHeading" fallback={pricingContentDefaults["clarity.communityHeading"]} className="mt-6 text-2xl font-semibold tracking-tight" />
+            <CmsText as="p" field="clarity.communityBody" fallback={pricingContentDefaults["clarity.communityBody"]} className="mt-4 max-w-xl leading-7 text-slate-300" />
           </article>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="border-b border-teal-900/15 bg-[#effcf9]">
+      <CmsSection sectionId="cta" label="Call to action" className="border-b border-teal-900/15 bg-[#effcf9]">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_auto] lg:items-center lg:py-16">
           <div className="border-l-2 border-teal-600 pl-6">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">No online payment</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950">
-              Choose the exact bike before sending a request.
-            </h2>
-            <p className="mt-3 max-w-2xl leading-7 text-slate-600">
-              Find a Bike shows whether each listing is for rent, sale, or both.
-              Pickup, inspection, and payment happen locally.
-            </p>
+            <CmsText as="p" field="cta.eyebrow" fallback={pricingContentDefaults["cta.eyebrow"]} className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700" />
+            <CmsText as="h2" field="cta.heading" fallback={pricingContentDefaults["cta.heading"]} className="mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950" />
+            <CmsText as="p" field="cta.body" fallback={pricingContentDefaults["cta.body"]} className="mt-3 max-w-2xl leading-7 text-slate-600" />
           </div>
-          <Link href="/bikes" className="editorial-button editorial-button-primary w-full px-8 lg:w-auto">
-            Find a Bike
+          <CmsLink labelField="cta.label" hrefField="cta.href" fallbackLabel={pricingContentDefaults["cta.label"]} fallbackHref={pricingContentDefaults["cta.href"]} className="editorial-button editorial-button-primary w-full px-8 lg:w-auto">
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+          </CmsLink>
         </div>
-      </section>
+      </CmsSection>
     </main>
+    </WebsiteContentRuntime>
   );
 }

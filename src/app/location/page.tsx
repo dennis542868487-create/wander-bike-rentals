@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import {
+  CmsImage,
+  CmsLink,
+  CmsSection,
+  CmsText,
+  WebsiteContentRuntime,
+} from "@/components/website-cms/content-runtime";
 import { wanderBusinessSchema } from "@/lib/seo/wander-business";
+import { locationContentDefaults } from "@/lib/website-cms/pages/location";
+import { getWebsitePageRenderState } from "@/lib/website-cms/server";
 
 export const metadata: Metadata = {
   title: "Location and Contact",
@@ -18,62 +25,68 @@ export const metadata: Metadata = {
   },
 };
 
-const contactCards = [
-  { label: "Address", value: "12071 First Ave #101, Richmond, BC V7E 3M1" },
-  { label: "Phone", value: "(778) 952-1389" },
-  { label: "Hours", value: "9:00 AM to 10:00 PM" },
-];
+const contactCards = ["address", "phone", "hours"] as const;
 
-export default function LocationPage() {
+export default async function LocationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ websitePreview?: string }>;
+}) {
+  const { content, previewMode } = await getWebsitePageRenderState(
+    "location",
+    searchParams,
+  );
+
   return (
-    <main className="pb-20 text-slate-900">
+    <WebsiteContentRuntime initialContent={content} previewMode={previewMode}>
+    <main data-website-preview={previewMode ? "true" : undefined} className="pb-20 text-slate-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(wanderBusinessSchema) }}
       />
 
-      <section className="route-wash overflow-hidden border-b border-slate-200 bg-white">
+      <CmsSection sectionId="hero" label="Hero" className="route-wash overflow-hidden border-b border-slate-200 bg-white">
         <div className="mx-auto grid min-h-[36rem] max-w-7xl items-center gap-10 px-6 py-12 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-14">
           <div className="motion-rise">
             <h1 className="display-heading text-5xl leading-[1] sm:text-6xl">
-              Visit Wander Bike Rentals in{" "}
-              <span className="text-[var(--teal)]">Steveston.</span>
+              <CmsText field="hero.heading" fallback={locationContentDefaults["hero.heading"]} />{" "}
+              <CmsText as="span" field="hero.highlight" fallback={locationContentDefaults["hero.highlight"]} className="text-[var(--teal)]" />
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              The physical shop is still open for Wander bike rentals, local
-              bike sales, and quick repair. Check the address, hours, phone,
-              and directions before you leave.
-            </p>
+            <CmsText as="p" field="hero.body" fallback={locationContentDefaults["hero.body"]} className="mt-6 max-w-xl text-lg leading-8 text-slate-600" />
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="tel:+17789521389"
+              <CmsLink
+                labelField="hero.primaryLabel"
+                hrefField="hero.primaryHref"
+                fallbackLabel={locationContentDefaults["hero.primaryLabel"]}
+                fallbackHref={locationContentDefaults["hero.primaryHref"]}
                 className="btn-primary px-6 py-3.5 text-sm no-underline"
-              >
-                Call (778) 952-1389
-              </a>
-              <a
-                href="https://maps.google.com/?q=12071+First+Ave+%23101+Richmond+BC+V7E+3M1"
+              />
+              <CmsLink
+                labelField="hero.secondaryLabel"
+                hrefField="hero.secondaryHref"
+                fallbackLabel={locationContentDefaults["hero.secondaryLabel"]}
+                fallbackHref={locationContentDefaults["hero.secondaryHref"]}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-secondary px-6 py-3.5 text-sm no-underline"
-              >
-                Open in Google Maps
-              </a>
+              />
             </div>
             <dl className="mt-9 grid gap-4 border-t border-slate-200 pt-6 sm:grid-cols-3">
               {contactCards.map((item) => (
-                <div key={item.label}>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</dt>
-                  <dd className="mt-2 text-sm font-bold leading-6 text-[var(--navy)]">{item.value}</dd>
+                <div key={item}>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"><CmsText field={`hero.${item}Label`} fallback={locationContentDefaults[`hero.${item}Label`]} /></dt>
+                  <dd className="mt-2 text-sm font-bold leading-6 text-[var(--navy)]"><CmsText field={`hero.${item}Value`} fallback={locationContentDefaults[`hero.${item}Value`]} /></dd>
                 </div>
               ))}
             </dl>
           </div>
 
           <div className="photo-arch-right motion-rise motion-rise-delay-1 relative min-h-[27rem] overflow-hidden bg-slate-100 lg:min-h-[32rem]">
-            <Image
-              src="/assets/fishermans-wharf.webp"
-              alt="Steveston harbour near Wander Bike Rentals"
+            <CmsImage
+              srcField="hero.imageSrc"
+              altField="hero.imageAlt"
+              fallbackSrc={locationContentDefaults["hero.imageSrc"]}
+              fallbackAlt={locationContentDefaults["hero.imageAlt"]}
               fill
               priority
               sizes="(min-width: 1024px) 52vw, 100vw"
@@ -85,19 +98,15 @@ export default function LocationPage() {
             />
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+      <CmsSection sectionId="map" label="Map" className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Map</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              Find us on the map
-            </h2>
+            <CmsText as="p" field="map.eyebrow" fallback={locationContentDefaults["map.eyebrow"]} className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700" />
+            <CmsText as="h2" field="map.heading" fallback={locationContentDefaults["map.heading"]} className="mt-2 text-3xl font-bold tracking-tight text-slate-950" />
           </div>
-          <p className="max-w-xl text-sm leading-7 text-slate-600">
-            12071 First Ave #101, Richmond, BC V7E 3M1. Tap the map to open directions in Google Maps.
-          </p>
+          <CmsText as="p" field="map.body" fallback={locationContentDefaults["map.body"]} className="max-w-xl text-sm leading-7 text-slate-600" />
         </div>
         <div className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 shadow-[0_18px_50px_rgba(15,23,42,0.10)]">
           <iframe
@@ -109,84 +118,58 @@ export default function LocationPage() {
             allowFullScreen
           />
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+      <CmsSection sectionId="visit" label="Before you visit" className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Before you visit</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">The basics should be easy to confirm</h2>
-            <p className="mt-4 text-base leading-8 text-slate-600">
-              Most people just want the essentials before they leave: where the shop is, how to call, and when it is open. This section keeps those details easy to check at a glance.
-            </p>
+            <CmsText as="p" field="visit.eyebrow" fallback={locationContentDefaults["visit.eyebrow"]} className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700" />
+            <CmsText as="h2" field="visit.heading" fallback={locationContentDefaults["visit.heading"]} className="mt-2 text-3xl font-bold tracking-tight text-slate-950" />
+            <CmsText as="p" field="visit.body" fallback={locationContentDefaults["visit.body"]} className="mt-4 text-base leading-8 text-slate-600" />
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {contactCards.map((item) => (
-                <div key={item.label} className="rounded-2xl bg-[#f0fdf9] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
-                  <p className="mt-2 text-sm font-medium text-slate-900">{item.value}</p>
+                <div key={item} className="rounded-2xl bg-[#f0fdf9] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"><CmsText field={`hero.${item}Label`} fallback={locationContentDefaults[`hero.${item}Label`]} /></p>
+                  <p className="mt-2 text-sm font-medium text-slate-900"><CmsText field={`hero.${item}Value`} fallback={locationContentDefaults[`hero.${item}Value`]} /></p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,#ecfdf5_0%,#f0fdf9_100%)] p-8 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500">Related pages</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-950">Helpful next steps before you go</h2>
-            <p className="mt-4 text-base leading-8 text-slate-600">
-              Once you have the location, you may want to look at the rental pages again or check a few quick answers before visiting.
-            </p>
+            <CmsText as="p" field="visit.relatedEyebrow" fallback={locationContentDefaults["visit.relatedEyebrow"]} className="text-sm font-semibold uppercase tracking-[0.15em] text-slate-500" />
+            <CmsText as="h2" field="visit.relatedHeading" fallback={locationContentDefaults["visit.relatedHeading"]} className="mt-2 text-2xl font-semibold text-slate-950" />
+            <CmsText as="p" field="visit.relatedBody" fallback={locationContentDefaults["visit.relatedBody"]} className="mt-4 text-base leading-8 text-slate-600" />
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/" className="btn-secondary px-4 py-2 text-sm">
-                Back to Home
-              </Link>
-              <Link href="/bike-rental-richmond" className="btn-secondary px-4 py-2 text-sm">
-                Bike Rental Richmond
-              </Link>
-              <Link href="/bike-rental-steveston" className="btn-secondary px-4 py-2 text-sm">
-                Bike Rental Steveston
-              </Link>
-              <Link href="/faq" className="btn-secondary px-4 py-2 text-sm">
-                View FAQ
-              </Link>
+              {(["home", "richmond", "steveston", "faq"] as const).map((item) => (
+                <CmsLink key={item} labelField={`visit.${item}Label`} hrefField={`visit.${item}Href`} fallbackLabel={locationContentDefaults[`visit.${item}Label`]} fallbackHref={locationContentDefaults[`visit.${item}Href`]} className="btn-secondary px-4 py-2 text-sm" />
+              ))}
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+      <CmsSection sectionId="repair" label="Quick repair" className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700">Quick Repair</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-              Walk in if you need help with a common bike issue
-            </h2>
-            <p className="mt-4 text-base leading-8 text-slate-600">
-              If you need help with a flat tire, brake adjustment, gear tuning, wheel rubbing, chain cleaning, or a basic safety check, you can stop by and ask the shop to take a look.
-            </p>
-            <p className="mt-4 text-base leading-8 text-slate-600">
-              Smaller issues can often be checked quickly, and the final service depends on the bike condition after inspection.
-            </p>
+            <CmsText as="p" field="repair.eyebrow" fallback={locationContentDefaults["repair.eyebrow"]} className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-700" />
+            <CmsText as="h2" field="repair.heading" fallback={locationContentDefaults["repair.heading"]} className="mt-2 text-3xl font-bold tracking-tight text-slate-950" />
+            <CmsText as="p" field="repair.body1" fallback={locationContentDefaults["repair.body1"]} className="mt-4 text-base leading-8 text-slate-600" />
+            <CmsText as="p" field="repair.body2" fallback={locationContentDefaults["repair.body2"]} className="mt-4 text-base leading-8 text-slate-600" />
           </div>
 
           <div className="rounded-[2rem] border border-slate-200 bg-slate-950 p-8 shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300">Walk-in repair info</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-white">
-              Check repair details before you head over
-            </h2>
-            <p className="mt-4 text-base leading-8 text-slate-300">
-              Use the repair page if you want a clearer overview of common services, walk-in expectations, and what the shop may be able to check on the spot.
-            </p>
+            <CmsText as="p" field="repair.cardEyebrow" fallback={locationContentDefaults["repair.cardEyebrow"]} className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-300" />
+            <CmsText as="h2" field="repair.cardHeading" fallback={locationContentDefaults["repair.cardHeading"]} className="mt-2 text-3xl font-bold tracking-tight text-white" />
+            <CmsText as="p" field="repair.cardBody" fallback={locationContentDefaults["repair.cardBody"]} className="mt-4 text-base leading-8 text-slate-300" />
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/quick-bike-repair-richmond" className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100">
-                Quick Repair
-              </Link>
-              <a href="tel:+17789521389" className="btn-outline-light px-4 py-2 text-sm">
-                Call Now
-              </a>
+              <CmsLink labelField="repair.primaryLabel" hrefField="repair.primaryHref" fallbackLabel={locationContentDefaults["repair.primaryLabel"]} fallbackHref={locationContentDefaults["repair.primaryHref"]} className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100" />
+              <CmsLink labelField="repair.secondaryLabel" hrefField="repair.secondaryHref" fallbackLabel={locationContentDefaults["repair.secondaryLabel"]} fallbackHref={locationContentDefaults["repair.secondaryHref"]} className="btn-outline-light px-4 py-2 text-sm" />
             </div>
           </div>
         </div>
-      </section>
+      </CmsSection>
     </main>
+    </WebsiteContentRuntime>
   );
 }

@@ -382,12 +382,12 @@ export default function SiteHeader() {
           >
             <span className="overflow-hidden rounded-[1rem] border border-[var(--card-border)] bg-white p-1 shadow-[0_14px_35px_rgba(15,23,42,0.08)] sm:rounded-[1.2rem]">
               <Image
-                src="/assets/wander-logo.jpg"
+                src="/favicon.png"
                 alt="Wander Bike logo"
-                width={64}
-                height={64}
+                width={96}
+                height={96}
+                unoptimized
                 className="h-10 w-10 rounded-[0.8rem] bg-white object-contain sm:h-12 sm:w-12 sm:rounded-[0.95rem]"
-                priority
               />
             </span>
             <span className="min-w-0">

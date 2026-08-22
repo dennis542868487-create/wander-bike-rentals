@@ -46,6 +46,7 @@ const imageExtensions: Record<string, string> = {
   "image/webp": "webp",
   "image/avif": "avif",
 };
+const IMMUTABLE_IMAGE_CACHE_SECONDS = "31536000";
 
 export function ListingForm({
   userId,
@@ -134,7 +135,7 @@ export function ListingForm({
         const { error: uploadError } = await supabase.storage
           .from("bike-listing-images")
           .upload(storagePath, file, {
-            cacheControl: "3600",
+            cacheControl: IMMUTABLE_IMAGE_CACHE_SECONDS,
             contentType: file.type,
             upsert: false,
           });

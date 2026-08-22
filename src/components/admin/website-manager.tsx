@@ -596,10 +596,11 @@ export function WebsiteManager({
         <div className="flex h-full flex-col overflow-hidden">
           <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-4">
             <Image
-              src="/assets/wander-logo.jpg"
+              src="/favicon.png"
               alt="Wander Bike"
               width={42}
               height={42}
+              unoptimized
               className="h-10 w-10 rounded-full object-cover"
             />
             {!sidebarCollapsed ? (

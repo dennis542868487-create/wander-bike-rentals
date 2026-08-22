@@ -65,17 +65,32 @@ export default async function HomePage({
         <CmsSection
           sectionId="hero"
           label="Hero"
-          className="route-wash relative isolate overflow-hidden border-b border-slate-200 bg-white"
+          className="hero relative isolate overflow-hidden border-b border-white/10"
         >
-          <div className="relative mx-auto grid max-w-7xl lg:min-h-[43rem] lg:grid-cols-[0.86fr_1.14fr]">
-            <div className="motion-rise flex flex-col justify-center px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+          <div className="absolute inset-0 -z-10">
+            <CmsImage
+              srcField="hero.imageSrc"
+              altField="hero.imageAlt"
+              fallbackSrc={homeContentDefaults["hero.imageSrc"]}
+              fallbackAlt={homeContentDefaults["hero.imageAlt"]}
+              fill
+              preload
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-slate-950/76 to-emerald-950/68" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.28),transparent_46%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.16),transparent_40%)]" />
+          </div>
+
+          <div className="relative mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:min-h-[46rem] lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-10 lg:px-8 lg:py-20">
+            <div className="motion-rise max-w-3xl">
               <CmsText
                 as="div"
                 field="hero.badge"
                 fallback={homeContentDefaults["hero.badge"]}
-                className="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--teal)] sm:text-sm"
+                className="inline-flex rounded-full border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold text-teal-100 shadow-sm backdrop-blur sm:px-4 sm:text-sm"
               />
-              <h1 className="display-heading mt-4 text-[3rem] leading-[0.96] sm:text-6xl lg:text-[4.85rem]">
+              <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.02] tracking-[-0.05em] text-white sm:mt-7 sm:text-6xl lg:text-[4.4rem]">
                 <CmsText
                   field="hero.heading"
                   fallback={homeContentDefaults["hero.heading"]}
@@ -84,14 +99,14 @@ export default async function HomePage({
                   as="span"
                   field="hero.highlight"
                   fallback={homeContentDefaults["hero.highlight"]}
-                  className="block text-[var(--teal)]"
+                  className="block text-teal-200"
                 />
               </h1>
               <CmsText
                 as="p"
                 field="hero.body"
                 fallback={homeContentDefaults["hero.body"]}
-                className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg"
+                className="mt-5 max-w-2xl text-base leading-7 text-slate-100/90 sm:mt-6 sm:text-xl sm:leading-8"
               />
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <CmsLink
@@ -108,57 +123,181 @@ export default async function HomePage({
                   hrefField="hero.secondaryHref"
                   fallbackLabel={homeContentDefaults["hero.secondaryLabel"]}
                   fallbackHref={homeContentDefaults["hero.secondaryHref"]}
-                  className="btn-secondary w-full border-[var(--green)] px-7 py-3.5 text-sm text-[var(--navy)] sm:w-auto"
+                  className="btn-outline-light w-full px-7 py-3.5 text-sm sm:w-auto"
                 />
               </div>
-              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-xs font-bold text-slate-600 sm:text-sm">
+              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-white">
                 <a
                   href="tel:+17789521389"
-                  className="inline-flex items-center gap-2 transition hover:text-[var(--teal)]"
+                  className="underline decoration-white/50 underline-offset-4 transition hover:decoration-white"
                 >
-                  <PhoneCall
-                    className="h-4 w-4 text-[var(--teal)]"
-                    aria-hidden="true"
-                  />
                   Call (778) 952-1389
                 </a>
                 <a
                   href={WANDER_SHOP_DIRECTIONS_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 transition hover:text-[var(--teal)]"
+                  className="underline decoration-white/50 underline-offset-4 transition hover:decoration-white"
                 >
-                  <MapPin
-                    className="h-4 w-4 text-[var(--teal)]"
-                    aria-hidden="true"
-                  />
                   Get Directions
                 </a>
-                <span className="inline-flex items-center gap-2">
-                  <Clock3
-                    className="h-4 w-4 text-[var(--teal)]"
-                    aria-hidden="true"
-                  />
-                  9 AM–10 PM
-                </span>
+              </div>
+              <div className="mt-9 hidden gap-4 sm:grid sm:grid-cols-3">
+                {[
+                  ["Location", "Steveston, Richmond"],
+                  ["Collections", "Wander + Community"],
+                  ["Exchange", "Pickup and pay locally"],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-white/20 bg-white/10 p-4 shadow-sm backdrop-blur"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-100/80">
+                      {label}
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-white">
+                      {value}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="photo-arch-left motion-rise motion-rise-delay-1 relative min-h-[22rem] overflow-hidden bg-slate-100 sm:min-h-[30rem] lg:min-h-full">
-              <CmsImage
-                srcField="hero.imageSrc"
-                altField="hero.imageAlt"
-                fallbackSrc={homeContentDefaults["hero.imageSrc"]}
-                fallbackAlt={homeContentDefaults["hero.imageAlt"]}
-                fill
-                priority
-                sizes="(min-width: 1024px) 58vw, 100vw"
-                className="object-cover object-center"
-              />
-              <div
-                className="absolute bottom-0 right-0 h-32 w-32 bg-[var(--teal)] [clip-path:polygon(100%_0,100%_100%,0_100%)] sm:h-44 sm:w-44"
-                aria-hidden="true"
-              />
+            <div className="motion-rise motion-rise-delay-1 lg:pl-5">
+              <div className="relative isolate overflow-hidden rounded-[2rem] border border-white/25 bg-slate-950/75 p-5 text-white shadow-[0_28px_80px_rgba(2,6,23,0.42)] backdrop-blur-2xl sm:p-7">
+                <div
+                  className="pointer-events-none absolute -right-24 -top-28 -z-10 h-64 w-64 rounded-full bg-teal-400/15 blur-3xl"
+                  aria-hidden="true"
+                />
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-teal-200/30 bg-teal-300/15 text-teal-100">
+                      <Store className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-200/80">
+                        Local bike snapshot
+                      </p>
+                      <p className="mt-1 truncate text-sm text-slate-300">
+                        Steveston, Richmond
+                      </p>
+                    </div>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-200/25 bg-emerald-300/10 px-3 py-1.5 text-xs font-bold text-emerald-100">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full bg-emerald-300"
+                      aria-hidden="true"
+                    />
+                    Open today
+                  </span>
+                </div>
+
+                <h2 className="mt-6 max-w-md text-2xl font-semibold leading-tight tracking-[-0.025em] sm:text-[2rem]">
+                  The shop stays.
+                  <span className="block text-teal-200">
+                    The marketplace is new.
+                  </span>
+                </h2>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                  Choose an exact bike online, then confirm pickup and payment
+                  directly with Wander or the community owner.
+                </p>
+
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/15 bg-white/[0.07]">
+                  <a
+                    href={WANDER_SHOP_DIRECTIONS_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group flex items-center gap-3 px-4 py-4 transition hover:bg-white/10"
+                  >
+                    <MapPin
+                      className="h-5 w-5 shrink-0 text-teal-200"
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-white">
+                        Wander Bike Rentals
+                      </span>
+                      <span className="mt-1 block text-sm leading-5 text-slate-300">
+                        12071 First Ave #101, Richmond, BC V7E 3M1
+                      </span>
+                    </span>
+                    <ArrowRight
+                      className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-white"
+                      aria-hidden="true"
+                    />
+                  </a>
+
+                  <div className="grid grid-cols-2 border-t border-white/15">
+                    <a
+                      href="tel:+17789521389"
+                      className="flex items-center gap-3 border-r border-white/15 px-4 py-4 transition hover:bg-white/10"
+                    >
+                      <PhoneCall
+                        className="h-4 w-4 shrink-0 text-teal-200"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        <span className="block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-400">
+                          Call
+                        </span>
+                        <span className="mt-1 block text-sm font-semibold text-white">
+                          (778) 952-1389
+                        </span>
+                      </span>
+                    </a>
+                    <div className="flex items-center gap-3 px-4 py-4">
+                      <Clock3
+                        className="h-4 w-4 shrink-0 text-teal-200"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        <span className="block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-400">
+                          Hours
+                        </span>
+                        <span className="mt-1 block text-sm font-semibold text-white">
+                          9 AM–10 PM
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <dl className="mt-5 grid grid-cols-3 divide-x divide-white/15 border-y border-white/15 py-4">
+                  {[
+                    ["Wander bikes", "Shop managed"],
+                    ["Community", "Owner listed"],
+                    ["Payment", "In person"],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="min-w-0 px-2 first:pl-0 last:pr-0 sm:px-4"
+                    >
+                      <dt className="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-slate-400">
+                        {label}
+                      </dt>
+                      <dd className="mt-1.5 text-xs font-semibold text-teal-100 sm:text-sm">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <a
+                  href={WANDER_SHOP_DIRECTIONS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary group mt-5 min-h-12 w-full px-5 py-3 text-sm shadow-[0_12px_28px_rgba(2,6,23,0.28)] hover:-translate-y-0.5 hover:bg-teal-50"
+                >
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                  Go to Store
+                  <ArrowRight
+                    className="h-4 w-4 transition group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </CmsSection>

@@ -9,10 +9,11 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <span className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-white p-1 shadow-[0_14px_35px_rgba(15,23,42,0.18)]">
               <Image
-                src="/assets/wander-logo.jpg"
+                src="/favicon.png"
                 alt="Wander Bike Rentals logo"
-                width={56}
-                height={56}
+                width={96}
+                height={96}
+                unoptimized
                 className="h-12 w-12 rounded-[0.95rem] bg-white object-contain"
               />
             </span>

@@ -1,5 +1,20 @@
 import type { NextConfig } from "next";
 
+function getSupabaseImageHostname() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return null;
+
+  try {
+    const parsedUrl = new URL(supabaseUrl);
+    return parsedUrl.protocol === "https:" ? parsedUrl.hostname : null;
+  } catch {
+    return null;
+  }
+}
+
+const supabaseImageHostname = getSupabaseImageHostname();
+const IMAGE_MINIMUM_CACHE_TTL_SECONDS = 60 * 60 * 24 * 31;
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
@@ -36,13 +51,27 @@ const nextConfig: NextConfig = {
     ],
   },
   images: {
-    remotePatterns: [
+    deviceSizes: [640, 768, 1080, 1440, 1920],
+    imageSizes: [128, 256, 384],
+    qualities: [75],
+    minimumCacheTTL: IMAGE_MINIMUM_CACHE_TTL_SECONDS,
+    localPatterns: [
       {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/bike-listing-images/**",
+        pathname: "/assets/**",
+        search: "",
       },
     ],
+    remotePatterns: supabaseImageHostname
+      ? [
+          {
+            protocol: "https",
+            hostname: supabaseImageHostname,
+            port: "",
+            pathname: "/storage/v1/object/public/bike-listing-images/**",
+            search: "",
+          },
+        ]
+      : [],
   },
   async redirects() {
     return [

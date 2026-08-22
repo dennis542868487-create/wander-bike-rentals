@@ -23,17 +23,17 @@ export type {
 } from "@/lib/website-cms/definitions";
 
 export const homeContentDefaults: WebsiteContent = {
-  "hero.badge": "Wander Bike Rentals • Steveston waterfront",
-  "hero.heading": "Steveston bike rentals,",
-  "hero.highlight": "now with a local marketplace.",
+  "hero.badge": "Wander Bike Rentals • Steveston, Richmond",
+  "hero.heading": "Easy local bike rentals,",
+  "hero.highlight": "now with a community marketplace.",
   "hero.body":
-    "Wander Bike Rentals still operates its physical shop in Steveston. Rent or buy a Wander bike, or browse a separate collection listed by local owners.",
+    "Rent or buy a bike managed by our Steveston shop, or browse a separate collection listed by local owners. Every bike has its own photos, price, and request page.",
   "hero.primaryLabel": "Find a Bike",
   "hero.primaryHref": "/bikes",
   "hero.secondaryLabel": "List Your Bike",
   "hero.secondaryHref": "/list-your-bike",
-  "hero.imageSrc": "/assets/fishermans-wharf.webp",
-  "hero.imageAlt": "Steveston Fisherman’s Wharf waterfront",
+  "hero.imageSrc": "/assets/bikes-row.jpg",
+  "hero.imageAlt": "Rows of rental bikes inside Wander Bike Rentals",
 
   "collections.eyebrow": "Find a bike",
   "collections.heading": "Two collections, clearly separated.",

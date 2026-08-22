@@ -259,6 +259,7 @@ export function CmsImage({
   altField,
   fallbackSrc,
   fallbackAlt,
+  unoptimized = true,
   ...props
 }: Omit<ImageProps, "src" | "alt"> & {
   srcField: string;
@@ -270,7 +271,7 @@ export function CmsImage({
   return (
     <Image
       {...props}
-      unoptimized
+      unoptimized={unoptimized}
       src={content[srcField] ?? fallbackSrc}
       alt={content[altField] ?? fallbackAlt}
       data-cms-field={previewMode ? srcField : undefined}

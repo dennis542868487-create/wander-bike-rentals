@@ -75,6 +75,7 @@ export default async function HomePage({
               fallbackAlt={homeContentDefaults["hero.imageAlt"]}
               fill
               preload
+              unoptimized={false}
               sizes="100vw"
               className="object-cover object-center"
             />

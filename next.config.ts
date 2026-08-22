@@ -70,6 +70,13 @@ const nextConfig: NextConfig = {
             pathname: "/storage/v1/object/public/bike-listing-images/**",
             search: "",
           },
+          {
+            protocol: "https",
+            hostname: supabaseImageHostname,
+            port: "",
+            pathname: "/storage/v1/object/public/website-media/**",
+            search: "",
+          },
         ]
       : [],
   },

@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { CompactListingCard } from "@/components/marketplace/compact-listing-card";
+import { RentalPauseNotice } from "@/components/marketplace/rental-pause-notice";
 import { getPublicListings } from "@/lib/marketplace/data";
 import type { BikeType } from "@/lib/marketplace/types";
 
@@ -81,6 +82,10 @@ export async function LocalRentalLanding({
               </Link>
               .
             </p>
+            <RentalPauseNotice
+              className="motion-rise motion-rise-delay-2 mt-6"
+              detail="Bike browsing remains available while new rental requests are unavailable."
+            />
           </div>
 
           <div className="photo-arch-right motion-rise motion-rise-delay-1 relative min-h-[26rem] overflow-hidden bg-slate-100 lg:min-h-[34rem]">

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { RentalPauseNotice } from "@/components/marketplace/rental-pause-notice";
 
 export const metadata: Metadata = {
   title: "Reserve a Bike in Richmond",
@@ -37,6 +38,10 @@ export default function BookingPage() {
             Reservations are attached to a specific listing because every bike
             has a different price, fit, availability, and pickup arrangement.
           </p>
+          <RentalPauseNotice
+            className="mx-auto mt-8 max-w-2xl text-left"
+            detail="You can still browse bikes, and purchase inquiries remain available where offered."
+          />
         </div>
       </section>
 

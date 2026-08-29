@@ -5,6 +5,10 @@ import {
   requestReceivedRecipients,
   type StaffNotificationProfile,
 } from "@/lib/marketplace/notification-recipients";
+import {
+  RENTAL_REQUEST_STATUS,
+  rentalRequestUnavailableMessage,
+} from "@/lib/marketplace/rental-request-status";
 import { requestInputSchema } from "@/lib/marketplace/schemas";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { requireMarketplaceActor } from "@/lib/supabase/auth";
@@ -23,6 +27,12 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? "Check the request details." },
         { status: 400 },
+      );
+    }
+    if (parsed.data.intent === "rent" && !RENTAL_REQUEST_STATUS.enabled) {
+      return NextResponse.json(
+        { error: rentalRequestUnavailableMessage() },
+        { status: 503 },
       );
     }
     if (parsed.data.website) {

@@ -211,6 +211,31 @@ test("legacy commerce URLs redirect into the marketplace", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("new rental requests show the pause reason", async ({ page }) => {
+  await page.goto("/booking");
+  await expect(
+    page.getByText("Rental requests are temporarily paused."),
+  ).toBeVisible();
+  await expect(page.getByText("需要更新")).toBeVisible();
+
+  await page.goto("/bikes/wander-west-dyke-hybrid");
+  const pauseNotices = page.getByText(
+    "Rental requests are temporarily paused.",
+  );
+  await expect(pauseNotices).toHaveCount(2);
+  await expect
+    .poll(() =>
+      pauseNotices.evaluateAll((elements) =>
+        elements.some((element) => element.getClientRects().length > 0),
+      ),
+    )
+    .toBe(true);
+  await expect(page.getByText("需要更新")).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "Request to rent" }),
+  ).toHaveCount(0);
+});
+
 test("mutation routes reject cross-origin requests before auth", async ({
   request,
 }) => {

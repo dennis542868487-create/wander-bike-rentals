@@ -6,8 +6,10 @@ import { useCallback, useRef, useState, type FormEvent } from "react";
 import { DateField } from "@/components/forms/date-field";
 import { FieldError } from "@/components/forms/field-error";
 import { useFieldErrors } from "@/components/forms/use-field-errors";
+import { RentalPauseNotice } from "@/components/marketplace/rental-pause-notice";
 import { requestLiveErrors } from "@/lib/forms/live-validation";
 import { formatCad } from "@/lib/marketplace/format";
+import { RENTAL_REQUEST_STATUS } from "@/lib/marketplace/rental-request-status";
 import type { BikeListing, RequestIntent } from "@/lib/marketplace/types";
 
 type RequestListing = Pick<
@@ -41,7 +43,11 @@ export function RequestPanel({
   userEmail: string | null;
   isOwner: boolean;
 }) {
-  const canRent = listing.offerMode === "rent" || listing.offerMode === "rent_sale";
+  const supportsRent =
+    listing.offerMode === "rent" || listing.offerMode === "rent_sale";
+  const rentalRequestsPaused =
+    supportsRent && !RENTAL_REQUEST_STATUS.enabled;
+  const canRent = supportsRent && RENTAL_REQUEST_STATUS.enabled;
   const canBuy = listing.offerMode === "sale" || listing.offerMode === "rent_sale";
   const [intent, setIntent] = useState<RequestIntent>(canRent ? "rent" : "buy");
   const [busy, setBusy] = useState(false);
@@ -131,15 +137,31 @@ export function RequestPanel({
     );
   }
 
+  if (rentalRequestsPaused && !canBuy) {
+    return (
+      <aside className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6">
+        <RentalPauseNotice detail="You can still browse this bike while rental requests are unavailable." />
+      </aside>
+    );
+  }
+
   if (!signedIn) {
     return (
       <aside className="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-6">
-        <LockKeyhole className="h-6 w-6 text-teal-700" aria-hidden="true" />
+        {rentalRequestsPaused ? (
+          <RentalPauseNotice detail="Purchase inquiries remain available for this bike." />
+        ) : null}
+        <LockKeyhole
+          className={`h-6 w-6 text-teal-700 ${rentalRequestsPaused ? "mt-5" : ""}`}
+          aria-hidden="true"
+        />
         <h2 className="mt-4 text-xl font-bold text-slate-950">
-          Sign in to send a request
+          {rentalRequestsPaused
+            ? "Sign in to ask about buying"
+            : "Sign in to send a request"}
         </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          One free account lets you request bikes and publish your own.
+          One free account lets you contact the owner and publish your own bike.
         </p>
         <Link
           href={`/auth?next=${encodeURIComponent(`/bikes/${listing.slug}`)}`}
@@ -183,16 +205,17 @@ export function RequestPanel({
         )}
       </div>
 
-      {canRent && canBuy ? (
+      {supportsRent && canBuy ? (
         <div className="mt-5 grid grid-cols-2 rounded-xl bg-slate-100 p-1">
           <button
             type="button"
             onClick={() => setIntent("rent")}
+            disabled={rentalRequestsPaused}
             className={`rounded-lg px-3 py-2.5 text-sm font-bold ${
               intent === "rent" ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
-            }`}
+            } disabled:cursor-not-allowed disabled:text-slate-400`}
           >
-            Rent
+            {rentalRequestsPaused ? "Rent · Paused" : "Rent"}
           </button>
           <button
             type="button"
@@ -204,6 +227,13 @@ export function RequestPanel({
             Buy
           </button>
         </div>
+      ) : null}
+
+      {rentalRequestsPaused ? (
+        <RentalPauseNotice
+          className="mt-5"
+          detail="Purchase inquiries remain available for this bike."
+        />
       ) : null}
 
       <div className="mt-5 rounded-xl bg-teal-50 p-4 text-sm text-teal-950">

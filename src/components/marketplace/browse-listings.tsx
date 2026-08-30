@@ -2,6 +2,7 @@ import {
   ArrowRight,
   Bike,
   Check,
+  CirclePause,
   MapPin,
   PackageCheck,
   Search,
@@ -14,7 +15,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { CompactListingCard } from "@/components/marketplace/compact-listing-card";
+import { RentalPauseNotice } from "@/components/marketplace/rental-pause-notice";
 import { bikeTypeLabel } from "@/lib/marketplace/format";
+import { RENTAL_REQUEST_STATUS } from "@/lib/marketplace/rental-request-status";
 import {
   bikeTypes,
   type BikeListing,
@@ -72,7 +75,11 @@ function ListingFilters({
           className="market-select"
         >
           <option value="all">All offers</option>
-          <option value="rent">Rent a bike</option>
+          <option value="rent">
+            {RENTAL_REQUEST_STATUS.enabled
+              ? "Rent a bike"
+              : "Rent a bike — paused"}
+          </option>
           <option value="sale">Buy a bike</option>
         </select>
       </label>
@@ -131,6 +138,8 @@ export function BrowseListings({
   filters: BrowseFilters;
 }) {
   const isWander = source === "wander";
+  const rentalRequestsPaused = !RENTAL_REQUEST_STATUS.enabled;
+  const filteringRentals = filters.intent === "rent";
   const basePath = isWander ? "/bikes/wander" : "/bikes/community";
   const availableBikeCount = listings.reduce(
     (total, listing) => total + listing.availableQuantity,
@@ -168,6 +177,24 @@ export function BrowseListings({
               Choose Wander Bikes from our Steveston shop or browse Community
               Bikes listed separately by local owners.
             </p>
+            {rentalRequestsPaused ? (
+              <div
+                role="status"
+                className="mt-5 inline-flex max-w-xl items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-bold leading-5 text-amber-950 shadow-sm sm:mt-6 sm:text-base"
+              >
+                <CirclePause
+                  className="h-5 w-5 shrink-0 text-amber-700"
+                  aria-hidden="true"
+                />
+                <span>
+                  Bike rentals are temporarily paused.{" "}
+                  <span className="whitespace-nowrap">
+                    Reason:{" "}
+                    <span lang="zh-Hant">{RENTAL_REQUEST_STATUS.reason}</span>
+                  </span>
+                </span>
+              </div>
+            ) : null}
           </div>
           <div className="marketplace-browse-media photo-arch-right motion-rise motion-rise-delay-1 relative min-h-[11.5rem] overflow-hidden bg-slate-100 sm:min-h-[17rem] lg:min-h-[23rem]">
             <Image
@@ -192,8 +219,12 @@ export function BrowseListings({
               </p>
               <p className="mt-1.5 text-sm font-bold leading-6 text-[var(--navy)]">
                 {isWander
-                  ? "Pick up at our Steveston shop after your request is confirmed."
-                  : "Request first, then arrange a safe local meetup directly."}
+                  ? rentalRequestsPaused
+                    ? "Browse our shop bikes while new rental requests are paused."
+                    : "Pick up at our Steveston shop after your request is confirmed."
+                  : rentalRequestsPaused
+                    ? "Browse owner-listed bikes while new rental requests are paused."
+                    : "Request first, then arrange a safe local meetup directly."}
               </p>
             </div>
             <div
@@ -245,7 +276,9 @@ export function BrowseListings({
                   }`}
                 >
                   {isWander
-                    ? "Shop-managed, checked daily, and rental-ready."
+                    ? rentalRequestsPaused
+                      ? "Shop-managed and checked daily · rentals temporarily paused."
+                      : "Shop-managed, checked daily, and rental-ready."
                     : "Managed directly by our Steveston shop."}
                 </span>
               </span>
@@ -276,7 +309,9 @@ export function BrowseListings({
                     </span>
                     <span className="min-w-0">
                       <span className="block text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-teal-300">
-                        Included with every rental
+                        {rentalRequestsPaused
+                          ? "Included when rentals resume"
+                          : "Included with every rental"}
                       </span>
                       <span className="mt-1 block text-sm font-semibold leading-5 text-white">
                         Helmet, basket &amp; lock.
@@ -393,16 +428,24 @@ export function BrowseListings({
           hasFilters={hasFilters}
         />
 
+        <RentalPauseNotice
+          prominent
+          className="mt-6"
+          detail="We are updating the rental service and are not accepting new rental requests right now. You can still browse bikes, and purchase inquiries remain available where a bike is listed for sale."
+        />
+
         <div className="mb-5 mt-8 flex items-center justify-between gap-4">
           <h2 className="text-sm font-semibold text-slate-600">
             {availableBikeCount} {availableBikeCount === 1 ? "bike" : "bikes"}
             {isWander && listings.length !== availableBikeCount
               ? ` across ${listings.length} listings`
               : ""}{" "}
-            available
+            {rentalRequestsPaused && filteringRentals ? "shown" : "available"}
           </h2>
           <p className="hidden text-xs text-slate-500 sm:block">
-            Prices belong to each individual bike
+            {rentalRequestsPaused
+              ? "Rental requests paused · purchase inquiries remain available where listed"
+              : "Prices belong to each individual bike"}
           </p>
         </div>
 

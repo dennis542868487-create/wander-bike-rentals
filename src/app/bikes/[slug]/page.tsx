@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ListingPhoto } from "@/components/marketplace/listing-photo";
+import { RentalPauseNotice } from "@/components/marketplace/rental-pause-notice";
 import { RequestPanel } from "@/components/marketplace/request-panel";
 import {
   bikeTypeLabel,
@@ -21,6 +22,7 @@ import {
   sourceLabel,
 } from "@/lib/marketplace/format";
 import { getPublicListingBySlug } from "@/lib/marketplace/data";
+import { RENTAL_REQUEST_STATUS } from "@/lib/marketplace/rental-request-status";
 import { WANDER_SHOP_LISTING_DEFAULTS } from "@/lib/marketplace/wander-shop";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
@@ -53,6 +55,7 @@ export default async function BikeDetailPage({
 
   const canRent = listing.offerMode === "rent" || listing.offerMode === "rent_sale";
   const canBuy = listing.offerMode === "sale" || listing.offerMode === "rent_sale";
+  const rentalPaused = canRent && !RENTAL_REQUEST_STATUS.enabled;
 
   return (
     <main className="min-h-screen bg-[var(--background)]">
@@ -67,6 +70,14 @@ export default async function BikeDetailPage({
             {listing.source === "wander" ? "Wander Bikes" : "Community Bikes"}
           </Link>
         </nav>
+
+        {rentalPaused ? (
+          <RentalPauseNotice
+            prominent
+            className="mt-6"
+            detail="We are updating the rental service and are not accepting new rental requests right now. Purchase inquiries remain available when this bike is also listed for sale."
+          />
+        ) : null}
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
           <div className="min-w-0">
@@ -101,7 +112,11 @@ export default async function BikeDetailPage({
                   {sourceLabel(listing.source)}
                 </span>
                 <span className="rounded-md bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-800">
-                  {offerModeLabel(listing.offerMode)}
+                  {rentalPaused
+                    ? canBuy
+                      ? "Buy available · rental paused"
+                      : "Rental paused"
+                    : offerModeLabel(listing.offerMode)}
                 </span>
                 <span className="text-xs font-semibold text-slate-500">
                   {bikeTypeLabel(listing.bikeType)}
@@ -115,7 +130,16 @@ export default async function BikeDetailPage({
               </p>
 
               <div className="mt-7 flex flex-wrap gap-x-9 gap-y-4 border-y border-slate-100 py-6">
-                {canRent && listing.rentalHourlyCents !== null ? (
+                {rentalPaused ? (
+                  <div>
+                    <p className="text-lg font-bold text-amber-800">
+                      Rental paused
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      Rental service is being updated
+                    </p>
+                  </div>
+                ) : canRent && listing.rentalHourlyCents !== null ? (
                   <div>
                     <p className="text-2xl font-bold text-slate-950">
                       {formatCad(listing.rentalHourlyCents)}
@@ -123,7 +147,7 @@ export default async function BikeDetailPage({
                     <p className="text-sm text-slate-500">per hour</p>
                   </div>
                 ) : null}
-                {canRent && listing.rentalDailyCents !== null ? (
+                {!rentalPaused && canRent && listing.rentalDailyCents !== null ? (
                   <div>
                     <p className="text-2xl font-bold text-slate-950">
                       {formatCad(listing.rentalDailyCents)}
@@ -173,10 +197,12 @@ export default async function BikeDetailPage({
                   <div>
                     <dt className="text-sm font-bold text-slate-950">Availability</dt>
                     <dd className="mt-1 text-sm text-slate-600">
-                      {listing.availabilitySummary ??
-                        (listing.source === "wander"
-                          ? WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary
-                          : "Confirm dates with the owner")}
+                      {rentalPaused
+                        ? "Rental requests paused while the service is updated"
+                        : listing.availabilitySummary ??
+                          (listing.source === "wander"
+                            ? WANDER_SHOP_LISTING_DEFAULTS.availabilitySummary
+                            : "Confirm dates with the owner")}
                     </dd>
                   </div>
                 </div>

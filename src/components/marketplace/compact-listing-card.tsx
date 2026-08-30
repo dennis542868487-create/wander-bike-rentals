@@ -1,10 +1,18 @@
-import { ArrowRight, Bike, MapPin, Store, UsersRound } from "lucide-react";
+import {
+  ArrowRight,
+  Bike,
+  CirclePause,
+  MapPin,
+  Store,
+  UsersRound,
+} from "lucide-react";
 import Link from "next/link";
 import {
   listingPriceLines,
   offerModeLabel,
   sourceLabel,
 } from "@/lib/marketplace/format";
+import { RENTAL_REQUEST_STATUS } from "@/lib/marketplace/rental-request-status";
 import type { BikeListing } from "@/lib/marketplace/types";
 import { ListingPhoto } from "@/components/marketplace/listing-photo";
 
@@ -16,8 +24,19 @@ export function CompactListingCard({
   priority?: boolean;
 }) {
   const prices = listingPriceLines(listing);
-  const rentalPrices = prices.filter((price) => price.label !== "buy");
+  const supportsRent =
+    listing.offerMode === "rent" || listing.offerMode === "rent_sale";
+  const rentalPaused = supportsRent && !RENTAL_REQUEST_STATUS.enabled;
+  const visiblePrices = rentalPaused
+    ? prices.filter((price) => price.label === "buy")
+    : prices;
+  const rentalPrices = visiblePrices.filter((price) => price.label !== "buy");
   const salePrice = prices.find((price) => price.label === "buy");
+  const displayOfferMode = rentalPaused
+    ? listing.offerMode === "rent_sale"
+      ? "Buy available · rental paused"
+      : "Rental paused"
+    : offerModeLabel(listing.offerMode);
 
   return (
     <Link
@@ -35,6 +54,12 @@ export function CompactListingCard({
         <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-1 text-[0.65rem] font-extrabold text-[var(--navy)] shadow-sm backdrop-blur sm:left-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs">
           {listing.availableQuantity} available
         </span>
+        {rentalPaused ? (
+          <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-amber-600 px-2 py-1 text-[0.62rem] font-extrabold text-white shadow-sm sm:right-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs">
+            <CirclePause className="h-3 w-3" aria-hidden="true" />
+            Rental paused
+          </span>
+        ) : null}
         <div
           className={`absolute bottom-0 right-0 h-6 w-16 sm:h-8 sm:w-24 ${
             listing.source === "wander"
@@ -55,7 +80,7 @@ export function CompactListingCard({
             <span className="truncate">{sourceLabel(listing.source)}</span>
           </span>
           <span className="hidden shrink-0 text-slate-500 sm:inline">
-            {offerModeLabel(listing.offerMode)}
+            {displayOfferMode}
           </span>
         </div>
         <div className="mt-2 flex items-start justify-between gap-2 sm:gap-3">
@@ -74,8 +99,14 @@ export function CompactListingCard({
           </p>
         ) : null}
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:mt-4 sm:items-end sm:gap-4 sm:pt-4">
-          {prices.length > 0 ? (
+          {prices.length > 0 || rentalPaused ? (
             <div className="grid min-w-0 gap-0.5 sm:hidden">
+              {rentalPaused ? (
+                <span className="inline-flex items-center gap-1 text-[0.62rem] font-bold text-amber-700">
+                  <CirclePause className="h-3 w-3" aria-hidden="true" />
+                  Rental paused
+                </span>
+              ) : null}
               {rentalPrices.length > 0 ? (
                 <span className="flex min-w-0 items-baseline gap-x-1 whitespace-nowrap text-[0.58rem] text-slate-500">
                   {rentalPrices.map((price) => (
@@ -99,7 +130,13 @@ export function CompactListingCard({
             </div>
           ) : null}
           <div className="hidden flex-wrap gap-x-4 gap-y-2 sm:flex">
-            {prices.map((price) => (
+            {rentalPaused ? (
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-700">
+                <CirclePause className="h-4 w-4" aria-hidden="true" />
+                Rental paused
+              </span>
+            ) : null}
+            {visiblePrices.map((price) => (
               <span key={price.label} className="text-sm">
                 <strong
                   className={

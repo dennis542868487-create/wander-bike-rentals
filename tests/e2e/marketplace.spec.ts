@@ -214,26 +214,40 @@ test("legacy commerce URLs redirect into the marketplace", async ({ page }) => {
 test("new rental requests show the pause reason", async ({ page }) => {
   await page.goto("/booking");
   await expect(
-    page.getByText("Rental requests are temporarily paused."),
+    page.getByText("Bike rentals are temporarily paused."),
   ).toBeVisible();
   await expect(page.getByText("需要更新")).toBeVisible();
 
   await page.goto("/bikes/wander-west-dyke-hybrid");
-  const pauseNotices = page.getByText(
-    "Rental requests are temporarily paused.",
-  );
-  await expect(pauseNotices).toHaveCount(2);
-  await expect
-    .poll(() =>
-      pauseNotices.evaluateAll((elements) =>
-        elements.some((element) => element.getClientRects().length > 0),
-      ),
-    )
-    .toBe(true);
-  await expect(page.getByText("需要更新")).toHaveCount(2);
+  const detailPauseNotice = page.locator("#rental-service-status");
+  await expect(
+    detailPauseNotice.getByRole("heading", {
+      level: 2,
+      name: "Bike rentals are temporarily paused.",
+    }),
+  ).toBeVisible();
+  await expect(
+    detailPauseNotice.getByText("需要更新"),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Request to rent" }),
   ).toHaveCount(0);
+
+  await page.goto("/bikes/wander?intent=rent&type=all&sort=newest");
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "Bike rentals are temporarily paused.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator("#rental-service-status").getByText("需要更新"),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Rental paused", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(page.locator('select[name="intent"]').first()).toHaveValue("rent");
+  await expect(page.getByText(/\/hour$/)).toHaveCount(0);
 });
 
 test("mutation routes reject cross-origin requests before auth", async ({
